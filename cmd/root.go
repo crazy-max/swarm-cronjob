@@ -40,8 +40,11 @@ func cronRun(cmd *cobra.Command, args []string) {
 		Logger.Error().Err(err).Msg("Cannot retrieve scheduled services")
 	}
 
-	l, _ := time.LoadLocation(GetEnv("TZ", "UTC"))
-	c := cron.NewWithLocation(l)
+	loc, err := time.LoadLocation(GetEnv("TZ", "UTC"))
+	if err != nil {
+		Logger.Fatal().Err(err).Msgf("Failed to load time zone %s", GetEnv("TZ", "UTC"))
+	}
+	c := cron.NewWithLocation(loc)
 	for _, service := range services {
 		if err := UpdateJob(service, dcli, c); err != nil {
 			Logger.Error().Err(err).Msgf("Cannot update job for service %s", service.Spec.Name)
