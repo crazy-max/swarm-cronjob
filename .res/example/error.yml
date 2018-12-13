@@ -1,0 +1,14 @@
+version: "3.5"
+
+services:
+  test:
+    image: busybox
+    command: exit 1
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 * * * * *"
+        - "swarm.cronjob.skip-running=false"
+      replicas: 0
+      restart_policy:
+        condition: none

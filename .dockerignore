@@ -1,0 +1,15 @@
+/.idea
+/*.iml
+
+/.dev
+/.git
+/.github
+/.res
+/bin
+/.editorconfig
+/.gitignore
+/.travis.yml
+/build.sh
+/CHANGELOG.md
+/LICENSE
+/README.md
