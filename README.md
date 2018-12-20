@@ -42,7 +42,7 @@ $ docker service create --name swarm_cronjob \
   --env "LOG_LEVEL=info" \
   --env "LOG_NOCOLOR=false" \
   --constraint "node.role == manager" \
-  crazy-max/swarm-cronjob
+  crazymax/swarm-cronjob
 ```
 
 Alternatively, you can deploy the stack [swarm_cronjob.yml](.res/example/swarm_cronjob.yml) :
