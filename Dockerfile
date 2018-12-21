@@ -1,12 +1,14 @@
+FROM golang:1.11.2 as builder
+
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 
-FROM golang:1.11 as builder
 WORKDIR /app
 COPY go.mod .
 COPY go.sum .
-RUN go mod download
+RUN go version \
+  && go mod download
 COPY . ./
 RUN cp /usr/local/go/lib/time/zoneinfo.zip ./ \
   && CGO_ENABLED=0 GOOS=linux go build \
@@ -14,6 +16,10 @@ RUN cp /usr/local/go/lib/time/zoneinfo.zip ./ \
   -v -o swarm-cronjob
 
 FROM scratch
+
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
 
 LABEL maintainer="CrazyMax" \
   org.label-schema.build-date=$BUILD_DATE \
