@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -53,11 +54,11 @@ func Service(c *client.Client, name string) (swarm.Service, error) {
 	services, err := c.ServiceList(context.Background(), types.ServiceListOptions{
 		Filters: svcFilters,
 	})
-	if err != nil {
-		return swarm.Service{}, err
+	if services == nil || len(services) == 0 {
+		return swarm.Service{}, errors.New("No matching service found for " + name)
 	}
 
-	return services[0], nil
+	return services[0], err
 }
 
 // RunService runs a cron based service

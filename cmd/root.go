@@ -20,6 +20,7 @@ var rootCmd = &cobra.Command{
 	Run: cronRun,
 }
 
+// Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		Logger.Error().Err(err).Msg("rootCmd failed")
@@ -46,8 +47,8 @@ func cronRun(cmd *cobra.Command, args []string) {
 	}
 	c := cron.NewWithLocation(loc)
 	for _, service := range services {
-		if err := UpdateJob(service, dcli, c); err != nil {
-			Logger.Error().Err(err).Msgf("Cannot update job for service %s", service.Spec.Name)
+		if _, err := CrudJob(service.Spec.Name, dcli, c); err != nil {
+			Logger.Error().Err(err).Msgf("Cannot manage job for service %s", service.Spec.Name)
 		}
 	}
 	c.Start()
@@ -81,16 +82,13 @@ func cronRun(cmd *cobra.Command, args []string) {
 				continue
 			}
 			Logger.Debug().Msgf("Event triggered for %s (newstate='%s' oldstate='%s')", event.Service, event.UpdateState.New, event.UpdateState.Old)
-			service, err := Service(dcli, event.Service)
+			processed, err := CrudJob(event.Service, dcli, c)
 			if err != nil {
-				Logger.Error().Err(err).Msgf("Cannot find service %s", event.Service)
+				Logger.Error().Err(err).Msgf("Cannot manage job for service %s", event.Service)
 				continue
+			} else if processed {
+				Logger.Debug().Msgf("Number of cronjob tasks : %d", len(c.Entries()))
 			}
-			if err := UpdateJob(service, dcli, c); err != nil {
-				Logger.Error().Err(err).Msgf("Cannot update job for service %s", event.Service)
-				continue
-			}
-			Logger.Debug().Msgf("Number of cronjob tasks : %d", len(c.Entries()))
 		}
 	}
 }
