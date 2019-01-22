@@ -27,8 +27,8 @@ about: Create a report to help us improve
 
 ### Docker info
 
-> Output of command docker info
+> Output of command `docker info`
 
 ### Logs
 
-> Service logs (set LOG_LEVEL to debug)
+> swarm-cronjob service logs (set LOG_LEVEL to debug) and cron based service logs if useful
