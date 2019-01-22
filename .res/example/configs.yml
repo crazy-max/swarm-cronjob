@@ -1,0 +1,21 @@
+version: "3.5"
+
+services:
+  test:
+    image: busybox
+    command: cat /app/config.txt
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 * * * * *"
+        - "swarm.cronjob.skip-running=false"
+      replicas: 0
+      restart_policy:
+        condition: none
+    configs:
+      - source: my_config
+        target: /app/config.txt
+
+configs:
+  my_config:
+    file: ./config.txt
