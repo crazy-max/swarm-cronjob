@@ -1,4 +1,4 @@
-package app
+package internal
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type ServiceEvent struct {
 
 // DockerEnvClient initializes a new Docker API client based on environment variables
 func DockerEnvClient() (*client.Client, error) {
-	c, err := client.NewEnvClient()
+	c, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.12"))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func Service(c *client.Client, name string) (swarm.Service, error) {
 
 // RunService runs a cron based service
 func RunService(c *client.Client, name string, skipRunning bool) {
-	service, _, err := c.ServiceInspectWithRaw(context.Background(), name)
+	service, _, err := c.ServiceInspectWithRaw(context.Background(), name, types.ServiceInspectOptions{})
 	if err != nil {
 		Logger.Error().Err(err).Msgf("Cannot inspect service %s", name)
 	}

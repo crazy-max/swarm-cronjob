@@ -1,4 +1,4 @@
-package app
+package internal
 
 // Application config
 var (
@@ -6,5 +6,5 @@ var (
 	AppDescription = "Create jobs on a time-based schedule on Swarm"
 	AppPackage     = "github.com/crazy-max/swarm-cronjob"
 	AppUrl         = "https://" + AppPackage
-	AppVersion     = "0.1.0"
+	AppVersion     = "0.0.0"
 )

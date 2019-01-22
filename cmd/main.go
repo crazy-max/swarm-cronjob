@@ -1,34 +1,22 @@
-package cmd
+package main
 
 import (
 	"context"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
 	"github.com/crazy-max/cron"
-	. "github.com/crazy-max/swarm-cronjob/app"
+	. "github.com/crazy-max/swarm-cronjob/internal"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use: AppName,
-	Run: cronRun,
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		Logger.Error().Err(err).Msg("rootCmd failed")
-		os.Exit(1)
-	}
-}
-
-func cronRun(cmd *cobra.Command, args []string) {
+func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	Logger.Info().Msgf("Starting %s v%s", AppName, AppVersion)
 
 	dcli, err := DockerEnvClient()
@@ -41,10 +29,13 @@ func cronRun(cmd *cobra.Command, args []string) {
 		Logger.Error().Err(err).Msg("Cannot retrieve scheduled services")
 	}
 
+	// Set timezone
 	loc, err := time.LoadLocation(GetEnv("TZ", "UTC"))
 	if err != nil {
 		Logger.Fatal().Err(err).Msgf("Failed to load time zone %s", GetEnv("TZ", "UTC"))
 	}
+
+	// Start cron
 	c := cron.NewWithLocation(loc)
 	for _, service := range services {
 		if _, err := CrudJob(service.Spec.Name, dcli, c); err != nil {

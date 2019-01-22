@@ -7,13 +7,14 @@ ARG VERSION
 WORKDIR /app
 COPY go.mod .
 COPY go.sum .
-RUN go version \
-  && go mod download
+RUN go version
+RUN go mod download
 COPY . ./
 RUN cp /usr/local/go/lib/time/zoneinfo.zip ./ \
   && CGO_ENABLED=0 GOOS=linux go build \
-  -ldflags "-w -s -X 'github.com/crazy-max/swarm-cronjob/app/config.AppVersion=${VERSION}'" \
-  -v -o swarm-cronjob
+  -ldflags "-w -s \
+    -X 'github.com/crazy-max/swarm-cronjob/internal.AppVersion=${VERSION}'" \
+  -v -o swarm-cronjob cmd/main.go
 
 FROM scratch
 
