@@ -8,7 +8,7 @@ BUILD_WORKINGDIR=${BUILD_WORKINGDIR:-.}
 DOCKERFILE=${DOCKERFILE:-Dockerfile}
 VCS_REF=${TRAVIS_COMMIT::8}
 RUNNING_TIMEOUT=120
-RUNNING_LOG_CHECK="Number of cronjob tasks : 3"
+RUNNING_LOG_CHECK="Number of cronjob tasks : 4"
 
 PUSH_LATEST=${PUSH_LATEST:-true}
 DOCKER_USERNAME=${DOCKER_USERNAME:-crazymax}
@@ -66,6 +66,7 @@ docker swarm init --advertise-addr ${ADVERTISE_ADDR:-192.168.99.100}
 docker stack deploy date -c .res/example/date.yml
 docker stack deploy sleep -c .res/example/sleep.yml
 docker stack deploy error -c .res/example/error.yml
+docker stack deploy configs -c .res/example/configs.yml
 docker service create --name ${PROJECT} \
   --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
   --env "LOG_LEVEL=debug" \
