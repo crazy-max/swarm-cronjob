@@ -1,4 +1,4 @@
-FROM golang:1.11.2 as builder
+FROM golang:1.11.5 as builder
 
 ARG BUILD_DATE
 ARG VCS_REF
