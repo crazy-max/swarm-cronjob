@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 (2019/01/24)
+
+* Upgrade to Go 1.11.5
+* Update `go.sum` after go@1.11.4 symlink fix (golang/go#29278)
+
 ## 0.2.0 (2019/01/22)
 
 * Add support for Docker API [1.38](https://docs.docker.com/engine/api/v1.38/) (Issue #3)

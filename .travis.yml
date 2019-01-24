@@ -5,7 +5,7 @@ services:
 
 env:
   global:
-    - VERSION=0.2.0
+    - VERSION=0.2.1
     - DOCKER_LOGIN=crazymax
     - DOCKER_USERNAME=crazymax
     - DOCKER_REPONAME=swarm-cronjob
