@@ -71,8 +71,6 @@ Once ready, deploy your cron stack on the swarm cluster :
 
 ### Logs
 
-Now check the logs of your services :
-
 ```
 $ docker service logs swarm_cronjob_app
 swarm_cronjob_app.1.nvsjbhdhiagl@default    | Thu, 13 Dec 2018 20:04:37 UTC INF Starting swarm-cronjob v0.1.0
