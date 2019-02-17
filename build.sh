@@ -25,11 +25,11 @@ if [[ ${TRAVIS_PULL_REQUEST} == "true" ]]; then
   BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
 fi
 DOCKER_TAG=${BRANCH:-local}
-if [[ "$BRANCH" == "master" ]]; then
+if [[ "$BRANCH" == "local" ]]; then
+  BUILD_DATE=
+else
   DOCKER_TAG=latest
   VERSION=${VERSION#v}
-elif [[ "$BRANCH" == "local" ]]; then
-  BUILD_DATE=
 fi
 
 echo "PROJECT=${PROJECT}"
