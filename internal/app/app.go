@@ -91,8 +91,6 @@ func (sc *SwarmCronjob) Run() error {
 
 // crudJob adds, updates or removes cron job service
 func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
-	sublogger := log.With().Str("service", serviceName).Logger()
-
 	// Find existing job
 	var jobEntry *cron.Entry
 	for _, entry := range sc.cron.Entries() {
