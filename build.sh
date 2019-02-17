@@ -100,7 +100,7 @@ echo
 docker swarm leave --force > /dev/null 2>&1 || true
 
 if [ "${VERSION}" == "dev" -o "${TRAVIS_PULL_REQUEST}" == "true" ]; then
-  echo "INFO: This is a PR or a dev build, skipping push..."
+  echo "INFO: This is a PR or an untagged build, skipping push..."
   exit 0
 fi
 if [[ ! -z ${DOCKER_PASSWORD} ]]; then

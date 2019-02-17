@@ -1,5 +1,6 @@
 package model
 
+// Job holds service job details
 type Job struct {
 	Name        string
 	Enable      bool
