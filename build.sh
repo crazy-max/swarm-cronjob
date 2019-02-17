@@ -2,6 +2,7 @@
 set -e
 
 PROJECT=swarm-cronjob
+VERSION=${TRAVIS_TAG:-dev}
 BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 BUILD_TAG=docker_build
 BUILD_WORKINGDIR=${BUILD_WORKINGDIR:-.}
@@ -18,7 +19,7 @@ QUAY_USERNAME=${QUAY_USERNAME:-crazymax}
 QUAY_LOGIN=${QUAY_LOGIN:-crazymax}
 QUAY_REPONAME=${QUAY_REPONAME:-swarm-cronjob}
 
-# Check local or travis
+# Check dev or travis
 BRANCH=${TRAVIS_BRANCH:-local}
 if [[ ${TRAVIS_PULL_REQUEST} == "true" ]]; then
   BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
@@ -26,9 +27,9 @@ fi
 DOCKER_TAG=${BRANCH:-local}
 if [[ "$BRANCH" == "master" ]]; then
   DOCKER_TAG=latest
+  VERSION=${VERSION#v}
 elif [[ "$BRANCH" == "local" ]]; then
   BUILD_DATE=
-  VERSION=local
 fi
 
 echo "PROJECT=${PROJECT}"
@@ -51,8 +52,14 @@ echo "BRANCH=${BRANCH}"
 echo "DOCKER_TAG=${DOCKER_TAG}"
 echo
 
-# Build
-echo "### Build"
+echo "### Goreleaser"
+if [[ -n "$TRAVIS_TAG" ]]; then
+  goreleaser release --skip-publish --rm-dist
+  else
+  goreleaser release --snapshot --rm-dist
+fi
+
+echo "### Docker build"
 docker build \
   --build-arg BUILD_DATE=${BUILD_DATE} \
   --build-arg VCS_REF=${VCS_REF} \
@@ -92,8 +99,8 @@ done < <(docker service logs -f ${PROJECT} 2>&1)
 echo
 docker swarm leave --force > /dev/null 2>&1 || true
 
-if [ "${VERSION}" == "local" -o "${TRAVIS_PULL_REQUEST}" == "true" ]; then
-  echo "INFO: This is a PR or a local build, skipping push..."
+if [ "${VERSION}" == "dev" -o "${TRAVIS_PULL_REQUEST}" == "true" ]; then
+  echo "INFO: This is a PR or a dev build, skipping push..."
   exit 0
 fi
 if [[ ! -z ${DOCKER_PASSWORD} ]]; then

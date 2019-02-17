@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.0.0 (2019/02/16)
+## 1.0.0 (2019/02/17)
 
 * Add JSON log output
+* Deliver artifacts through goreleaser
 * Review project structure
 
 ## 0.2.1 (2019/01/24)

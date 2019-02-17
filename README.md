@@ -32,7 +32,7 @@
 
 ## Quickstart
 
-### Deploy swarm-cronjob
+### Swarm cluster
 
 Create a service that uses the swarm-cronjob image :
 
@@ -48,8 +48,6 @@ $ docker service create --name swarm_cronjob \
 Alternatively, you can deploy the stack [swarm_cronjob.yml](.res/example/swarm_cronjob.yml) :
 
 `docker stack deploy -c swarm_cronjob.yml swarm_cronjob`
-
-### Deploy a stack
 
 Now that we have a swarm-cronjob instance up and running, we will deploy new services.
 
@@ -69,7 +67,38 @@ Once ready, deploy your cron stack on the swarm cluster :
 
 > :bulb: More examples can be found [here](.res/example)
 
-### Logs
+### Without Docker
+
+swarm-cronjob binaries are available in [releases](https://github.com/crazy-max/swarm-cronjob/releases) page.
+
+Choose the archive matching the destination platform and extract swarm-cronjob:
+
+```
+$ cd /opt
+$ wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/1.0.0/swarm-cronjob_1.0.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+```
+
+After getting the binary, it can be tested with `swarm-cronjob --help` or moved to a permanent location.
+When launched manually, swarm-cronjob can be killed using `Ctrl+C`:
+
+```
+$ swarm-cronjob --help
+usage: swarm-cronjob [<flags>]
+
+Create jobs on a time-based schedule on Swarm. More info on
+https://github.com/crazy-max/swarm-cronjob
+
+Flags:
+  --help              Show context-sensitive help (also try --help-long and --help-man).
+  --timezone="UTC"    Timezone assigned to the scheduler.
+  --log-level="info"  Set log level.
+  --log-json          Enable JSON logging output.
+  --version           Show application version.
+```
+
+## Logs
+
+Here is a sample output:
 
 ```
 $ docker service logs swarm_cronjob_app
