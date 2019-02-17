@@ -4,6 +4,8 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Microsoft/go-winio v0.4.11 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
+	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
+	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/crazy-max/cron v1.2.1
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
@@ -11,18 +13,19 @@ require (
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/google/go-cmp v0.2.0 // indirect
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/mux v1.6.2 // indirect
+	github.com/gorilla/mux v1.7.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/rs/zerolog v1.11.0
 	github.com/sirupsen/logrus v1.3.0 // indirect
-	golang.org/x/net v0.0.0-20190119204137-ed066c81e75e // indirect
-	golang.org/x/sys v0.0.0-20190123074212-c6b37f3e9285 // indirect
+	github.com/stretchr/testify v1.3.0 // indirect
+	golang.org/x/net v0.0.0-20190213061140-3a22650c66bd // indirect
+	golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c // indirect
 	google.golang.org/grpc v1.18.0 // indirect
+	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gotest.tools v2.2.0+incompatible // indirect
 )
 

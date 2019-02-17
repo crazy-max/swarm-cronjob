@@ -70,7 +70,7 @@ docker stack deploy configs -c .res/example/configs.yml
 docker service create --name ${PROJECT} \
   --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
   --env "LOG_LEVEL=debug" \
-  --env "LOG_NOCOLOR=true" \
+  --env "LOG_JSON=false" \
   --constraint 'node.role == manager' \
   ${BUILD_TAG}
 echo

@@ -12,9 +12,8 @@ RUN go mod download
 COPY . ./
 RUN cp /usr/local/go/lib/time/zoneinfo.zip ./ \
   && CGO_ENABLED=0 GOOS=linux go build \
-  -ldflags "-w -s \
-    -X 'github.com/crazy-max/swarm-cronjob/internal.AppVersion=${VERSION}'" \
-  -v -o swarm-cronjob cmd/main.go
+    -ldflags "-w -s -X 'main.version=${VERSION}'" \
+    -v -o swarm-cronjob cmd/main.go
 
 FROM scratch
 

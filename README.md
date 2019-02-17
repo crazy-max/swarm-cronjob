@@ -28,7 +28,7 @@
 
 * `TZ` : The timezone assigned to the scheduler (default `UTC`)
 * `LOG_LEVEL` : Log level (default `info`)
-* `LOG_NOCOLOR` : Disables the colorized output (default `false`)
+* `LOG_JSON` : Enable JSON logging output (default `false`)
 
 ## Quickstart
 
@@ -40,7 +40,7 @@ Create a service that uses the swarm-cronjob image :
 $ docker service create --name swarm_cronjob \
   --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
   --env "LOG_LEVEL=info" \
-  --env "LOG_NOCOLOR=false" \
+  --env "LOG_JSON=false" \
   --constraint "node.role == manager" \
   crazymax/swarm-cronjob
 ```

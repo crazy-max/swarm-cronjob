@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0 (2019/02/16)
+
+* Add JSON log output
+* Review project structure
+
 ## 0.2.1 (2019/01/24)
 
 * Upgrade to Go 1.11.5

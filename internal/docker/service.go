@@ -1,4 +1,4 @@
-package internal
+package docker
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
-	"github.com/docker/docker/client"
 )
 
 // ServiceEvent represents attributes of a Docker service event
@@ -19,19 +18,8 @@ type ServiceEvent struct {
 	} `mapstructure:",squash"`
 }
 
-// DockerEnvClient initializes a new Docker API client based on environment variables
-func DockerEnvClient() (*client.Client, error) {
-	c, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.12"))
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = c.ServerVersion(context.Background())
-	return c, err
-}
-
 // ScheduledServices returns the list of scheduled Docker services based on swarm-cronjob labels
-func ScheduledServices(c *client.Client) ([]swarm.Service, error) {
+func (c *Client) ScheduledServices() ([]swarm.Service, error) {
 	svcFilters := filters.NewArgs()
 	svcFilters.Add("label", "swarm.cronjob.enable")
 	svcFilters.Add("label", "swarm.cronjob.schedule")
@@ -47,7 +35,7 @@ func ScheduledServices(c *client.Client) ([]swarm.Service, error) {
 }
 
 // Service returns a Docker service
-func Service(c *client.Client, name string) (swarm.Service, error) {
+func (c *Client) Service(name string) (swarm.Service, error) {
 	svcFilters := filters.NewArgs()
 	svcFilters.Add("name", name)
 
@@ -61,33 +49,8 @@ func Service(c *client.Client, name string) (swarm.Service, error) {
 	return services[0], err
 }
 
-// RunService runs a cron based service
-func RunService(c *client.Client, name string, skipRunning bool) {
-	service, _, err := c.ServiceInspectWithRaw(context.Background(), name, types.ServiceInspectOptions{})
-	if err != nil {
-		Logger.Error().Err(err).Msgf("Cannot inspect service %s", name)
-	}
-
-	svcExitCode, svcStatus := ServiceStatus(c, service.ID)
-
-	if skipRunning && svcStatus == "running" {
-		Logger.Warn().Msgf("Skip %s (exit %d ; %s)", name, svcExitCode, svcStatus)
-		return
-	}
-
-	Logger.Info().Msgf("Start %s (exit %d ; %s)", name, svcExitCode, svcStatus)
-
-	serviceSpec := service.Spec
-	*serviceSpec.Mode.Replicated.Replicas = 1                    // Only 1 replica is necessary
-	serviceSpec.TaskTemplate.ForceUpdate = service.Version.Index // Set ForceUpdate with Version to ensure update
-	_, err = c.ServiceUpdate(context.Background(), service.ID, service.Version, serviceSpec, types.ServiceUpdateOptions{})
-	if err != nil {
-		Logger.Error().Err(err).Msgf("Cannot update service %s", name)
-	}
-}
-
 // ServiceStatus returns service exit code and status
-func ServiceStatus(c *client.Client, id string) (int, string) {
+func (c *Client) ServiceStatus(id string) (int, string) {
 	taskFilter := filters.NewArgs()
 	taskFilter.Add("service", id)
 

@@ -1,85 +1,67 @@
 package main
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
 
-	"github.com/crazy-max/cron"
-	. "github.com/crazy-max/swarm-cronjob/internal"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/mitchellh/mapstructure"
+	"github.com/crazy-max/swarm-cronjob/internal/app"
+	"github.com/crazy-max/swarm-cronjob/internal/logging"
+	"github.com/crazy-max/swarm-cronjob/internal/model"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/alecthomas/kingpin.v2"
+)
+
+var (
+	sc      *app.SwarmCronjob
+	flags   model.Flags
+	version = "dev"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	Logger.Info().Msgf("Starting %s v%s", AppName, AppVersion)
 
-	dcli, err := DockerEnvClient()
+	// Parse command line
+	kingpin.Flag("timezone", "Timezone assigned to the scheduler.").Envar("TZ").Default("UTC").StringVar(&flags.Timezone)
+	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
+	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJson)
+	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
+	kingpin.CommandLine.Name = "swarm-cronjob"
+	kingpin.CommandLine.Help = `Create jobs on a time-based schedule on Swarm. More info on https://github.com/crazy-max/swarm-cronjob`
+	kingpin.Parse()
+
+	// Load timezone location
+	location, err := time.LoadLocation(flags.Timezone)
 	if err != nil {
-		Logger.Fatal().Err(err).Msg("Cannot create Docker client")
+		log.Panic().Err(err).Msgf("Cannot load timezone %s", flags.Timezone)
 	}
 
-	services, err := ScheduledServices(dcli)
-	if err != nil {
-		Logger.Error().Err(err).Msg("Cannot retrieve scheduled services")
-	}
-
-	// Set timezone
-	loc, err := time.LoadLocation(GetEnv("TZ", "UTC"))
-	if err != nil {
-		Logger.Fatal().Err(err).Msgf("Failed to load time zone %s", GetEnv("TZ", "UTC"))
-	}
-
-	// Start cron
-	c := cron.NewWithLocation(loc)
-	for _, service := range services {
-		if _, err := CrudJob(service.Spec.Name, dcli, c); err != nil {
-			Logger.Error().Err(err).Msgf("Cannot manage job for service %s", service.Spec.Name)
-		}
-	}
-	c.Start()
+	// Init
+	logging.Configure(&flags, location)
+	log.Info().Msgf("Starting swarm-cronjob %s", version)
 
 	// Handle os signals
 	channel := make(chan os.Signal)
 	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-channel
-		c.Stop()
+		sig := <-channel
+		if sc != nil {
+			sc.Close()
+		}
+		log.Warn().Msgf("Caught signal %v", sig)
 		os.Exit(1)
 	}()
 
-	// Listen Docker events
-	filter := filters.NewArgs()
-	filter.Add("type", "service")
+	// Init
+	sc, err = app.New(location)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Cannot initialize swarm-cronjob")
+	}
 
-	msgs, errs := dcli.Events(context.Background(), types.EventsOptions{
-		Filters: filter,
-	})
-
-	var event ServiceEvent
-	for {
-		select {
-		case err := <-errs:
-			Logger.Fatal().Err(err).Msg("Event channel failed")
-		case msg := <-msgs:
-			err := mapstructure.Decode(msg.Actor.Attributes, &event)
-			if err != nil {
-				Logger.Warn().Msgf("Cannot decode event, %v", err)
-				continue
-			}
-			Logger.Debug().Msgf("Event triggered for %s (newstate='%s' oldstate='%s')", event.Service, event.UpdateState.New, event.UpdateState.Old)
-			processed, err := CrudJob(event.Service, dcli, c)
-			if err != nil {
-				Logger.Error().Err(err).Msgf("Cannot manage job for service %s", event.Service)
-				continue
-			} else if processed {
-				Logger.Debug().Msgf("Number of cronjob tasks : %d", len(c.Entries()))
-			}
-		}
+	// Run
+	if err := sc.Run(); err != nil {
+		log.Panic().Err(err).Msg("")
 	}
 }
