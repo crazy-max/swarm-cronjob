@@ -75,7 +75,7 @@ Choose the archive matching the destination platform and extract swarm-cronjob:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/v1.0.0/swarm-cronjob_1.0.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+$ wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/v1.1.0/swarm-cronjob_1.1.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
 After getting the binary, it can be tested with `./swarm-cronjob --help` or moved to a permanent location.

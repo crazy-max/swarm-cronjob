@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 (2019/03/21)
+
+* Upgrade to Go 1.12.1
+
 ## 1.0.0 (2019/02/17)
 
 * Add JSON log output
