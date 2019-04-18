@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/crazy-max/swarm-cronjob" target="_blank"><img height="292"src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.res/swarm-cronjob.png"></a></p>
+<p align="center"><a href="https://github.com/crazy-max/swarm-cronjob" target="_blank"><img height="292"src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.res/swarm-cronjob.jpg"></a></p>
 
 <p align="center">
   <a href="https://microbadger.com/images/crazymax/swarm-cronjob"><img src="https://images.microbadger.com/badges/version/crazymax/swarm-cronjob.svg?style=flat-square" alt="Version"></a>
