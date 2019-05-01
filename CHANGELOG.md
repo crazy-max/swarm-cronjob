@@ -1,8 +1,14 @@
 # Changelog
 
+## 1.2.0 (2019/05/01)
+
+* Skip completed tasks while checking status (Issue #4)
+* Update Docker client and some libs
+* Go 1.12.4
+
 ## 1.1.0 (2019/03/21)
 
-* Upgrade to Go 1.12.1
+* Go 1.12.1
 
 ## 1.0.0 (2019/02/17)
 
@@ -12,7 +18,7 @@
 
 ## 0.2.1 (2019/01/24)
 
-* Upgrade to Go 1.11.5
+* Go 1.11.5
 * Update `go.sum` after go@1.11.4 symlink fix (golang/go#29278)
 
 ## 0.2.0 (2019/01/22)
