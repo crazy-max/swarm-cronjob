@@ -77,10 +77,14 @@ func (sc *SwarmCronjob) Run() error {
 				log.Warn().Msgf("Cannot decode event, %v", err)
 				continue
 			}
-			log.Debug().Msgf("Event triggered for %s (newstate='%s' oldstate='%s')", event.Service, event.UpdateState.New, event.UpdateState.Old)
+			log.Debug().
+				Str("service", event.Service).
+				Str("newstate", event.UpdateState.New).
+				Str("oldstate", event.UpdateState.Old).
+				Msg("Event triggered")
 			processed, err := sc.crudJob(event.Service)
 			if err != nil {
-				log.Error().Err(err).Msgf("Cannot manage job for service %s", event.Service)
+				log.Error().Str("service", event.Service).Err(err).Msg("Cannot manage job")
 				continue
 			} else if processed {
 				log.Debug().Msgf("Number of cronjob tasks : %d", len(sc.cron.Entries()))
@@ -104,10 +108,10 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	service, err := sc.docker.Service(serviceName)
 	if err != nil {
 		if jobEntry != nil {
-			log.Debug().Msgf("Remove cronjob for service %s", serviceName)
+			log.Debug().Str("service", serviceName).Msg("Remove cronjob")
 			return true, sc.cron.Remove(jobEntry.Name)
 		}
-		log.Debug().Msgf("Service %s does not exist (removed)", serviceName)
+		log.Debug().Str("service", serviceName).Msg("Service does not exist (removed)")
 		return false, nil
 	}
 
@@ -127,14 +131,14 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		case "swarm.cronjob.enable":
 			wc.Job.Enable, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.enable for service %s", labelKey, service.Spec.Name)
+				log.Error().Str("service", service.Spec.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.enable", labelKey)
 			}
 		case "swarm.cronjob.schedule":
 			wc.Job.Schedule = labelValue
 		case "swarm.cronjob.skip-running":
 			wc.Job.SkipRunning, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running for service %s", labelKey, service.Spec.Name)
+				log.Error().Str("service", service.Spec.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running", labelKey)
 			}
 		}
 	}
@@ -142,10 +146,10 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	// Disabled or non-cron service
 	if !wc.Job.Enable {
 		if jobEntry != nil {
-			log.Debug().Msgf("Disable cronjob for service %s", service.Spec.Name)
+			log.Debug().Str("service", service.Spec.Name).Msg("Disable cronjob")
 			return true, sc.cron.Remove(jobEntry.Name)
 		}
-		log.Debug().Msgf("Cronjob disabled for service %s", service.Spec.Name)
+		log.Debug().Str("service", service.Spec.Name).Msg("Cronjob disabled")
 		return false, nil
 	}
 
@@ -154,9 +158,9 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		if err := sc.cron.Remove(jobEntry.Name); err != nil {
 			return true, err
 		}
-		log.Debug().Msgf("Update cronjob for service %s with schedule %s", service.Spec.Name, wc.Job.Schedule)
+		log.Debug().Str("service", service.Spec.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
-		log.Info().Msgf("Add cronjob for service %s with schedule %s", service.Spec.Name, wc.Job.Schedule)
+		log.Info().Str("service", service.Spec.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
 	}
 
 	return true, sc.cron.AddJob(wc.Job.Schedule, wc, wc.Job.Name)

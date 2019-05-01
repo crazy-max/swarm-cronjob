@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/rs/zerolog/log"
 )
 
 // ServiceEvent represents attributes of a Docker service event
@@ -49,8 +50,8 @@ func (c *Client) Service(name string) (swarm.Service, error) {
 	return services[0], err
 }
 
-// ServiceStatus returns service exit code and status
-func (c *Client) ServiceStatus(id string) (int, string) {
+// ServiceTaskStatus returns latest service task status
+func (c *Client) ServiceTaskStatus(id string) string {
 	taskFilter := filters.NewArgs()
 	taskFilter.Add("service", id)
 
@@ -58,8 +59,9 @@ func (c *Client) ServiceStatus(id string) (int, string) {
 		Filters: taskFilter,
 	})
 
-	exitCode := 1
-	status := ""
+	ltask := swarm.Task{}
+	exitCode := -1
+	status := "n/a"
 	stopStates := []swarm.TaskState{
 		swarm.TaskStateComplete,
 		swarm.TaskStateFailed,
@@ -67,6 +69,12 @@ func (c *Client) ServiceStatus(id string) (int, string) {
 	}
 
 	for _, task := range tasks {
+		// skip completed tasks
+		if task.Status.State == swarm.TaskStateComplete {
+			continue
+		}
+		ltask = task
+		status = string(task.Status.State)
 		stop := false
 		for _, stopState := range stopStates {
 			if task.Status.State == stopState {
@@ -74,7 +82,6 @@ func (c *Client) ServiceStatus(id string) (int, string) {
 				break
 			}
 		}
-		status = string(task.Status.State)
 		if stop {
 			exitCode = task.Status.ContainerStatus.ExitCode
 			if exitCode == 0 && task.Status.State == swarm.TaskStateRejected {
@@ -84,5 +91,14 @@ func (c *Client) ServiceStatus(id string) (int, string) {
 		break
 	}
 
-	return exitCode, status
+	log.Debug().
+		Str("node_id", ltask.NodeID).
+		Str("service_id", id).
+		Str("task_id", ltask.ID).
+		Int("exit_code", exitCode).
+		Str("status_message", ltask.Status.Message).
+		Str("status_state", status).
+		Msg("Service task")
+
+	return status
 }
