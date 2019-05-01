@@ -2,8 +2,9 @@ version: "3.2"
 
 services:
   test:
-    image: busybox
-    command: sleep 70
+    image: crazymax/loop
+    environment:
+      - DURATION=70s
     deploy:
       labels:
         - "swarm.cronjob.enable=true"
