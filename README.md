@@ -54,6 +54,7 @@ Now that we have a swarm-cronjob instance up and running, we will deploy new ser
 Create a new stack based on [this one (date)](.res/example/date.yml). You can include any configuration as long as you abide with the following conditions :
 
 * Set `command` to run the task command
+* Set `mode` to `replicated` (default)
 * Set `replicas` to `0` to avoid running task as soon as the service is deployed
 * Set `restart_policy.condition` to `none`. This is needed for a cronjob, otherwise the task will restart automatically
 * Add labels to tell *swarm-cronjob* that your service is a cronjob :
