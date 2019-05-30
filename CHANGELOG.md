@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 (2019/05/30)
+
+* Fix nil pointer (Issue #7)
+
 ## 1.2.0 (2019/05/01)
 
 * Skip completed tasks while checking status (Issue #4)
