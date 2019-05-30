@@ -29,12 +29,16 @@ func (c *Client) Run() {
 		return
 	}
 
+	if service.Spec.Mode.Replicated == nil {
+		log.Error().Str("service", c.Job.Name).Err(err).Msg("Only replicated mode is supported")
+		return
+	}
+
 	log.Info().Str("service", c.Job.Name).Str("last_status", status).Msg("Start job")
 
-	serviceSpec := service.Spec
-	*serviceSpec.Mode.Replicated.Replicas = 1                    // Only 1 replica is necessary
-	serviceSpec.TaskTemplate.ForceUpdate = service.Version.Index // Set ForceUpdate with Version to ensure update
-	_, err = c.Docker.ServiceUpdate(context.Background(), service.ID, service.Version, serviceSpec, types.ServiceUpdateOptions{})
+	*service.Spec.Mode.Replicated.Replicas = 1                    // Only 1 replica is necessary
+	service.Spec.TaskTemplate.ForceUpdate = service.Version.Index // Set ForceUpdate with Version to ensure update
+	_, err = c.Docker.ServiceUpdate(context.Background(), service.ID, service.Version, service.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot update")
 	}
