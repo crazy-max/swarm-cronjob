@@ -6,10 +6,11 @@ services:
     environment:
       - DURATION=70s
     deploy:
+      mode: replicated
+      replicas: 0
       labels:
         - "swarm.cronjob.enable=true"
         - "swarm.cronjob.schedule=0 * * * * *"
         - "swarm.cronjob.skip-running=true"
-      replicas: 0
       restart_policy:
         condition: none
