@@ -15,7 +15,7 @@ require (
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gorilla/mux v1.7.0 // indirect
-	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84 // indirect
+	github.com/hako/durafmt v0.0.0-20190612201238-650ed9f29a84
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
@@ -29,4 +29,4 @@ require (
 	gotest.tools v2.2.0+incompatible // indirect
 )
 
-replace github.com/docker/docker => github.com/docker/engine v0.0.0-20190219214528-cbe11bdc6da8
+replace github.com/docker/docker => github.com/docker/engine v0.0.0-20190620014054-c513a4c6c298
