@@ -5,13 +5,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/crazy-max/cron"
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/hako/durafmt"
 	"github.com/mitchellh/mapstructure"
+	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,6 +21,7 @@ type SwarmCronjob struct {
 	docker   *docker.Client
 	cron     *cron.Cron
 	location *time.Location
+	jobs     map[string]cron.EntryID
 }
 
 // New creates new swarm-cronjob instance
@@ -27,13 +29,11 @@ func New(location *time.Location) (*SwarmCronjob, error) {
 	log.Debug().Msg("Creating Docker API client")
 	d, err := docker.NewEnvClient()
 
-	log.Debug().Msg("Creating Cron job runner")
-	c := cron.NewWithLocation(location)
-
 	return &SwarmCronjob{
 		docker:   d,
-		cron:     c,
+		cron:     cron.New(cron.WithLocation(location), cron.WithSeconds()),
 		location: location,
+		jobs:     make(map[string]cron.EntryID),
 	}, err
 }
 
@@ -96,20 +96,15 @@ func (sc *SwarmCronjob) Run() error {
 // crudJob adds, updates or removes cron job service
 func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	// Find existing job
-	var jobEntry *cron.Entry
-	for _, entry := range sc.cron.Entries() {
-		if entry.Name == serviceName {
-			jobEntry = entry
-			break
-		}
-	}
+	jobID, jobFound := sc.jobs[serviceName]
 
 	// Check service exists
 	service, err := sc.docker.Service(serviceName)
 	if err != nil {
-		if jobEntry != nil {
+		if jobFound {
 			log.Debug().Str("service", serviceName).Msg("Remove cronjob")
-			return true, sc.cron.Remove(jobEntry.Name)
+			sc.removeJob(serviceName, jobID)
+			return true, nil
 		}
 		log.Debug().Str("service", serviceName).Msg("Service does not exist (removed)")
 		return false, nil
@@ -145,25 +140,29 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 
 	// Disabled or non-cron service
 	if !wc.Job.Enable {
-		if jobEntry != nil {
+		if jobFound {
 			log.Debug().Str("service", service.Spec.Name).Msg("Disable cronjob")
-			return true, sc.cron.Remove(jobEntry.Name)
+			sc.removeJob(serviceName, jobID)
+			return true, nil
 		}
 		log.Debug().Str("service", service.Spec.Name).Msg("Cronjob disabled")
 		return false, nil
 	}
 
 	// Add/Update job
-	if jobEntry != nil {
-		if err := sc.cron.Remove(jobEntry.Name); err != nil {
-			return true, err
-		}
+	if jobFound {
+		sc.removeJob(serviceName, jobID)
 		log.Debug().Str("service", service.Spec.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
 		log.Info().Str("service", service.Spec.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
 	}
 
-	return true, sc.cron.AddJob(wc.Job.Schedule, wc, wc.Job.Name)
+	sc.jobs[serviceName], err = sc.cron.AddJob(wc.Job.Schedule, wc)
+	log.Info().Str("service", service.Spec.Name).Msgf("Next run in %s (%s)",
+		durafmt.ParseShort(sc.cron.Entry(jobID).Next.Sub(time.Now())).String(),
+		sc.cron.Entry(jobID).Next)
+
+	return true, err
 }
 
 // Close closes swarm-cronjob
@@ -171,4 +170,9 @@ func (sc *SwarmCronjob) Close() {
 	if sc.cron != nil {
 		sc.cron.Stop()
 	}
+}
+
+func (sc *SwarmCronjob) removeJob(serviceName string, id cron.EntryID) {
+	delete(sc.jobs, serviceName)
+	sc.cron.Remove(id)
 }
