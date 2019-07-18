@@ -5,7 +5,7 @@ services:
     image: docker:18.09.7
     command: ["docker", "info", "--format=NodeID: {{ json .Swarm.NodeID }}"]
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       mode: global
       labels:
