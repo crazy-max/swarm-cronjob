@@ -1,0 +1,16 @@
+version: "3.2"
+
+services:
+  test:
+    image: docker:18.09.7
+    command: ["docker", "info", "--format=NodeID: {{ json .Swarm.NodeID }}"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0/10 * * * * *"
+        - "swarm.cronjob.skip-running=false"
+      restart_policy:
+        condition: none

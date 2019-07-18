@@ -10,7 +10,6 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/hako/durafmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
@@ -40,7 +39,12 @@ func New(location *time.Location) (*SwarmCronjob, error) {
 // Run starts swarm-cronjob process
 func (sc *SwarmCronjob) Run() error {
 	// Find scheduled services
-	services, err := sc.docker.ScheduledServices()
+	services, err := sc.docker.ServiceList(&model.ServiceListArgs{
+		Labels: []string{
+			"swarm.cronjob.enable",
+			"swarm.cronjob.schedule",
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -48,8 +52,8 @@ func (sc *SwarmCronjob) Run() error {
 
 	// Add services as cronjobs
 	for _, service := range services {
-		if _, err := sc.crudJob(service.Spec.Name); err != nil {
-			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Spec.Name)
+		if _, err := sc.crudJob(service.Name); err != nil {
+			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Name)
 		}
 	}
 
@@ -62,11 +66,11 @@ func (sc *SwarmCronjob) Run() error {
 	filter := filters.NewArgs()
 	filter.Add("type", "service")
 
-	msgs, errs := sc.docker.Events(context.Background(), types.EventsOptions{
+	msgs, errs := sc.docker.Cli.Events(context.Background(), types.EventsOptions{
 		Filters: filter,
 	})
 
-	var event docker.ServiceEvent
+	var event model.ServiceEvent
 	for {
 		select {
 		case err := <-errs:
@@ -87,7 +91,7 @@ func (sc *SwarmCronjob) Run() error {
 				log.Error().Str("service", event.Service).Err(err).Msg("Cannot manage job")
 				continue
 			} else if processed {
-				log.Debug().Msgf("Number of cronjob tasks : %d", len(sc.cron.Entries()))
+				log.Debug().Msgf("Number of cronjob tasks: %d", len(sc.cron.Entries()))
 			}
 		}
 	}
@@ -114,26 +118,26 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	wc := &worker.Client{
 		Docker: sc.docker,
 		Job: model.Job{
-			Name:        service.Spec.Name,
+			Name:        service.Name,
 			Enable:      false,
 			SkipRunning: false,
 		},
 	}
 
 	// Seek swarm.cronjob labels
-	for labelKey, labelValue := range service.Spec.Labels {
+	for labelKey, labelValue := range service.Labels {
 		switch labelKey {
 		case "swarm.cronjob.enable":
 			wc.Job.Enable, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Str("service", service.Spec.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.enable", labelKey)
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.enable", labelKey)
 			}
 		case "swarm.cronjob.schedule":
 			wc.Job.Schedule = labelValue
 		case "swarm.cronjob.skip-running":
 			wc.Job.SkipRunning, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Str("service", service.Spec.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running", labelKey)
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running", labelKey)
 			}
 		}
 	}
@@ -141,27 +145,28 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	// Disabled or non-cron service
 	if !wc.Job.Enable {
 		if jobFound {
-			log.Debug().Str("service", service.Spec.Name).Msg("Disable cronjob")
+			log.Debug().Str("service", service.Name).Msg("Disable cronjob")
 			sc.removeJob(serviceName, jobID)
 			return true, nil
 		}
-		log.Debug().Str("service", service.Spec.Name).Msg("Cronjob disabled")
+		log.Debug().Str("service", service.Name).Msg("Cronjob disabled")
 		return false, nil
 	}
 
 	// Add/Update job
 	if jobFound {
 		sc.removeJob(serviceName, jobID)
-		log.Debug().Str("service", service.Spec.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
+		log.Debug().Str("service", service.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
-		log.Info().Str("service", service.Spec.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
+		log.Info().Str("service", service.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
 	}
 
-	sc.jobs[serviceName], err = sc.cron.AddJob(wc.Job.Schedule, wc)
-	log.Info().Str("service", service.Spec.Name).Msgf("Next run in %s (%s)",
-		durafmt.ParseShort(sc.cron.Entry(jobID).Next.Sub(time.Now())).String(),
-		sc.cron.Entry(jobID).Next)
+	jobID, err = sc.cron.AddJob(wc.Job.Schedule, wc)
+	if err != nil {
+		return false, err
+	}
 
+	sc.jobs[serviceName] = jobID
 	return true, err
 }
 
