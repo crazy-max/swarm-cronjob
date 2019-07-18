@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0-beta.1 (2019/07/18)
+
+* Add support for global mode (Issue #7)
+* Use v3 robfig/cron
+* Docker client v18.09.7
+
 ## 1.2.1 (2019/05/30)
 
 * Fix nil pointer (Issue #7)
