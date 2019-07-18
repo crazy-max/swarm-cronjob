@@ -66,6 +66,17 @@ Once ready, deploy your cron stack on the swarm cluster :
 
 `docker stack deploy -c date.yml date`
 
+You can also use global mode services with swarm-cronjob. A typical use-case would be to remove unused data on your nodes using `docker system prune` command periodically.
+
+To do so, create a new stack based on [this one (global)](.res/example/global.yml). Same conditions have to be applied as `replicated` mode excepted :
+
+* Set `mode` to `global`
+* Remove `replicas` field as this is only used with `replicated` mode
+
+Once ready, deploy your global cron stack on the swarm cluster :
+
+`docker stack deploy -c global.yml global`
+
 > :bulb: More examples can be found [here](.res/example)
 
 ### Without Docker
