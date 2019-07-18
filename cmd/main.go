@@ -26,7 +26,7 @@ func main() {
 	// Parse command line
 	kingpin.Flag("timezone", "Timezone assigned to the scheduler.").Envar("TZ").Default("UTC").StringVar(&flags.Timezone)
 	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
-	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJson)
+	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJSON)
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
 	kingpin.CommandLine.Name = "swarm-cronjob"
 	kingpin.CommandLine.Help = `Create jobs on a time-based schedule on Swarm. More info on https://github.com/crazy-max/swarm-cronjob`

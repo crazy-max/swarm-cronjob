@@ -4,5 +4,5 @@ package model
 type Flags struct {
 	Timezone string
 	LogLevel string
-	LogJson  bool
+	LogJSON  bool
 }

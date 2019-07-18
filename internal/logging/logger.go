@@ -19,7 +19,7 @@ func Configure(fl *model.Flags, location *time.Location) {
 		return time.Now().In(location)
 	}
 
-	if !fl.LogJson {
+	if !fl.LogJSON {
 		w = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
 			TimeFormat: time.RFC1123,

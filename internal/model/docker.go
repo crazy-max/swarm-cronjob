@@ -6,7 +6,7 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-// ServiceEvent represents attributes of a Docker service event
+// ServiceEvent represents attributes of a service event
 type ServiceEvent struct {
 	Service     string `mapstructure:"name"`
 	UpdateState struct {
@@ -15,11 +15,13 @@ type ServiceEvent struct {
 	} `mapstructure:",squash"`
 }
 
+// ServiceListArgs are options to list services
 type ServiceListArgs struct {
 	Name   string
 	Labels []string
 }
 
+// ServiceInfo represents attributes of a service
 type ServiceInfo struct {
 	Raw          swarm.Service
 	ID           string
@@ -34,13 +36,16 @@ type ServiceInfo struct {
 	UpdateStatus string
 }
 
+// ServiceMode is a service mode
 type ServiceMode string
 
+// Services modes available
 const (
 	ServiceModeReplicated = ServiceMode("replicated")
 	ServiceModeGlobal     = ServiceMode("global")
 )
 
+// TaskInfo represents attributes of a task
 type TaskInfo struct {
 	swarm.Task
 	NodeName    string
