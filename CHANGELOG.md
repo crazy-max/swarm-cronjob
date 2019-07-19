@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 (2019/07/19)
+
+* Docker client v18.09.8
+
 ## 1.3.0-beta.1 (2019/07/18)
 
 * Add support for global mode (Issue #7)
