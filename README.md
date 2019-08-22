@@ -16,6 +16,8 @@
 
 **swarm-cronjob** creates jobs on a time-based schedule on [Swarm](https://docs.docker.com/engine/swarm/) with a dedicated service in a distributed manner that configures itself automatically and dynamically through [labels](https://docs.docker.com/engine/reference/commandline/service_create/#set-metadata-on-a-service--l---label) and Docker API.
 
+💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
+
 ## Features
 
 * Continuously updates its configuration (no restart)
@@ -88,7 +90,7 @@ Choose the archive matching the destination platform and extract swarm-cronjob:
 
 ```
 $ cd /opt
-$ wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/v1.1.0/swarm-cronjob_1.1.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+$ wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/v1.3.0/swarm-cronjob_1.3.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
 After getting the binary, it can be tested with `./swarm-cronjob --help` or moved to a permanent location.
