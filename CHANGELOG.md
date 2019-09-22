@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.0 (2019/09/22)
+
+* Log removed/disabled services
+* Docker client v19.03.2
+* Use GOPROXY
+* Stop publishing Docker image on Quay
+* Add multi-platform Docker images
+* Switch to GitHub Actions
+* Add instructions to create a Linux service
+
 ## 1.3.0 (2019/07/19)
 
 * Docker client v18.09.8
