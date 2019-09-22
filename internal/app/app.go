@@ -106,7 +106,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	service, err := sc.docker.Service(serviceName)
 	if err != nil {
 		if jobFound {
-			log.Debug().Str("service", serviceName).Msg("Remove cronjob")
+			log.Info().Str("service", serviceName).Msg("Remove cronjob")
 			sc.removeJob(serviceName, jobID)
 			return true, nil
 		}
@@ -145,7 +145,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	// Disabled or non-cron service
 	if !wc.Job.Enable {
 		if jobFound {
-			log.Debug().Str("service", service.Name).Msg("Disable cronjob")
+			log.Info().Str("service", service.Name).Msg("Disable cronjob")
 			sc.removeJob(serviceName, jobID)
 			return true, nil
 		}
