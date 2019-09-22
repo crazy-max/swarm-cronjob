@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/badge/dynamic/json.svg?label=version&query=$.results[1].name&url=https://hub.docker.com/v2/repositories/crazymax/swarm-cronjob/tags&style=flat-square" alt="Latest Version"></a>
-  <a href="https://travis-ci.com/crazy-max/swarm-cronjob"><img src="https://img.shields.io/travis/com/crazy-max/swarm-cronjob/master.svg?style=flat-square" alt="Build Status"></a>
+  <a href="https://github.com/crazy-max/swarm-cronjob/actions"><img src="https://github.com/crazy-max/swarm-cronjob/workflows/build/badge.svg" alt="Build Status"></a>
+  <a href="https://github.com/crazy-max/swarm-cronjob/actions"><img src="https://github.com/crazy-max/swarm-cronjob/workflows/test/badge.svg" alt="Test Status"></a>
   <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/stars/crazymax/swarm-cronjob.svg?style=flat-square" alt="Docker Stars"></a>
   <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/pulls/crazymax/swarm-cronjob.svg?style=flat-square" alt="Docker Pulls"></a>
   <br /><a href="https://goreportcard.com/report/github.com/crazy-max/swarm-cronjob"><img src="https://goreportcard.com/badge/github.com/crazy-max/swarm-cronjob?style=flat-square" alt="Go Report"></a>
