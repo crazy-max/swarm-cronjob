@@ -31,8 +31,7 @@ jobs:
       -
         name: Docker Buildx
         run: |
-          docker buildx build --platform linux/amd64 \
-            --output "type=image,push=false" \
+          docker buildx build --platform linux/amd64 --load \
             --tag ${{ steps.prepare.outputs.build_tag }} \
             --file Dockerfile .
       -
