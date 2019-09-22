@@ -10,8 +10,6 @@
 /.editorconfig
 /.gitignore
 /.goreleaser.yml
-/.travis.yml
-/build.sh
 /CHANGELOG.md
 /LICENSE
 /README.md
