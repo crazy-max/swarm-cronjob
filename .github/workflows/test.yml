@@ -1,0 +1,76 @@
+name: test
+
+on:
+  pull_request:
+    branches: master
+  push:
+    branches: master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          echo ::set-output name=build_tag::test
+          echo ::set-output name=service_name::swarm-cronjob
+          echo ::set-output name=running_timeout::120
+          echo ::set-output name=running_log_check::Number of cronjob tasks: 5
+      -
+        # https://github.com/actions/checkout
+        name: Checkout
+        uses: actions/checkout@v1
+      -
+        # https://github.com/crazy-max/ghaction-docker-buildx
+        name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@master
+        with:
+          version: latest
+      -
+        name: Docker Buildx
+        run: |
+          docker buildx build --platform linux/amd64 \
+            --output "type=image,push=false" \
+            --tag ${{ steps.prepare.outputs.build_tag }} \
+            --file Dockerfile .
+      -
+        name: Swarm init
+        run: |
+          docker swarm leave --force > /dev/null 2>&1 || true
+          docker swarm init --advertise-addr $(dig +short myip.opendns.com @resolver1.opendns.com)
+      -
+        name: Swarm deploy stacks
+        run: |
+          docker stack deploy date -c .res/example/date.yml
+          docker stack deploy sleep -c .res/example/sleep.yml
+          docker stack deploy error -c .res/example/error.yml
+          docker stack deploy configs -c .res/example/configs.yml
+          docker stack deploy global -c .res/example/global.yml
+      -
+        name: Create service
+        run: |
+          docker service create --name ${{ steps.prepare.outputs.service_name }} \
+            --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
+            --env "LOG_LEVEL=debug" \
+            --env "LOG_JSON=false" \
+            --constraint 'node.role == manager' \
+            ${{ steps.prepare.outputs.build_tag }}
+      -
+        name: Test service
+        run: |
+          TIMEOUT=$((SECONDS + ${{ steps.prepare.outputs.running_timeout }}))
+          while read LOGLINE; do
+            echo ${LOGLINE}
+            if [[ ${LOGLINE} == *"${{ steps.prepare.outputs.running_log_check }}"* ]]; then
+              echo "Service up!"
+              break
+            fi
+            if [[ $SECONDS -gt ${TIMEOUT} ]]; then
+              >&2 echo "ERROR: Failed to run ${PROJECT} container"
+              docker swarm leave --force > /dev/null 2>&1 || true
+              exit 1
+            fi
+          done < <(docker service logs -f ${PROJECT} 2>&1)
+          docker swarm leave --force > /dev/null 2>&1 || true
