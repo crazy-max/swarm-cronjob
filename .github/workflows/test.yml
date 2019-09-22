@@ -67,9 +67,9 @@ jobs:
               break
             fi
             if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "ERROR: Failed to run ${PROJECT} container"
+              >&2 echo "ERROR: Failed to run ${{ steps.prepare.outputs.service_name }} container"
               docker swarm leave --force > /dev/null 2>&1 || true
               exit 1
             fi
-          done < <(docker service logs -f ${PROJECT} 2>&1)
+          done < <(docker service logs -f ${{ steps.prepare.outputs.service_name }} 2>&1)
           docker swarm leave --force > /dev/null 2>&1 || true
