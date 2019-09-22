@@ -1,6 +1,6 @@
 # Get started
 
-Before starting, you must have a swarm-cronjob instance up and running using [docker](install/docker.md) or an available [binary](install/binary.md) for your platform.
+> :warning: You must have a swarm-cronjob instance up and running using [docker](install/docker.md) or an available [binary](install/binary.md) for your platform before.
 
 When swarm-cronjob is ready, create a new stack based on [this one (date)](../.res/example/date.yml). You can include any configuration as long as you abide with the following conditions:
 

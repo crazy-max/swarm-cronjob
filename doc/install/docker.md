@@ -38,3 +38,5 @@ $ docker service create --name swarm_cronjob \
 Alternatively, you can deploy the stack [swarm_cronjob.yml](../../.res/example/swarm_cronjob.yml) :
 
 `docker stack deploy -c swarm_cronjob.yml swarm_cronjob`
+
+You are now ready to [deploy cronjob based services with swarm](../get-started.md).

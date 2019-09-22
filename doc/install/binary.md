@@ -70,3 +70,7 @@ See how to create [Linux service](linux-service.md) to start swarm-cronjob autom
 You can update to a new version of swarm-cronjob by stopping it, replacing the binary at `/usr/local/bin/swarm-cronjob` and restarting the instance.
 
 If you have carried out the installation steps as described above, the binary should have the generic name `swarm-cronjob`. Do not change this, i.e. to include the version number.
+
+## Next
+
+You are now ready to [deploy cronjob based services with swarm](../get-started.md).
