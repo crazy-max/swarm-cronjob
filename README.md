@@ -8,8 +8,8 @@
   <a href="https://quay.io/repository/crazymax/swarm-cronjob"><img src="https://quay.io/repository/crazymax/swarm-cronjob/status?style=flat-square" alt="Docker Repository on Quay"></a>
   <br /><a href="https://goreportcard.com/report/github.com/crazy-max/swarm-cronjob"><img src="https://goreportcard.com/badge/github.com/crazy-max/swarm-cronjob?style=flat-square" alt="Go Report"></a>
   <a href="https://www.codacy.com/app/crazy-max/swarm-cronjob"><img src="https://img.shields.io/codacy/grade/1edb80b0f97b4195b7bb50cfb35a37d2.svg?style=flat-square" alt="Code Quality"></a>
-  <br /><a href="https://www.patreon.com/crazymax"><img src="https://img.shields.io/badge/donate-patreon-fb664e.svg?style=flat-square" alt="Support me on Patreon"></a>
-  <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-7057ff.svg?style=flat-square" alt="Donate Paypal"></a>
+  <br /><a href="https://www.patreon.com/crazymax"><img src="https://img.shields.io/badge/donate-patreon-f96854.svg?logo=patreon&style=flat-square" alt="Support me on Patreon"></a>
+  <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
 </p>
 
 ## About
@@ -140,7 +140,7 @@ The most basic way to show your support is to star :star2: the project, or to ra
 But we're not gonna lie to each other, I'd rather you buy me a beer or two :beers:!
 
 [![Support me on Patreon](.res/patreon.png)](https://www.patreon.com/crazymax) 
-[![Paypal Donate](.res/paypal-donate.png)](https://www.paypal.me/crazyws)
+[![Paypal Donate](.res/paypal.png)](https://www.paypal.me/crazyws)
 
 ## License
 
