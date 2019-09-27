@@ -45,15 +45,10 @@ LABEL maintainer="CrazyMax" \
 RUN apk --update --no-cache add \
     ca-certificates \
     libressl \
-    shadow \
-  && addgroup -g 1000 swarm-cronjob \
-  && adduser -u 1000 -G swarm-cronjob -s /sbin/nologin -D swarm-cronjob \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /app/swarm-cronjob /usr/local/bin/swarm-cronjob
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
 RUN swarm-cronjob --version
-
-USER swarm-cronjob
 
 ENTRYPOINT [ "swarm-cronjob" ]

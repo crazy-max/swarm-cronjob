@@ -2,7 +2,6 @@
 
 ## 1.5.0 (2019/09/27)
 
-* Run container as non-root user
 * Update libs
 * Go 1.12.10
 
