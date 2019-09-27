@@ -2,7 +2,7 @@
 
 swarm-cronjob provides automatically updated Docker :whale: images within [Docker Hub](https://hub.docker.com/r/crazymax/swarm-cronjob). It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
 
-Following multi-platform images are available:
+Following platforms for this image are available:
 
 ```
 $ docker run --rm mplatform/mquery crazymax/swarm-cronjob:latest
