@@ -35,9 +35,9 @@ jobs:
         name: Checkout
         uses: actions/checkout@v1
       -
-        # https://github.com/crazy-max/ghaction-goreleaser
+        # https://github.com/goreleaser/goreleaser-action
         name: GoReleaser
-        uses: crazy-max/ghaction-goreleaser@master
+        uses: goreleaser/goreleaser-action@master
         with:
           version: latest
           args: release --skip-publish --rm-dist
