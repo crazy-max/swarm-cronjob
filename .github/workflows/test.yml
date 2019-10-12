@@ -25,7 +25,7 @@ jobs:
       -
         # https://github.com/crazy-max/ghaction-docker-buildx
         name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@master
+        uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
       -
