@@ -50,17 +50,20 @@ func (c *Client) Run() {
 		Uint64("tasks_active", service.Actives).
 		Str("status", service.UpdateStatus).Msg("Start job")
 
-	// Only 1 replica is necessary in replicated mode
+	// Set number of replicas in replicated mode
 	if service.Mode == model.ServiceModeReplicated {
-		*serviceUp.Spec.Mode.Replicated.Replicas = 1
+		*serviceUp.Spec.Mode.Replicated.Replicas = c.Job.Replicas
 	}
 
-	// Set ForceUpdate with Version to ensure update
-	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
+	// Force update
+	serviceUp.Spec.TaskTemplate.ForceUpdate++
 
 	// Update service
-	_, err = c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{})
+	response, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot update")
+	}
+	for _, warn := range response.Warnings {
+		log.Warn().Str("service", c.Job.Name).Msg(warn)
 	}
 }

@@ -121,6 +121,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 			Name:        service.Name,
 			Enable:      false,
 			SkipRunning: false,
+			Replicas:    1,
 		},
 	}
 
@@ -138,6 +139,11 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 			wc.Job.SkipRunning, err = strconv.ParseBool(labelValue)
 			if err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running", labelKey)
+			}
+		case "swarm.cronjob.replicas":
+			wc.Job.Replicas, err = strconv.ParseUint(labelValue, 10, 64)
+			if err != nil {
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.replicas", labelKey)
 			}
 		}
 	}
