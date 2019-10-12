@@ -29,7 +29,7 @@ func main() {
 	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJSON)
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
 	kingpin.CommandLine.Name = "swarm-cronjob"
-	kingpin.CommandLine.Help = `Create jobs on a time-based schedule on Swarm. More info on https://github.com/crazy-max/swarm-cronjob`
+	kingpin.CommandLine.Help = `Create jobs on a time-based schedule on Swarm.\nMore info: https://github.com/crazy-max/swarm-cronjob`
 	kingpin.Parse()
 
 	// Load timezone location
