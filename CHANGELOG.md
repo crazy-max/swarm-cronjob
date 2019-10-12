@@ -10,7 +10,7 @@
 * Log removed/disabled services
 * Docker client v19.03.2
 * Use GOPROXY
-* Stop publishing Docker image on Quay
+* :warning: Stop publishing Docker image on Quay
 * Multi-platform Docker image
 * Switch to GitHub Actions
 * Add instructions to create a Linux service
