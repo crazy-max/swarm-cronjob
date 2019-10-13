@@ -131,19 +131,21 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		case "swarm.cronjob.enable":
 			wc.Job.Enable, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.enable", labelKey)
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
 		case "swarm.cronjob.schedule":
 			wc.Job.Schedule = labelValue
 		case "swarm.cronjob.skip-running":
 			wc.Job.SkipRunning, err = strconv.ParseBool(labelValue)
 			if err != nil {
-				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.skip-running", labelKey)
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
 		case "swarm.cronjob.replicas":
 			wc.Job.Replicas, err = strconv.ParseUint(labelValue, 10, 64)
 			if err != nil {
-				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.replicas", labelKey)
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
+			} else if wc.Job.Replicas < 1 {
+				log.Error().Str("service", service.Name).Msgf("%s must be greater than or equal to one", labelKey)
 			}
 		case "swarm.cronjob.scaledown":
 			if labelValue == "true" {
