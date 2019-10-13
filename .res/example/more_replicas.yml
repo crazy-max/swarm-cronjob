@@ -1,0 +1,16 @@
+version: "3.2"
+
+services:
+  test:
+    image: busybox
+    command: date
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=*/10 * * * * *"
+        - "swarm.cronjob.skip-running=false"
+        - "swarm.cronjob.replicas=5"
+      restart_policy:
+        condition: none
