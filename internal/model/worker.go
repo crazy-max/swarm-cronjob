@@ -6,4 +6,5 @@ type Job struct {
 	Enable      bool
 	Schedule    string
 	SkipRunning bool
+	Replicas    uint64
 }

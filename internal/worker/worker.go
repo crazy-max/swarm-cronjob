@@ -6,6 +6,7 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/swarm"
 	"github.com/rs/zerolog/log"
 )
 
@@ -50,17 +51,46 @@ func (c *Client) Run() {
 		Uint64("tasks_active", service.Actives).
 		Str("status", service.UpdateStatus).Msg("Start job")
 
-	// Only 1 replica is necessary in replicated mode
+	// Set number of replicas in replicated mode
 	if service.Mode == model.ServiceModeReplicated {
-		*serviceUp.Spec.Mode.Replicated.Replicas = 1
+		if c.Job.Replicas > 1 {
+			// Need to scale down service to 0 to fix an issue if replicas > 1
+			// See https://github.com/crazy-max/swarm-cronjob/issues/16
+			if serviceUp, err = c.scaleDown(serviceUp); err != nil {
+				log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot scaled down")
+			}
+		}
+		*serviceUp.Spec.Mode.Replicated.Replicas = c.Job.Replicas
 	}
 
 	// Set ForceUpdate with Version to ensure update
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
 	// Update service
-	_, err = c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{})
+	response, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot update")
 	}
+	for _, warn := range response.Warnings {
+		log.Warn().Str("service", c.Job.Name).Msg(warn)
+	}
+}
+
+func (c *Client) scaleDown(serviceRaw swarm.Service) (swarm.Service, error) {
+	*serviceRaw.Spec.Mode.Replicated.Replicas = 0
+	serviceRaw.Spec.Labels["swarm.cronjob.scaledown"] = "true"
+	serviceRaw.Spec.TaskTemplate.ForceUpdate = serviceRaw.Version.Index
+
+	_, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, types.ServiceUpdateOptions{})
+	if err != nil {
+		return swarm.Service{}, err
+	}
+
+	service, err := c.Docker.Service(c.Job.Name)
+	if err != nil {
+		return swarm.Service{}, err
+	}
+
+	delete(service.Raw.Spec.Labels, "swarm.cronjob.scaledown")
+	return service.Raw, nil
 }

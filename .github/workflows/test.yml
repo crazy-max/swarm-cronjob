@@ -17,7 +17,7 @@ jobs:
           echo ::set-output name=build_tag::test
           echo ::set-output name=service_name::swarm-cronjob
           echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::Number of cronjob tasks: 5
+          echo ::set-output name=running_log_check::Number of cronjob tasks: 6
       -
         # https://github.com/actions/checkout
         name: Checkout
@@ -45,6 +45,7 @@ jobs:
           docker stack deploy error -c .res/example/error.yml
           docker stack deploy configs -c .res/example/configs.yml
           docker stack deploy global -c .res/example/global.yml
+          docker stack deploy more_replicas -c .res/example/more_replicas.yml
       -
         name: Create service
         run: |
@@ -61,11 +62,11 @@ jobs:
           while read LOGLINE; do
             echo ${LOGLINE}
             if [[ ${LOGLINE} == *"${{ steps.prepare.outputs.running_log_check }}"* ]]; then
-              echo "Service up!"
+              echo "🎉 Service up!"
               break
             fi
             if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "ERROR: Failed to run ${{ steps.prepare.outputs.service_name }} container"
+              >&2 echo "❌ Failed to run ${{ steps.prepare.outputs.service_name }} service"
               docker swarm leave --force > /dev/null 2>&1 || true
               exit 1
             fi

@@ -12,6 +12,7 @@ When swarm-cronjob is ready, create a new stack based on [this one (date)](../.r
   * `swarm.cronjob.enable` : Set to true to enable the cronjob (**required**)
   * `swarm.cronjob.schedule` : [CRON expression format](https://godoc.org/github.com/crazy-max/cron#hdr-CRON_Expression_Format) to use (**required**)
   * `swarm.cronjob.skip-running` : Do not start a job if the service is currently running (**optional**)
+  * `swarm.cronjob.replicas` : Number of replicas to set on schedule in `replicated` mode. (**optional**, default `1`)
 
 Once ready, deploy your cron stack on the swarm cluster :
 
