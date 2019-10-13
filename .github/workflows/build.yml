@@ -95,14 +95,14 @@ jobs:
             --file Dockerfile .
       -
         name: Docker Login
-        if: success() && startsWith(github.ref, 'refs/tags/v') && startsWith(github.ref, 'refs/tags/v')
+        if: success() && startsWith(github.ref, 'refs/tags/v')
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin
       -
         name: Docker Buildx (push beta)
-        if: success() && contains(steps.prepare.outputs.version, 'beta')
+        if: success() && startsWith(github.ref, 'refs/tags/v') && contains(steps.prepare.outputs.version, 'beta')
         run: |
           docker buildx build --platform ${{ steps.prepare.outputs.docker_platforms }} \
             --output "type=image,push=true" \
