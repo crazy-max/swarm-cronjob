@@ -145,6 +145,11 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 			if err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label swarm.cronjob.replicas", labelKey)
 			}
+		case "swarm.cronjob.scaledown":
+			if labelValue == "true" {
+				log.Debug().Str("service", service.Name).Msg("Scale down detected. Skipping cronjob")
+				return false, nil
+			}
 		}
 	}
 
