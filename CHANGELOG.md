@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0 (2019/10/13)
+
+* Allow to set more replicas (Issue #16)
+* Docker client v19.03.3
+* Update libs
+
 ## 1.5.0 (2019/09/27)
 
 * Update libs
