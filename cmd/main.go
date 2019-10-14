@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/alecthomas/kingpin"
 	"github.com/crazy-max/swarm-cronjob/internal/app"
 	"github.com/crazy-max/swarm-cronjob/internal/logging"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
