@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/crazy-max/swarm-cronjob" target="_blank"><img height="292"src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.res/swarm-cronjob.jpg"></a></p>
+<p align="center"><a href="https://github.com/crazy-max/swarm-cronjob" target="_blank"><img height="292" src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.res/swarm-cronjob.jpg"></a></p>
 
 <p align="center">
   <a href="https://github.com/crazy-max/swarm-cronjob/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/swarm-cronjob.svg?style=flat-square" alt="GitHub release"></a>
