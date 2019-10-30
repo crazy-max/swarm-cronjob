@@ -29,8 +29,10 @@ func New(location *time.Location) (*SwarmCronjob, error) {
 	d, err := docker.NewEnvClient()
 
 	return &SwarmCronjob{
-		docker:   d,
-		cron:     cron.New(cron.WithLocation(location), cron.WithSeconds()),
+		docker: d,
+		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
+			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
+		)),
 		location: location,
 		jobs:     make(map[string]cron.EntryID),
 	}, err
