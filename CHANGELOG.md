@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0 (2019/10/30)
+
+* Seconds field is now optional
+* Docker client v19.03.4
+
 ## 1.6.0 (2019/10/13)
 
 * Allow to set more replicas (Issue #16)
