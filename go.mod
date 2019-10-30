@@ -21,9 +21,9 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/rs/zerolog v1.15.0
 	github.com/sirupsen/logrus v1.4.2 // indirect
-	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/grpc v1.24.0 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 )
 
-replace github.com/docker/docker => github.com/docker/engine v0.0.0-20191007211215-3e077fc8667a
+replace github.com/docker/docker => github.com/docker/engine v0.0.0-20191011211953-adfac697dc5b
