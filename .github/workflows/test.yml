@@ -2,9 +2,25 @@ name: test
 
 on:
   pull_request:
-    branches: master
+    branches: 'master'
+    paths:
+      - '.github/workflows/test.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - '.goreleaser.yml'
+      - 'Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
   push:
-    branches: master
+    branches: 'master'
+    paths:
+      - '.github/workflows/test.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - '.goreleaser.yml'
+      - 'Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
 
 jobs:
   test:
