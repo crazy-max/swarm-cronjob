@@ -10,7 +10,7 @@ services:
       mode: global
       labels:
         - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=0/10 * * * * *"
+        - "swarm.cronjob.schedule=* * * * *"
         - "swarm.cronjob.skip-running=false"
       restart_policy:
         condition: none

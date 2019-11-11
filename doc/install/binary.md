@@ -7,7 +7,7 @@ swarm-cronjob binaries are available in [releases](https://github.com/crazy-max/
 Choose the archive matching the destination platform and extract swarm-cronjob:
 
 ```
-wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/1.3.0/swarm-cronjob_1.3.0_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+wget -qO- https://github.com/crazy-max/swarm-cronjob/releases/download/1.7.1/swarm-cronjob_1.7.1_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
 ## Test
