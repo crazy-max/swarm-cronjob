@@ -18,7 +18,7 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/robfig/cron/v3 v3.0.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.17.2
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
