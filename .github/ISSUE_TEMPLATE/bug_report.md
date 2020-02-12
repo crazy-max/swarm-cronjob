@@ -23,6 +23,7 @@ about: Create a report to help us improve
 
 * Target Docker version (the host/cluster you manage) : 
 * Platform (windows/linux) : 
+* System info (type `uname -a`) : 
 * Target Swarm version : 
 
 ### Docker info
