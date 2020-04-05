@@ -33,7 +33,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@master
         with:
-          go-version: 1.12.10
+          go-version: 1.13
       -
         # https://github.com/actions/cache
         name: Cache Go modules
