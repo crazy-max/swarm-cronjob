@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
 
-	"github.com/alecthomas/kingpin"
+	"github.com/alecthomas/kong"
 	"github.com/crazy-max/swarm-cronjob/internal/app"
 	"github.com/crazy-max/swarm-cronjob/internal/logging"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
@@ -16,7 +17,7 @@ import (
 
 var (
 	sc      *app.SwarmCronjob
-	flags   model.Flags
+	cli     model.Cli
 	version = "dev"
 )
 
@@ -24,22 +25,26 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Parse command line
-	kingpin.Flag("timezone", "Timezone assigned to the scheduler.").Envar("TZ").Default("UTC").StringVar(&flags.Timezone)
-	kingpin.Flag("log-level", "Set log level.").Envar("LOG_LEVEL").Default("info").StringVar(&flags.LogLevel)
-	kingpin.Flag("log-json", "Enable JSON logging output.").Envar("LOG_JSON").Default("false").BoolVar(&flags.LogJSON)
-	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(version).Author("CrazyMax")
-	kingpin.CommandLine.Name = "swarm-cronjob"
-	kingpin.CommandLine.Help = `Create jobs on a time-based schedule on Swarm. More info: https://github.com/crazy-max/swarm-cronjob`
-	kingpin.Parse()
+	_ = kong.Parse(&cli,
+		kong.Name("swarm-cronjob"),
+		kong.Description(`Create jobs on a time-based schedule on Swarm. More info: https://github.com/crazy-max/swarm-cronjob`),
+		kong.UsageOnError(),
+		kong.Vars{
+			"version": fmt.Sprintf("%s", version),
+		},
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+			Summary: true,
+		}))
 
 	// Load timezone location
-	location, err := time.LoadLocation(flags.Timezone)
+	location, err := time.LoadLocation(cli.Timezone)
 	if err != nil {
-		log.Panic().Err(err).Msgf("Cannot load timezone %s", flags.Timezone)
+		log.Panic().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
 	}
 
 	// Init
-	logging.Configure(&flags, location)
+	logging.Configure(&cli, location)
 	log.Info().Msgf("Starting swarm-cronjob %s", version)
 
 	// Handle os signals
