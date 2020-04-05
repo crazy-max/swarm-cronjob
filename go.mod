@@ -26,4 +26,4 @@ require (
 	gotest.tools v2.2.0+incompatible // indirect
 )
 
-replace github.com/docker/docker => github.com/docker/engine v0.0.0-20191011211953-adfac697dc5b
+replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200309214505-aa6a9891b09c
