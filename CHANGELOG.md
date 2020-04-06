@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0 (2020/04/06)
+
+* Switch to kong command-line parser
+* Go 1.13
+* Docker client v19.03.8
+* Use Open Container Specification labels as label-schema.org ones are deprecated
+* Update libs
+
 ## 1.7.1 (2019/11/11)
 
 * Update libs
@@ -12,7 +20,7 @@
 
 ## 1.6.0 (2019/10/13)
 
-* Allow to set more replicas (Issue #16)
+* Allow to set more replicas (#16)
 * Docker client v19.03.3
 * Update libs
 
@@ -37,17 +45,17 @@
 
 ## 1.3.0-beta.1 (2019/07/18)
 
-* Add support for global mode (Issue #7)
+* Add support for global mode (#7)
 * Use v3 robfig/cron
 * Docker client v18.09.7
 
 ## 1.2.1 (2019/05/30)
 
-* Fix nil pointer (Issue #7)
+* Fix nil pointer (#7)
 
 ## 1.2.0 (2019/05/01)
 
-* Skip completed tasks while checking status (Issue #4)
+* Skip completed tasks while checking status (#4)
 * Update Docker client and some libs
 * Go 1.12.4
 
@@ -68,12 +76,12 @@
 
 ## 0.2.0 (2019/01/22)
 
-* Add support for Docker API [1.38](https://docs.docker.com/engine/api/v1.38/) (Issue #3)
+* Add support for Docker API [1.38](https://docs.docker.com/engine/api/v1.38/) (#3)
 * ldflags -X not properly applied
 
 ## 0.1.2 (2019/01/14)
 
-* Fix non-cronjob services added to cronjob list (Issue #2)
+* Fix non-cronjob services added to cronjob list (#2)
 * Handle removed services
 * NPE while checking service
 
