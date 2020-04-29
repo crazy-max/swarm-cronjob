@@ -14,7 +14,7 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/mux v1.7.3 // indirect
-	github.com/mitchellh/mapstructure v1.2.3
+	github.com/mitchellh/mapstructure v1.3.0
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
