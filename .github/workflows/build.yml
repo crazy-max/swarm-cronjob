@@ -20,7 +20,7 @@ jobs:
       -
         # https://github.com/actions/checkout
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       -
         name: Prepare
         id: prepare
@@ -31,7 +31,7 @@ jobs:
       -
         # https://github.com/actions/setup-go
         name: Set up Go
-        uses: actions/setup-go@master
+        uses: actions/setup-go@v2
         with:
           go-version: 1.13
       -
@@ -71,7 +71,7 @@ jobs:
       -
         # https://github.com/actions/checkout
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       -
         name: Prepare
         id: prepare
@@ -100,8 +100,6 @@ jobs:
         # https://github.com/crazy-max/ghaction-docker-buildx
         name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
       -
         name: Docker Buildx (build)
         run: |
