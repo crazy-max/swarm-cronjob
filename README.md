@@ -3,9 +3,9 @@
 <p align="center">
   <a href="https://github.com/crazy-max/swarm-cronjob/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/swarm-cronjob.svg?style=flat-square" alt="GitHub release"></a>
   <a href="https://github.com/crazy-max/swarm-cronjob/releases/latest"><img src="https://img.shields.io/github/downloads/crazy-max/swarm-cronjob/total.svg?style=flat-square" alt="Total downloads"></a>
-  <a href="https://github.com/crazy-max/swarm-cronjob/actions"><img src="https://github.com/crazy-max/swarm-cronjob/workflows/build/badge.svg" alt="Build Status"></a>
-  <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/stars/crazymax/swarm-cronjob.svg?style=flat-square" alt="Docker Stars"></a>
-  <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/pulls/crazymax/swarm-cronjob.svg?style=flat-square" alt="Docker Pulls"></a>
+  <a href="https://github.com/crazy-max/swarm-cronjob/actions?workflow=build"><img src="https://img.shields.io/github/workflow/status/crazy-max/swarm-cronjob/build?label=build&logo=github&style=flat-square" alt="Build Status"></a>
+  <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/stars/crazymax/swarm-cronjob.svg?style=flat-square&logo=docker" alt="Docker Stars"></a>
+  <a href="https://hub.docker.com/r/crazymax/swarm-cronjob/"><img src="https://img.shields.io/docker/pulls/crazymax/swarm-cronjob.svg?style=flat-square&logo=docker" alt="Docker Pulls"></a>
   <br /><a href="https://goreportcard.com/report/github.com/crazy-max/swarm-cronjob"><img src="https://goreportcard.com/badge/github.com/crazy-max/swarm-cronjob?style=flat-square" alt="Go Report"></a>
   <a href="https://www.codacy.com/app/crazy-max/swarm-cronjob"><img src="https://img.shields.io/codacy/grade/1edb80b0f97b4195b7bb50cfb35a37d2.svg?style=flat-square" alt="Code Quality"></a>
   <a href="https://github.com/sponsors/crazy-max"><img src="https://img.shields.io/badge/sponsor-crazy--max-181717.svg?logo=github&style=flat-square" alt="Become a sponsor"></a>
@@ -32,9 +32,10 @@
   * [With Docker](doc/install/docker.md)
   * [From binary](doc/install/binary.md)
   * [Linux service](doc/install/linux-service.md)
+* [FAQ](doc/faq.md)
 * [Logs](doc/logs.md)
 
-## How can I help ?
+## How can I help?
 
 All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon: You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
 
