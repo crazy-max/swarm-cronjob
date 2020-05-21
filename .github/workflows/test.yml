@@ -35,11 +35,9 @@ jobs:
           echo ::set-output name=running_timeout::120
           echo ::set-output name=running_log_check::Number of cronjob tasks: 6
       -
-        # https://github.com/actions/checkout
         name: Checkout
         uses: actions/checkout@v2
       -
-        # https://github.com/crazy-max/ghaction-docker-buildx
         name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v1
       -
