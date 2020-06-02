@@ -19,7 +19,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/rs/zerolog v1.18.0
+	github.com/rs/zerolog v1.19.0
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/grpc v1.24.0 // indirect
