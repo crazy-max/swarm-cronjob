@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:experimental
 FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.13-alpine as builder
 
 ARG BUILD_DATE
