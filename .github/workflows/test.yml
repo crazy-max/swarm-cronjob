@@ -1,26 +1,17 @@
 name: test
 
 on:
-  pull_request:
-    branches: 'master'
-    paths:
-      - '.github/workflows/test.yml'
-      - 'cmd/**'
-      - 'internal/**'
-      - '.goreleaser.yml'
-      - 'Dockerfile'
-      - 'go.mod'
-      - 'go.sum'
   push:
-    branches: 'master'
-    paths:
-      - '.github/workflows/test.yml'
-      - 'cmd/**'
-      - 'internal/**'
-      - '.goreleaser.yml'
-      - 'Dockerfile'
-      - 'go.mod'
-      - 'go.sum'
+    branches:
+      - '**'
+      - '!dependabot/**'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**.md'
 
 jobs:
   test:
