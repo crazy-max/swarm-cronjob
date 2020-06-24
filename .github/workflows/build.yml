@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-go-
       -
         name: GoReleaser
-        uses: goreleaser/goreleaser-action@v2.1.0
+        uses: goreleaser/goreleaser-action@v2.1.1
         with:
           version: latest
           args: release --skip-publish --rm-dist
