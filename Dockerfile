@@ -29,7 +29,7 @@ RUN apk --update --no-cache add \
 WORKDIR /app
 
 ENV GO111MODULE on
-ENV GOPROXY https://goproxy.io
+ENV GOPROXY https://goproxy.io,direct
 COPY go.mod .
 COPY go.sum .
 RUN env $(cat /tmp/.env | xargs) go mod download
