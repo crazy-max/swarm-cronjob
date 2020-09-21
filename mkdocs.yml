@@ -68,9 +68,9 @@ plugins:
       lang:
         - en
 
-#google_analytics:
-#  - UA-12516800-10
-#  - auto
+google_analytics:
+  - UA-12516800-14
+  - auto
 
 nav:
   - Home: index.md
