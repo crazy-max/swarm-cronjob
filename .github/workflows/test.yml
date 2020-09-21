@@ -51,12 +51,12 @@ jobs:
       -
         name: Swarm deploy stacks
         run: |
-          docker stack deploy date -c .res/example/date.yml
-          docker stack deploy sleep -c .res/example/sleep.yml
-          docker stack deploy error -c .res/example/error.yml
-          docker stack deploy configs -c .res/example/configs.yml
-          docker stack deploy global -c .res/example/global.yml
-          docker stack deploy more_replicas -c .res/example/more_replicas.yml
+          docker stack deploy date -c test/date.yml
+          docker stack deploy sleep -c test/sleep.yml
+          docker stack deploy error -c test/error.yml
+          docker stack deploy configs -c test/configs.yml
+          docker stack deploy global -c test/global.yml
+          docker stack deploy more_replicas -c test/more_replicas.yml
       -
         name: Create service
         run: |

@@ -1,3 +1,6 @@
+# Dump MariaDB database
+
+```yaml
 version: "3.2"
 
 services:
@@ -30,3 +33,4 @@ services:
 volumes:
   db:
   dumps:
+```

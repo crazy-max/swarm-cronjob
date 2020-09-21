@@ -1,0 +1,93 @@
+site_name: swarm-cronjob
+site_description: Create jobs on a time-based schedule on Docker Swarm
+site_author: CrazyMax
+site_url: https://crazy-max.github.io/swarm-cronjob/
+edit_uri: edit/master/docs/
+docs_dir: docs
+
+repo_name: crazy-max/swarm-cronjob
+repo_url: https://github.com/crazy-max/swarm-cronjob
+
+extra:
+  seo:
+    google: zczpYiFTLpd1jgOb3K5zGqERX2gZrkm7aRjtDqxP0a4
+    bing: D188E0BEC1AB6E7C1E0194BFC35D0033
+    #alexa:
+    #yandex:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/crazy-max/swarm-cronjob
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/crazyws
+
+theme:
+  name: material
+  custom_dir: docs/_overrides
+  language: en
+  palette:
+    scheme: default
+    primary: light blue
+    accent: light blue
+  font:
+    text: Roboto
+    code: Roboto Mono
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  include_search_page: false
+  search_index_only: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - markdown_include.include:
+      base_path: docs
+  - meta
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+
+plugins:
+  - exclude:
+      glob:
+        - "_overrides/*"
+        - "Dockerfile"
+  - git-revision-date-localized:
+      type: iso_datetime
+  - macros
+  - search:
+      prebuild_index: python
+      lang:
+        - en
+
+#google_analytics:
+#  - UA-12516800-10
+#  - auto
+
+nav:
+  - Home: index.md
+  - Installation:
+    - With Docker: install/docker.md
+    - From binary: install/binary.md
+    - Linux service: install/linux-service.md
+  - Usage:
+    - Get started: usage/get-started.md
+    - Docker labels: usage/docker-labels.md
+    - Command line: usage/cli.md
+  - Examples:
+    - Dump MariaDB database: examples/dump-mariadb.md
+    - Prune Swarm nodes: examples/prune-swarm-nodes.md
+    - Renovate: examples/renovate.md
+  - FAQ: faq.md
+  - Changelog: changelog.md
+  - Reporting an issue: reporting-issue.md
+  - Contributing: contributing.md
+  - Donate: donate.md

@@ -6,11 +6,11 @@
 * Go 1.13
 * Docker client v19.03.8
 * Use Open Container Specification labels as label-schema.org ones are deprecated
-* Update libs
+* Update deps
 
 ## 1.7.1 (2019/11/11)
 
-* Update libs
+* Update deps
 * Cache go modules
 
 ## 1.7.0 (2019/10/30)
@@ -22,11 +22,11 @@
 
 * Allow to set more replicas (#16)
 * Docker client v19.03.3
-* Update libs
+* Update deps
 
 ## 1.5.0 (2019/09/27)
 
-* Update libs
+* Update deps
 * Go 1.12.10
 
 ## 1.4.0 (2019/09/22)

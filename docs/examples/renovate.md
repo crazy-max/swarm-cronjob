@@ -1,4 +1,6 @@
----
+# Renovate
+
+```yaml
 version: "3.8"
 
 services:
@@ -30,3 +32,4 @@ configs:
 secrets:
   api-token-v1:
     external: true
+```

@@ -1,0 +1,69 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'v*'
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'mkdocs.yml'
+  pull_request:
+    branches:
+      - 'master'
+      - 'v*'
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'mkdocs.yml'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+      -
+        name: Prepare
+        id: prep
+        run: |
+          VERSION=edge
+          RELEASE=false
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            RELEASE=true
+          fi
+          echo ::set-output name=release::${RELEASE}
+      -
+        name: Build mkdocs Docker image
+        run: |
+          docker build -t mkdocs -f ./docs/Dockerfile ./
+      -
+        name: Build docs
+        run: |
+          docker run --rm -v "$(pwd):/docs" mkdocs build --strict
+          sudo chown -R $(id -u):$(id -g) ./site
+      -
+        name: Check GitHub Pages status
+        uses: crazy-max/ghaction-github-status@v1
+        with:
+          pages_threshold: major_outage
+      -
+        name: Deploy
+        if: success() && github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || steps.prep.outputs.release == 'true')
+        uses: crazy-max/ghaction-github-pages@v2.1.2
+        with:
+          target_branch: gh-pages
+          build_dir: site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
