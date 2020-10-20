@@ -30,4 +30,5 @@ and Docker API.
 
 ## License
 
-This project is licensed under the terms of the MIT license.
+This project is licensed under the terms of the MIT license.<br />
+Icon credit to [Laurel](https://twitter.com/laurelcomics).
