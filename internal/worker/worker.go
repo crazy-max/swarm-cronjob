@@ -67,7 +67,9 @@ func (c *Client) Run() {
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
 	// Update service
-	response, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{})
+	response, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{
+		RegistryAuthFrom: types.RegistryAuthFromSpec,
+	})
 	if err != nil {
 		log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot update")
 	}
