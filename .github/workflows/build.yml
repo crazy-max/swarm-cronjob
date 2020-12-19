@@ -87,9 +87,9 @@ jobs:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
+          tag-semver: |
+            {{version}}
           tag-edge: true
-          tag-match: v(.*)
-          tag-match-group: 1
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
