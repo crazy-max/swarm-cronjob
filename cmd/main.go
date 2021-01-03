@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
@@ -31,7 +30,7 @@ func main() {
 		kong.Description(`Create jobs on a time-based schedule on Swarm. More info: https://github.com/crazy-max/swarm-cronjob`),
 		kong.UsageOnError(),
 		kong.Vars{
-			"version": fmt.Sprintf("%s", version),
+			"version": version,
 		},
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,

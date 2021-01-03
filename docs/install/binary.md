@@ -9,6 +9,7 @@ Choose the archive matching the destination platform:
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_darwin_i386.tar.gz`]({{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_i386.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
+* [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv5.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv5.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_i386.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_i386.tar.gz)
@@ -22,7 +23,8 @@ And extract swarm-cronjob:
 $ wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
-After getting the binary, it can be tested with [`./swarm-cronjob --help`](../usage/cli.md) command and moved to a permanent location.
+After getting the binary, it can be tested with [`./swarm-cronjob --help`](../usage/cli.md) command and moved to a
+permanent location.
 
 ## Server configuration
 
@@ -62,6 +64,8 @@ $ /usr/local/bin/swarm-cronjob
 
 ## Updating to a new version
 
-You can update to a new version of swarm-cronjob by stopping it, replacing the binary at `/usr/local/bin/swarm-cronjob` and restarting the instance.
+You can update to a new version of swarm-cronjob by stopping it, replacing the binary at `/usr/local/bin/swarm-cronjob`
+and restarting the instance.
 
-If you have carried out the installation steps as described above, the binary should have the generic name `swarm-cronjob`. Do not change this, i.e. to include the version number.
+If you have carried out the installation steps as described above, the binary should have the generic name
+`swarm-cronjob`. Do not change this, i.e. to include the version number.
