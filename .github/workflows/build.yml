@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'v*'
     tags:
       - 'v*'
     paths-ignore:
@@ -15,70 +14,25 @@ on:
   pull_request:
     branches:
       - 'master'
-      - 'v*'
     paths-ignore:
       - '**.md'
       - '.github/workflows/docs.yml'
       - 'docs/**'
       - 'mkdocs.yml'
 
-jobs:
-  go:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Prepare
-        id: prep
-        run: |
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/}
-          fi
-      -
-        name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.15
-      -
-        name: Cache Go modules
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      -
-        name: GoReleaser
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
-          args: release --skip-publish --rm-dist
-      -
-        name: GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          draft: true
-          files: |
-            dist/checksums.txt
-            dist/*.tar.gz
-            dist/*.zip
-          name: ${{ steps.prep.outputs.tag_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+env:
+  DOCKERHUB_SLUG: crazymax/swarm-cronjob
+  GHCR_SLUG: ghcr.io/crazy-max/swarm-cronjob
 
-  docker:
+jobs:
+  build:
     runs-on: ubuntu-latest
-    needs: go
-    env:
-      DOCKERHUB_SLUG: crazymax/swarm-cronjob
-      GHCR_SLUG: ghcr.io/crazy-max/swarm-cronjob
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       -
         name: Docker meta
         id: docker_meta
@@ -90,6 +44,10 @@ jobs:
           tag-semver: |
             {{version}}
           tag-edge: true
+          label-custom: |
+            org.opencontainers.image.title=swarm-cronjob
+            org.opencontainers.image.description=Create jobs on a time-based schedule on Swarm
+            org.opencontainers.image.vendor=CrazyMax
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -97,7 +55,8 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
-          buildkitd-flags: "--debug"
+          version: latest
+          buildkitd-flags: --debug
       -
         name: Login to DockerHub
         if: github.event_name != 'pull_request'
@@ -114,21 +73,41 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
       -
-        name: Build
-        uses: docker/build-push-action@v2
+        name: Build artifacts
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
         with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le,linux/s390x
+          targets: artifact-all
+      -
+        name: Move artifacts
+        run: |
+          mv ./dist/**/* ./dist/
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: swarm-cronjob
+          path: ./dist/*
+          if-no-files-found: error
+      -
+        name: Build image
+        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.docker_meta.outputs.bake-file }}
+          targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          build-args: |
-            VERSION=${{ steps.docker_meta.outputs.version }}
-          labels: |
-            ${{ steps.docker_meta.outputs.labels }}
-            org.opencontainers.image.title=swarm-cronjob
-            org.opencontainers.image.description=Create jobs on a time-based schedule on Swarm
-            org.opencontainers.image.vendor=CrazyMax
+      -
+        name: GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Check manifest
         if: github.event_name != 'pull_request'

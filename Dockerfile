@@ -1,32 +1,35 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} tonistiigi/xx:golang AS xgo
-FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.15-alpine AS builder
+# syntax=docker/dockerfile:1.2
+ARG GO_VERSION=1.15
+ARG GORELEASER_VERSION=0.149.0
 
-ARG VERSION=dev
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS base
+ARG GORELEASER_VERSION
+RUN apk add --no-cache ca-certificates curl gcc file git musl-dev tar
+RUN wget -qO- https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/goreleaser_Linux_x86_64.tar.gz | tar -zxvf - goreleaser \
+  && mv goreleaser /usr/local/bin/goreleaser
+WORKDIR /src
 
-ENV CGO_ENABLED 0
-ENV GO111MODULE on
-ENV GOPROXY https://goproxy.io,direct
-COPY --from=xgo / /
+FROM base AS gomod
+RUN --mount=type=bind,target=.,rw \
+  --mount=type=cache,target=/go/pkg/mod \
+  go mod tidy && go mod download
 
-RUN apk --update --no-cache add \
-    build-base \
-    gcc \
-    git \
-  && rm -rf /tmp/* /var/cache/apk/*
-
-WORKDIR /app
-
-COPY . ./
-RUN go mod download
-
+FROM gomod AS build
 ARG TARGETPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
-RUN go env
-RUN go build -ldflags "-w -s -X 'main.version=${VERSION}'" -v -o swarm-cronjob cmd/main.go
+ARG TARGETVARIANT
+ARG GIT_REF
+RUN --mount=type=bind,target=/src,rw \
+  --mount=type=cache,target=/root/.cache/go-build \
+  --mount=target=/go/pkg/mod,type=cache \
+  ./hack/goreleaser.sh
 
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:latest
+FROM scratch AS artifacts
+COPY --from=build /out/*.tar.gz /
+COPY --from=build /out/*.zip /
 
+FROM --platform=$TARGETPLATFORM alpine
 LABEL maintainer="CrazyMax"
 
 RUN apk --update --no-cache add \
@@ -34,7 +37,7 @@ RUN apk --update --no-cache add \
     libressl \
   && rm -rf /tmp/* /var/cache/apk/*
 
-COPY --from=builder /app/swarm-cronjob /usr/local/bin/swarm-cronjob
+COPY --from=build /usr/local/bin/swarm-cronjob /usr/local/bin/swarm-cronjob
 RUN swarm-cronjob --version
 
 ENTRYPOINT [ "swarm-cronjob" ]
