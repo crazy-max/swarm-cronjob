@@ -17,7 +17,7 @@ import (
 
 // SwarmCronjob represents an active swarm-cronjob object
 type SwarmCronjob struct {
-	docker   *docker.Client
+	docker   docker.Client
 	cron     *cron.Cron
 	location *time.Location
 	jobs     map[string]cron.EntryID
@@ -68,7 +68,7 @@ func (sc *SwarmCronjob) Run() error {
 	filter := filters.NewArgs()
 	filter.Add("type", "service")
 
-	msgs, errs := sc.docker.Cli.Events(context.Background(), types.EventsOptions{
+	msgs, errs := sc.docker.Events(context.Background(), types.EventsOptions{
 		Filters: filter,
 	})
 
@@ -148,6 +148,11 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			} else if wc.Job.Replicas < 1 {
 				log.Error().Str("service", service.Name).Msgf("%s must be greater than or equal to one", labelKey)
+			}
+		case "swarm.cronjob.registry-auth":
+			wc.Job.RegistryAuth, err = strconv.ParseBool(labelValue)
+			if err != nil {
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
 		case "swarm.cronjob.scaledown":
 			if labelValue == "true" {

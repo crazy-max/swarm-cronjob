@@ -12,7 +12,7 @@ import (
 
 // Client represents an active worker object
 type Client struct {
-	Docker *docker.Client
+	Docker docker.Client
 	Job    model.Job
 }
 
@@ -66,10 +66,23 @@ func (c *Client) Run() {
 	// Set ForceUpdate with Version to ensure update
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
+	// Update options
+	updateOpts := types.ServiceUpdateOptions{}
+	if c.Job.RegistryAuth {
+		encodedAuth, err := c.Docker.RetrieveAuthTokenFromImage(context.Background(), serviceUp.Spec.TaskTemplate.ContainerSpec.Image)
+		if err != nil {
+			log.Error().Err(err).Str("service", c.Job.Name).Msg("Cannot retrieve auth token from service's image")
+			return
+		}
+		if encodedAuth != "e30=" {
+			updateOpts.EncodedRegistryAuth = encodedAuth
+		}
+	} else {
+		updateOpts.RegistryAuthFrom = types.RegistryAuthFromSpec
+	}
+
 	// Update service
-	response, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, types.ServiceUpdateOptions{
-		RegistryAuthFrom: types.RegistryAuthFromSpec,
-	})
+	response, err := c.Docker.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, updateOpts)
 	if err != nil {
 		log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot update")
 	}
@@ -83,7 +96,7 @@ func (c *Client) scaleDown(serviceRaw swarm.Service) (swarm.Service, error) {
 	serviceRaw.Spec.Labels["swarm.cronjob.scaledown"] = "true"
 	serviceRaw.Spec.TaskTemplate.ForceUpdate = serviceRaw.Version.Index
 
-	_, err := c.Docker.Cli.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, types.ServiceUpdateOptions{})
+	_, err := c.Docker.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		return swarm.Service{}, err
 	}

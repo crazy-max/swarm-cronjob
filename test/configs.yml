@@ -11,6 +11,7 @@ services:
         - "swarm.cronjob.enable=true"
         - "swarm.cronjob.schedule=* * * * *"
         - "swarm.cronjob.skip-running=false"
+        - "swarm.cronjob.registry-auth=false"
       restart_policy:
         condition: none
     configs:

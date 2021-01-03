@@ -12,7 +12,7 @@ import (
 )
 
 // ServiceList return all services.
-func (c *Client) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error) {
+func (c *dockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error) {
 	opts := types.ServiceListOptions{
 		Filters: filters.NewArgs(),
 	}
@@ -25,7 +25,7 @@ func (c *Client) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo,
 		}
 	}
 
-	services, err := c.Cli.ServiceList(context.Background(), opts)
+	services, err := c.api.ServiceList(context.Background(), opts)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (c *Client) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo,
 	})
 
 	// nodes
-	nodes, err := c.Cli.NodeList(context.Background(), types.NodeListOptions{})
+	nodes, err := c.api.NodeList(context.Background(), types.NodeListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *Client) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo,
 	for _, service := range services {
 		taskOpts.Filters.Add("service", service.ID)
 	}
-	tasks, err := c.Cli.TaskList(context.Background(), taskOpts)
+	tasks, err := c.api.TaskList(context.Background(), taskOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *Client) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo,
 }
 
 // Service returns a service
-func (c *Client) Service(name string) (*model.ServiceInfo, error) {
+func (c *dockerClient) Service(name string) (*model.ServiceInfo, error) {
 	service, err := c.ServiceList(&model.ServiceListArgs{
 		Name: name,
 	})

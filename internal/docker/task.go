@@ -10,10 +10,10 @@ import (
 )
 
 // TaskList return all running tasks of a service.
-func (c *Client) TaskList(service string) ([]*model.TaskInfo, error) {
+func (c *dockerClient) TaskList(service string) ([]*model.TaskInfo, error) {
 	tasksFilters := filters.NewArgs()
 	tasksFilters.Add("service", service)
-	tasks, err := c.Cli.TaskList(context.Background(), types.TaskListOptions{
+	tasks, err := c.api.TaskList(context.Background(), types.TaskListOptions{
 		Filters: tasksFilters,
 	})
 	if err != nil || len(tasks) == 0 {
@@ -26,7 +26,7 @@ func (c *Client) TaskList(service string) ([]*model.TaskInfo, error) {
 	nodes := make(map[string]string)
 	for _, t := range tasks {
 		if _, ok := nodes[t.NodeID]; !ok {
-			if node, _, e := c.Cli.NodeInspectWithRaw(context.Background(), t.NodeID); e == nil {
+			if node, _, e := c.api.NodeInspectWithRaw(context.Background(), t.NodeID); e == nil {
 				if node.Spec.Name == "" {
 					nodes[t.NodeID] = node.Description.Hostname
 				} else {
