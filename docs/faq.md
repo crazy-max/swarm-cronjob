@@ -2,8 +2,7 @@
 
 ## Timezones
 
-By default, all interpretation and scheduling is done with the specified timezone through `--timezone` flag or `TZ`
-environment variable (default to `UTC`).
+By default, all interpretation and scheduling is done with your local timezone (`TZ` environment variable).
 
 Individual cron schedules may also override the time zone they are to be interpreted in by providing an additional
 space-separated field at the beginning of the cron spec, of the form `CRON_TZ=Asia/Tokyo`.
