@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.9.0 (2021/01/03)
+
+* Refactor CI and dev workflow with buildx bake (#99)
+  * Upload artifacts
+  * Add `image-local` target
+  * Single job for artifacts and image
+  * Add `armv5` artifact
+* Use embedded tzdata package and remove `--timezone` flag (#98)
+* Go 1.15 (#97)
+* Send registry authentication details to Swarm agents (#96)
+* Handle registry auth from spec (#92)
+* Bump github.com/mitchellh/mapstructure from 1.3.3 to 1.4.0 (#88)
+* Bump github.com/alecthomas/kong from 0.2.11 to 0.2.12 (#89)
+* Docker image also available on [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/swarm-cronjob)
+* Bump github.com/rs/zerolog from 1.19.0 to 1.20.0 (#68)
+* Docs website with mkdocs
+* Switch to [Docker actions](https://github.com/docker/build-push-action)
+* Add notes about timezone (#43)
+* Add renovate example (#42)
+* Add MariaDB dump example (#35)
+
 ## 1.8.0 (2020/04/06)
 
 * Switch to kong command-line parser
