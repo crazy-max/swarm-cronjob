@@ -10,6 +10,8 @@
 * Use embedded tzdata package and remove `--timezone` flag (#98)
 * Go 1.15 (#97)
 * Send registry authentication details to Swarm agents (#96)
+* Docker client v20.10.1
+* Remove support for `freebsd/*` (moby/moby#38818)
 * Handle registry auth from spec (#92)
 * Bump github.com/mitchellh/mapstructure from 1.3.3 to 1.4.0 (#88)
 * Bump github.com/alecthomas/kong from 0.2.11 to 0.2.12 (#89)
