@@ -1,6 +1,6 @@
 module github.com/crazy-max/swarm-cronjob
 
-go 1.13
+go 1.15
 
 require (
 	github.com/Microsoft/go-winio v0.4.16 // indirect

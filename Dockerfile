@@ -1,5 +1,5 @@
 FROM --platform=${BUILDPLATFORM:-linux/amd64} tonistiigi/xx:golang AS xgo
-FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.13-alpine AS builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.15-alpine AS builder
 
 ARG VERSION=dev
 
