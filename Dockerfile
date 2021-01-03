@@ -35,7 +35,6 @@ RUN apk --update --no-cache add \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /app/swarm-cronjob /usr/local/bin/swarm-cronjob
-COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
 RUN swarm-cronjob --version
 
 ENTRYPOINT [ "swarm-cronjob" ]

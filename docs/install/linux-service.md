@@ -21,6 +21,7 @@ User=swarmcronjob
 Group=swarmcronjob
 ExecStart=/usr/local/bin/swarm-cronjob
 Restart=always
+#Environment=TZ=Europe/Paris
 
 [Install]
 WantedBy=multi-user.target

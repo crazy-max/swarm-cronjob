@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"strconv"
-	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
@@ -17,24 +16,22 @@ import (
 
 // SwarmCronjob represents an active swarm-cronjob object
 type SwarmCronjob struct {
-	docker   docker.Client
-	cron     *cron.Cron
-	location *time.Location
-	jobs     map[string]cron.EntryID
+	docker docker.Client
+	cron   *cron.Cron
+	jobs   map[string]cron.EntryID
 }
 
 // New creates new swarm-cronjob instance
-func New(location *time.Location) (*SwarmCronjob, error) {
+func New() (*SwarmCronjob, error) {
 	log.Debug().Msg("Creating Docker API client")
 	d, err := docker.NewEnvClient()
 
 	return &SwarmCronjob{
 		docker: d,
-		cron: cron.New(cron.WithLocation(location), cron.WithParser(cron.NewParser(
-			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor),
+		cron: cron.New(cron.WithParser(cron.NewParser(
+			cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor),
 		)),
-		location: location,
-		jobs:     make(map[string]cron.EntryID),
+		jobs: make(map[string]cron.EntryID),
 	}, err
 }
 

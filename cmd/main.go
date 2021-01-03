@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
-	"time"
+	_ "time/tzdata"
 
 	"github.com/alecthomas/kong"
 	"github.com/crazy-max/swarm-cronjob/internal/app"
@@ -23,6 +23,7 @@ var (
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	var err error
 
 	// Parse command line
 	_ = kong.Parse(&cli,
@@ -37,14 +38,8 @@ func main() {
 			Summary: true,
 		}))
 
-	// Load timezone location
-	location, err := time.LoadLocation(cli.Timezone)
-	if err != nil {
-		log.Panic().Err(err).Msgf("Cannot load timezone %s", cli.Timezone)
-	}
-
 	// Init
-	logging.Configure(&cli, location)
+	logging.Configure(&cli)
 	log.Info().Msgf("Starting swarm-cronjob %s", version)
 
 	// Handle os signals
@@ -60,7 +55,7 @@ func main() {
 	}()
 
 	// Init
-	sc, err = app.New(location)
+	sc, err = app.New()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Cannot initialize swarm-cronjob")
 	}
