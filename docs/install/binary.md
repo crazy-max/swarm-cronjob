@@ -8,8 +8,6 @@ Choose the archive matching the destination platform:
 
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_darwin_i386.tar.gz`]({{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_i386.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_x86_64.tar.gz)
-* [`swarm-cronjob_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_freebsd_i386.tar.gz)
-* [`swarm-cronjob_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_freebsd_x86_64.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
 * [`swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz`]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
