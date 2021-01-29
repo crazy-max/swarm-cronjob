@@ -74,7 +74,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
       -
         name: Build artifacts
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: artifact-all
       -
@@ -90,7 +90,7 @@ jobs:
           if-no-files-found: error
       -
         name: Build image
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           files: |
             ./docker-bake.hcl
