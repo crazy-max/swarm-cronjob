@@ -17,7 +17,7 @@ require (
 	github.com/cloudflare/cfssl v1.5.0 // indirect
 	github.com/containerd/containerd v1.4.3 // indirect
 	github.com/containerd/continuity v0.0.0-20201208142359-180525291bb7 // indirect
-	github.com/docker/cli v20.10.1+incompatible
+	github.com/docker/cli v20.10.3+incompatible
 	github.com/docker/distribution v0.0.0-20190905152932-14b96e55d84c // indirect
 	github.com/docker/docker v20.10.1+incompatible
 	github.com/docker/docker-credential-helpers v0.6.3 // indirect
@@ -47,6 +47,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/spf13/cobra v1.1.1 // indirect
 	github.com/theupdateframework/notary v0.6.1 // indirect
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324 // indirect
 	google.golang.org/grpc v1.34.0 // indirect
 	gopkg.in/dancannon/gorethink.v3 v3.0.5 // indirect
