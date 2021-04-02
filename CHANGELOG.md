@@ -3,10 +3,10 @@
 ## 1.9.0 (2021/01/03)
 
 * Refactor CI and dev workflow with buildx bake (#99)
-  * Upload artifacts
-  * Add `image-local` target
-  * Single job for artifacts and image
-  * Add `armv5` artifact
+    * Upload artifacts
+    * Add `image-local` target
+    * Single job for artifacts and image
+    * Add `armv5` artifact
 * Use embedded tzdata package and remove `--timezone` flag (#98)
 * Go 1.15 (#97)
 * Send registry authentication details to Swarm agents (#96)
