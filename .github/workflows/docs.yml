@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v1.3.0
       -
         name: Build docs
         uses: docker/bake-action@v1
