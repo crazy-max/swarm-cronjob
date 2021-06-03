@@ -37,12 +37,14 @@ target "lint" {
   inherits = ["go-version"]
   dockerfile = "./hack/lint.Dockerfile"
   target = "lint"
+  output = ["type=cacheonly"]
 }
 
 target "vendor-validate" {
   inherits = ["go-version"]
   dockerfile = "./hack/vendor.Dockerfile"
   target = "validate"
+  output = ["type=cacheonly"]
 }
 
 target "vendor-update" {
