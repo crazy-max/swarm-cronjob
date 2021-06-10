@@ -7,7 +7,7 @@ require (
 	github.com/Microsoft/hcsshim v0.8.14 // indirect
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/agl/ed25519 v0.0.0-00010101000000-000000000000 // indirect
-	github.com/alecthomas/kong v0.2.16
+	github.com/alecthomas/kong v0.2.17
 	github.com/bitly/go-hostpool v0.1.0 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
