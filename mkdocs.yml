@@ -21,7 +21,7 @@ extra:
       link: https://twitter.com/crazyws
   plausible:
     server: plausible.re4per.com
-    domain: crazymax.dev/artifactory-cleanup
+    domain: crazymax.dev/swarm-cronjob
 
 theme:
   name: material
