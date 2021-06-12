@@ -17,7 +17,7 @@ require (
 	github.com/cloudflare/cfssl v1.5.0 // indirect
 	github.com/containerd/containerd v1.4.3 // indirect
 	github.com/containerd/continuity v0.0.0-20201208142359-180525291bb7 // indirect
-	github.com/docker/cli v20.10.5+incompatible
+	github.com/docker/cli v20.10.7+incompatible
 	github.com/docker/distribution v0.0.0-20190905152932-14b96e55d84c // indirect
 	github.com/docker/docker v20.10.5+incompatible
 	github.com/docker/docker-credential-helpers v0.6.3 // indirect
