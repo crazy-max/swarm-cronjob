@@ -1,7 +1,7 @@
 site_name: swarm-cronjob
 site_description: Create jobs on a time-based schedule on Docker Swarm
 site_author: CrazyMax
-site_url: https://crazy-max.github.io/swarm-cronjob/
+site_url: https://crazymax.dev/swarm-cronjob/
 edit_uri: edit/master/docs/
 docs_dir: docs
 
@@ -19,6 +19,9 @@ extra:
       link: https://github.com/crazy-max/swarm-cronjob
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/crazyws
+  plausible:
+    server: plausible.re4per.com
+    domain: crazymax.dev/artifactory-cleanup
 
 theme:
   name: material
@@ -66,10 +69,6 @@ plugins:
       prebuild_index: python
       lang:
         - en
-
-google_analytics:
-  - UA-12516800-14
-  - auto
 
 nav:
   - Home: index.md

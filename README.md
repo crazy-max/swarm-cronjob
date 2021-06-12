@@ -1,7 +1,7 @@
-<p align="center"><a href="https://crazy-max.github.io/swarm-cronjob/" target="_blank"><img height="128" src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.github/swarm-cronjob.png"></a></p>
+<p align="center"><a href="https://crazymax.dev/swarm-cronjob/" target="_blank"><img height="128" src="https://raw.githubusercontent.com/crazy-max/swarm-cronjob/master/.github/swarm-cronjob.png"></a></p>
 
 <p align="center">
-  <a href="https://crazy-max.github.io/swarm-cronjob/"><img src="https://img.shields.io/badge/doc-mkdocs-02a6f2?style=flat-square&logo=read-the-docs" alt="Documentation"></a>
+  <a href="https://crazymax.dev/swarm-cronjob/"><img src="https://img.shields.io/badge/doc-mkdocs-02a6f2?style=flat-square&logo=read-the-docs" alt="Documentation"></a>
   <a href="https://github.com/crazy-max/swarm-cronjob/releases/latest"><img src="https://img.shields.io/github/release/crazy-max/swarm-cronjob.svg?style=flat-square" alt="GitHub release"></a>
   <a href="https://github.com/crazy-max/swarm-cronjob/releases/latest"><img src="https://img.shields.io/github/downloads/crazy-max/swarm-cronjob/total.svg?style=flat-square" alt="Total downloads"></a>
   <a href="https://github.com/crazy-max/swarm-cronjob/actions?workflow=build"><img src="https://img.shields.io/github/workflow/status/crazy-max/swarm-cronjob/build?label=build&logo=github&style=flat-square" alt="Build Status"></a>
@@ -24,7 +24,7 @@ and Docker API.
 
 ## Documentation
 
-Documentation can be found on https://crazy-max.github.io/swarm-cronjob/
+Documentation can be found on https://crazymax.dev/swarm-cronjob/
 
 ## How can I help?
 
