@@ -29,7 +29,6 @@ COPY --from=build /out/*.tar.gz /
 COPY --from=build /out/*.zip /
 
 FROM alpine
-LABEL maintainer="CrazyMax"
 
 RUN apk --update --no-cache add \
   ca-certificates \
