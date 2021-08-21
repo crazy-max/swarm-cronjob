@@ -25,8 +25,26 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/swarm-cronjob
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Validate
+        uses: docker/bake-action@v1
+        with:
+          targets: validate
+          pull: true
+
   build:
     runs-on: ubuntu-latest
+    needs:
+      - validate
     steps:
       -
         name: Checkout
@@ -43,6 +61,8 @@ jobs:
             ${{ env.GHCR_SLUG }}
           tags: |
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
             type=ref,event=pr
             type=edge
           labels: |
@@ -75,6 +95,7 @@ jobs:
         uses: docker/bake-action@v1
         with:
           targets: artifact-all
+          pull: true
       -
         name: Move artifacts
         run: |
@@ -94,6 +115,7 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
           targets: image-all
+          pull: true
           push: ${{ github.event_name != 'pull_request' }}
       -
         name: GitHub Release
