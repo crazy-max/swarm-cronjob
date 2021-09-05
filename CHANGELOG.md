@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.10.0 (2021/09/05)
+
+* Docker client v20.10.8 (#109 #110 #134 #135)
+* Go 1.17 (#114 #140)
+* Add `darwin/amd64`, `darwin/arm64`, `linux/riscv64`, `windows/arm64` artifacts (#141)
+* Alpine Linux 3.14
+* MkDocs Materials 7.2.6 (#143)
+* Remove `linux/s390x` Docker platform support (for now)
+* Switch to goreleaser-xx (#111)
+* Bump github.com/rs/zerolog from 1.20.0 to 1.24.0 (#131 #137 #142)
+* Bump github.com/mitchellh/mapstructure from 1.4.0 to 1.4.1 (#103)
+* Bump github.com/alecthomas/kong from 0.2.12 to 0.2.16 (#106 #112)
+
 ## 1.9.0 (2021/01/03)
 
 * Refactor CI and dev workflow with buildx bake (#99)
