@@ -16,7 +16,7 @@ It is possible to always use the latest stable tag or to use another service tha
 
 Following platforms for this image are available:
 
-```shell
+```
 $ docker run --rm mplatform/mquery crazymax/swarm-cronjob:latest
 Image: crazymax/swarm-cronjob:latest
  * Manifest List: Yes
@@ -52,18 +52,18 @@ services:
 Edit this example with your preferences and deploy the stack:
 
 ```shell
-$ docker stack deploy -c swarm_cronjob.yml swarm_cronjob
+docker stack deploy -c swarm_cronjob.yml swarm_cronjob
 ```
 
 Or use the following command:
 
 ```shell
-$ docker service create --name swarm_cronjob \
-    --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
-    --env "LOG_LEVEL=info" \
-    --env "LOG_JSON=false" \
-    --constraint "node.role == manager" \
-    crazymax/swarm-cronjob
+docker service create --name swarm_cronjob \
+  --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+  --env "LOG_LEVEL=info" \
+  --env "LOG_JSON=false" \
+  --constraint "node.role == manager" \
+  crazymax/swarm-cronjob
 ```
 
 You are now ready to [deploy cronjob based services with swarm](../usage/get-started.md).

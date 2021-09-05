@@ -24,7 +24,7 @@ Choose the archive matching the destination platform:
 And extract swarm-cronjob:
 
 ```shell
-$ wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
 After getting the binary, it can be tested with [`./swarm-cronjob --help`](../usage/cli.md) command and moved to a
@@ -39,14 +39,14 @@ Steps below are the recommended server configuration.
 Create user to run swarm-cronjob (ex. `swarm-cronjob`)
 
 ```shell
-$ groupadd swarm-cronjob
-$ useradd -s /bin/false -d /bin/null -g swarm-cronjob swarm-cronjob
+groupadd swarm-cronjob
+useradd -s /bin/false -d /bin/null -g swarm-cronjob swarm-cronjob
 ```
 
 ### Copy binary to global location
 
 ```shell
-$ cp swarm-cronjob /usr/local/bin/swarm-cronjob
+cp swarm-cronjob /usr/local/bin/swarm-cronjob
 ```
 
 ## Running swarm-cronjob
@@ -60,7 +60,7 @@ See how to create [Linux service](linux-service.md) to start swarm-cronjob autom
 ### 2. Running from terminal
 
 ```shell
-$ /usr/local/bin/swarm-cronjob
+/usr/local/bin/swarm-cronjob
 ```
 
 !!! note
