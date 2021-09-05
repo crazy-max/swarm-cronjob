@@ -32,12 +32,12 @@ Change the user, group, and other required startup values following your needs.
 Enable and start swarm-cronjob at boot:
 
 ```shell
-$ sudo systemctl enable swarm-cronjob
-$ sudo systemctl start swarm-cronjob
+sudo systemctl enable swarm-cronjob
+sudo systemctl start swarm-cronjob
 ```
 
 To view logs:
 
 ```shell
-$ journalctl -fu swarm-cronjob.service
+journalctl -fu swarm-cronjob.service
 ```

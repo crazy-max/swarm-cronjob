@@ -86,4 +86,6 @@ Same conditions have to be applied as `replicated` mode excepted:
 
 Once ready, deploy your global cron stack on the swarm cluster:
 
-`docker stack deploy -c global.yml global`
+```shell
+docker stack deploy -c global.yml global
+```

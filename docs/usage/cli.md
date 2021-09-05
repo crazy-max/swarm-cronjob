@@ -3,7 +3,7 @@
 ## Usage
 
 ```shell
-$ swarm-cronjob [options]
+swarm-cronjob [options]
 ```
 
 ## Options
