@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/alecthomas/kong v0.2.17
-	github.com/docker/cli v20.10.8+incompatible
+	github.com/docker/cli v20.10.10+incompatible
 	github.com/docker/docker v20.10.10+incompatible
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/pkg/errors v0.9.1
