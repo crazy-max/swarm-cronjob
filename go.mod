@@ -3,7 +3,7 @@ module github.com/crazy-max/swarm-cronjob
 go 1.17
 
 require (
-	github.com/alecthomas/kong v0.2.18
+	github.com/alecthomas/kong v0.2.22
 	github.com/docker/cli v20.10.10+incompatible
 	github.com/docker/docker v20.10.10+incompatible
 	github.com/mitchellh/mapstructure v1.4.3
