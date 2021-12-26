@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.3
 
-FROM squidfunk/mkdocs-material:7.2.6 AS base
+ARG MKDOCS_VERSION="7.2.6"
+
+FROM squidfunk/mkdocs-material:${MKDOCS_VERSION} AS base
 RUN apk add --no-cache \
     git \
     git-fast-import \
@@ -18,7 +20,7 @@ RUN apk add --no-cache \
 
 FROM base AS generate
 RUN --mount=type=bind,target=. \
-  mkdocs build --strict --site-dir /tmp/site
+  mkdocs build --strict --site-dir /out
 
 FROM scratch AS release
-COPY --from=generate /tmp/site/ /
+COPY --from=generate /out /
