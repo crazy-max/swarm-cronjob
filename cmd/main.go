@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"syscall"
 	_ "time/tzdata"
 
 	"github.com/alecthomas/kong"
@@ -43,7 +42,7 @@ func main() {
 
 	// Handle os signals
 	channel := make(chan os.Signal)
-	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(channel, os.Interrupt, SIGTERM)
 	go func() {
 		sig := <-channel
 		if sc != nil {
