@@ -5,19 +5,7 @@ on:
   push:
     tags:
       - 'v*'
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'CHANGELOG.md'
-      - 'mkdocs.yml'
   pull_request:
-    branches:
-      - 'master'
-    paths:
-      - '.github/workflows/docs.yml'
-      - 'docs/**'
-      - 'CHANGELOG.md'
-      - 'mkdocs.yml'
 
 jobs:
   publish:
@@ -48,5 +36,6 @@ jobs:
         with:
           target_branch: gh-pages
           build_dir: site
+          jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

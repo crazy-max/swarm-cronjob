@@ -27,7 +27,7 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          echo ::set-output name=build_tag::crazymax/swarm-cronjob:local
+          echo ::set-output name=build_tag::swarm-cronjob:local
           echo ::set-output name=service_name::swarm-cronjob
           echo ::set-output name=running_timeout::120
           echo ::set-output name=running_log_check::Number of cronjob tasks: 6
