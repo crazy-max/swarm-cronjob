@@ -7,5 +7,6 @@ type Job struct {
 	Schedule     string
 	SkipRunning  bool
 	RegistryAuth bool
+	UpdateImage  bool
 	Replicas     uint64
 }

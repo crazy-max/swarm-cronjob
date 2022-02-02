@@ -81,6 +81,10 @@ func (c *Client) Run() {
 		updateOpts.RegistryAuthFrom = types.RegistryAuthFromSpec
 	}
 
+	if c.Job.UpdateImage {
+		updateOpts.QueryRegistry = true
+	}
+
 	// Update service
 	response, err := c.Docker.ServiceUpdate(context.Background(), serviceUp.ID, serviceUp.Version, serviceUp.Spec, updateOpts)
 	if err != nil {

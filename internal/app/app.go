@@ -121,6 +121,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 			Enable:      false,
 			SkipRunning: false,
 			Replicas:    1,
+			UpdateImage: false,
 		},
 	}
 
@@ -156,7 +157,13 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 				log.Debug().Str("service", service.Name).Msg("Scale down detected. Skipping cronjob")
 				return false, nil
 			}
+		case "swarm.cronjob.update-image":
+			wc.Job.UpdateImage, err = strconv.ParseBool(labelValue)
+			if err != nil {
+				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
+			}
 		}
+
 	}
 
 	// Disabled or non-cron service
