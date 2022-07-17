@@ -1,0 +1,17 @@
+version: "3.2"
+
+services:
+  test:
+    image: alpine:3.16
+    command: date
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=* * * * *"
+        - "swarm.cronjob.skip-running=false"
+        - "swarm.cronjob.query-registry=true"
+        - "swarm.cronjob.registry-auth=true"
+      restart_policy:
+        condition: none
