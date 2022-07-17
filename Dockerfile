@@ -16,6 +16,7 @@ RUN --mount=type=bind,source=.,target=/src,rw \
   go mod tidy && go mod download
 
 FROM vendored AS build
+ARG GIT_REF
 ARG TARGETPLATFORM
 RUN --mount=type=bind,target=/src,rw \
   --mount=type=cache,target=/root/.cache \
