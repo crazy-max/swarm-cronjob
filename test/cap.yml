@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  test:
+    image: alpine:edge
+    command: >
+      /bin/sh -c "apk add libcap-utils && capsh --print | grep Current: | cut -d' ' -f2"
+    deploy:
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=*/5 * * * * *"
+        - "swarm.cronjob.skip-running=true"
+        - "swarm.cronjob.capabilities=NET_ADMIN"

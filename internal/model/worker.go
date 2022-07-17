@@ -8,5 +8,6 @@ type Job struct {
 	SkipRunning   bool
 	RegistryAuth  bool
 	QueryRegistry *bool
+	Capabilities  []string
 	Replicas      uint64
 }

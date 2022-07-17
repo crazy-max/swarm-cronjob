@@ -10,3 +10,4 @@ You can configure your service using swarm-cronjob through Docker labels:
 | `swarm.cronjob.replicas`       | `1`     | Number of replicas to set on schedule in `replicated` mode.                                                        |
 | `swarm.cronjob.registry-auth`  | `false` | Send registry authentication details to Swarm agents.                                                              |
 | `swarm.cronjob.query-registry` |         | Indicates whether the service update requires contacting a registry                                                |
+| `swarm.cronjob.capabilities`   |         | Comma separated list of kernel capabilities to add to the default set when service is updated                      |
