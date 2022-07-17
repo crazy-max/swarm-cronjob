@@ -27,6 +27,10 @@ theme:
   name: material
   custom_dir: docs/_overrides
   language: en
+  features:
+    - search.highlight
+    - search.share
+    - search.suggest
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -61,11 +65,14 @@ markdown_extensions:
       base_path: docs
   - meta
   - pymdownx.details
-  - pymdownx.tabbed
-  - pymdownx.superfences
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - toc:
       permalink: true
 
@@ -76,9 +83,9 @@ plugins:
   - git-revision-date-localized:
       type: iso_datetime
       enable_creation_date: true
+      fallback_to_build_date: true
   - macros
   - search:
-      prebuild_index: python
       lang:
         - en
 
