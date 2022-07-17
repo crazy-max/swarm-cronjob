@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.11.0 (2022/07/17)
+
+* Option to query the registry on service update (#201)
+* Fix possible nil pointer with ElectAuthServer from docker cli (#202)
+* Go 1.18 (#204)
+* Alpine Linux 3.16 (#166 #206)
+* goreleaser-xx 1.2.5
+* Move `syscall` to `golang.org/x/sys`
+* MkDocs Material 8.3.9 (#205)
+* Enhance dockerfiles (#163)
+* Bump github.com/alecthomas/kong from 0.2.17 to 0.6.1 (#152 #162 #165 #176 #200)
+* Bump github.com/docker/cli from 20.10.8 to 20.10.17 (#149 #160 #197)
+* Bump github.com/docker/docker from 20.10.8 to 20.10.17 (#148 #159 #196)
+* Bump github.com/mitchellh/mapstructure from 1.4.1 to 1.5.0 (#145 #155 #181)
+* Bump github.com/rs/zerolog from 1.24.0 to 1.27.0 (#144 #150 #162 #198)
+
 ## 1.10.0 (2021/09/05)
 
 * Docker client v20.10.8 (#109 #110 #134 #135)
