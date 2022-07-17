@@ -37,7 +37,7 @@ COPY --from=build /out/*.zip /
 FROM scratch AS binary
 COPY --from=build /usr/local/bin/swarm-cronjob* /
 
-FROM alpine:3.15
+FROM alpine:3.16
 RUN apk --update --no-cache add ca-certificates openssl
 COPY --from=build /usr/local/bin/swarm-cronjob /usr/local/bin/swarm-cronjob
 ENTRYPOINT [ "swarm-cronjob" ]
