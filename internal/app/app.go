@@ -10,7 +10,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mitchellh/mapstructure"
-	"github.com/robfig/cron/v3"
+	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
 

@@ -12,7 +12,7 @@ import (
 )
 
 // ServiceList return all services.
-func (c *dockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error) {
+func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error) {
 	opts := types.ServiceListOptions{
 		Filters: filters.NewArgs(),
 	}
@@ -97,7 +97,7 @@ func (c *dockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.Servic
 }
 
 // Service returns a service
-func (c *dockerClient) Service(name string) (*model.ServiceInfo, error) {
+func (c *DockerClient) Service(name string) (*model.ServiceInfo, error) {
 	service, err := c.ServiceList(&model.ServiceListArgs{
 		Name: name,
 	})

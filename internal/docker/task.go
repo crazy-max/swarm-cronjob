@@ -10,7 +10,7 @@ import (
 )
 
 // TaskList return all running tasks of a service.
-func (c *dockerClient) TaskList(service string) ([]*model.TaskInfo, error) {
+func (c *DockerClient) TaskList(service string) ([]*model.TaskInfo, error) {
 	tasksFilters := filters.NewArgs()
 	tasksFilters.Add("service", service)
 	tasks, err := c.api.TaskList(context.Background(), types.TaskListOptions{
