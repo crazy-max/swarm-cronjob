@@ -62,7 +62,7 @@ func (c *dockerClient) DistributionInspect(ctx context.Context, image, encodedAu
 
 // RetrieveAuthTokenFromImage retrieves an encoded auth token given a complete image
 func (c *dockerClient) RetrieveAuthTokenFromImage(ctx context.Context, image string) (string, error) {
-	return command.RetrieveAuthTokenFromImage(ctx, c.cli, image)
+	return retrieveAuthTokenFromImage(ctx, c.cli, image)
 }
 
 // ServiceUpdate updates a Service. The version number is required to avoid conflicting writes.
