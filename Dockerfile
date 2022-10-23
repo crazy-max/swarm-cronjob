@@ -1,44 +1,78 @@
 # syntax=docker/dockerfile:1
 
 ARG GO_VERSION="1.19"
-ARG GORELEASER_XX_VERSION="1.2.5"
+ARG ALPINE_VERSION="3.16"
+ARG XX_VERSION="1.1.2"
 
-FROM --platform=$BUILDPLATFORM crazymax/goreleaser-xx:${GORELEASER_XX_VERSION} AS goreleaser-xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS base
+COPY --from=xx / /
 ENV CGO_ENABLED=0
-COPY --from=goreleaser-xx / /
 RUN apk add --no-cache file git
 WORKDIR /src
 
+FROM base AS version
+ARG GIT_REF
+RUN --mount=target=. <<EOT
+  set -e
+  case "$GIT_REF" in
+    refs/tags/v*) version="${GIT_REF#refs/tags/}" ;;
+    *) version=$(git describe --match 'v[0-9]*' --dirty='.m' --always --tags) ;;
+  esac
+  echo "$version" | tee /tmp/.version
+EOT
+
 FROM base AS vendored
-RUN --mount=type=bind,source=.,target=/src,rw \
-  --mount=type=cache,target=/go/pkg/mod \
-  go mod tidy && go mod download
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+  go mod download
 
 FROM vendored AS build
-ARG GIT_REF
 ARG TARGETPLATFORM
-RUN --mount=type=bind,target=/src,rw \
-  --mount=type=cache,target=/root/.cache \
-  --mount=type=cache,target=/go/pkg/mod \
-  goreleaser-xx --debug \
-    --name "swarm-cronjob" \
-    --dist "/out" \
-    --main="./cmd" \
-    --flags="-trimpath" \
-    --ldflags="-s -w -X 'main.version={{.Version}}'" \
-    --files="CHANGELOG.md" \
-    --files="LICENSE" \
-    --files="README.md"
+RUN --mount=type=bind,target=. \
+    --mount=type=bind,from=version,source=/tmp/.version,target=/tmp/.version \
+    --mount=type=cache,target=/root/.cache \
+    --mount=type=cache,target=/go/pkg/mod <<EOT
+  set -ex
+  xx-go build -trimpath -ldflags "-s -w -X main.version=$(cat /tmp/.version)" -o /usr/bin/swarm-cronjob ./cmd
+  xx-verify --static /usr/bin/swarm-cronjob
+EOT
+
+FROM scratch AS binary-unix
+COPY --link --from=build /usr/bin/swarm-cronjob /
+
+FROM scratch AS binary-windows
+COPY --link --from=build /usr/bin/swarm-cronjob /swarm-cronjob.exe
+
+FROM binary-unix AS binary-darwin
+FROM binary-unix AS binary-linux
+FROM binary-$TARGETOS AS binary
+
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS build-artifact
+RUN apk add --no-cache bash tar zip
+WORKDIR /work
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+RUN --mount=type=bind,target=/src \
+    --mount=type=bind,from=binary,target=/build \
+    --mount=type=bind,from=version,source=/tmp/.version,target=/tmp/.version <<EOT
+  set -ex
+  mkdir /out
+  version=$(cat /tmp/.version)
+  cp /build/* /src/CHANGELOG.md /src/LICENSE /src/README.md .
+  if [ "$TARGETOS" = "windows" ]; then
+    zip -r "/out/swarm-cronjob_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.zip" .
+  else
+    tar -czvf "/out/swarm-cronjob_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.tgz" .
+  fi
+EOT
 
 FROM scratch AS artifact
-COPY --from=build /out/*.tar.gz /
-COPY --from=build /out/*.zip /
+COPY --link --from=build-artifact /out /
 
-FROM scratch AS binary
-COPY --from=build /usr/local/bin/swarm-cronjob* /
-
-FROM alpine:3.16
+FROM alpine:${ALPINE_VERSION}
 RUN apk --update --no-cache add ca-certificates openssl
-COPY --from=build /usr/local/bin/swarm-cronjob /usr/local/bin/swarm-cronjob
+COPY --from=build /usr/bin/swarm-cronjob /usr/local/bin/swarm-cronjob
 ENTRYPOINT [ "swarm-cronjob" ]
