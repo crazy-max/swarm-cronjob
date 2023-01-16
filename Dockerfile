@@ -65,7 +65,7 @@ RUN --mount=type=bind,target=/src \
   if [ "$TARGETOS" = "windows" ]; then
     zip -r "/out/swarm-cronjob_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.zip" .
   else
-    tar -czvf "/out/swarm-cronjob_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.tgz" .
+    tar -czvf "/out/swarm-cronjob_${version#v}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.gz" .
   fi
 EOT
 
