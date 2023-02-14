@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.12.0 (2023/02/14)
+
+* Go 1.19 (#214)
+* Alpine Linux 3.17 (#223)
+* Enhance workflow (#215)
+* Bump github.com/alecthomas/kong from 0.6.1 to 0.7.1 (#220)
+* Bump github.com/docker/cli from 20.10.17+incompatible to 20.10.22+incompatible (#221)
+* Bump github.com/docker/docker from 20.10.17+incompatible to 20.10.22+incompatible (#222)
+* Bump golang.org/x/sys to 0.5.0 (#224 #230)
+* Bump github.com/rs/zerolog from 1.27.0 to 1.29.0 (#207 #227)
+* Bump github.com/docker/distribution from 2.7.1+incompatible to 2.8.0+incompatible (#233)
+
 ## 1.11.0 (2022/07/17)
 
 * Option to query the registry on service update (#201)
