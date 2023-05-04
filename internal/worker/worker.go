@@ -66,6 +66,12 @@ func (c *Client) Run() {
 	// Set ForceUpdate with Version to ensure update
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
+	// Add capabilities
+	if len(c.Job.Capabilities) > 0 {
+		log.Debug().Str("service", c.Job.Name).Strs("capabilities", c.Job.Capabilities).Msg("Set capabilities")
+		serviceUp.Spec.TaskTemplate.ContainerSpec.CapabilityAdd = c.Job.Capabilities
+	}
+
 	// Update options
 	updateOpts := types.ServiceUpdateOptions{}
 	if c.Job.RegistryAuth {

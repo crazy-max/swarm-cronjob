@@ -21,6 +21,18 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - date
+          - sleep
+          - error
+          - configs
+          - global
+          - more_replicas
+          - query
+          - cap
     steps:
       -
         name: Checkout
@@ -34,7 +46,7 @@ jobs:
           echo ::set-output name=build_tag::swarm-cronjob:local
           echo ::set-output name=service_name::swarm-cronjob
           echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::Number of cronjob tasks: 7
+          echo ::set-output name=running_log_check::Number of cronjob tasks: 1
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -52,15 +64,9 @@ jobs:
           docker swarm leave --force > /dev/null 2>&1 || true
           docker swarm init --advertise-addr $(dig +short myip.opendns.com @resolver1.opendns.com)
       -
-        name: Swarm deploy stacks
+        name: Swarm deploy stack
         run: |
-          docker stack deploy date -c test/date.yml
-          docker stack deploy sleep -c test/sleep.yml
-          docker stack deploy error -c test/error.yml
-          docker stack deploy configs -c test/configs.yml
-          docker stack deploy global -c test/global.yml
-          docker stack deploy more_replicas -c test/more_replicas.yml
-          docker stack deploy query -c test/query.yml
+          docker stack deploy ${{ matrix.service }} -c test/${{ matrix.service }}.yml
       -
         name: Create service
         run: |
@@ -86,4 +92,7 @@ jobs:
               exit 1
             fi
           done < <(docker service logs -f ${{ steps.prep.outputs.service_name }} 2>&1)
-          docker swarm leave --force > /dev/null 2>&1 || true
+      -
+        name: Service logs
+        run: |
+          docker service logs ${{ matrix.service }}_test

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
@@ -157,6 +158,8 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
 			wc.Job.QueryRegistry = &queryRegistry
+		case "swarm.cronjob.capabilities":
+			wc.Job.Capabilities = strings.Split(labelValue, ",")
 		case "swarm.cronjob.scaledown":
 			if labelValue == "true" {
 				log.Debug().Str("service", service.Name).Msg("Scale down detected. Skipping cronjob")
