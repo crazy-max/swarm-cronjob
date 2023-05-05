@@ -12,11 +12,14 @@ on:
     paths-ignore:
       - '**.md'
   pull_request:
-    branches:
-      - 'master'
-      - 'v*'
     paths-ignore:
       - '**.md'
+
+env:
+  BUILD_TAG: 'swarm-cronjob:local'
+  SERVICE_NAME: 'swarm-cronjob'
+  RUNNING_TIMEOUT: '120'
+  RUNNING_LOG_CHECK: 'Number of cronjob tasks: 7'
 
 jobs:
   e2e:
@@ -25,16 +28,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      -
-        name: Prepare
-        id: prep
-        run: |
-          echo ::set-output name=build_tag::swarm-cronjob:local
-          echo ::set-output name=service_name::swarm-cronjob
-          echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::Number of cronjob tasks: 7
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -64,26 +57,26 @@ jobs:
       -
         name: Create service
         run: |
-          docker service create --name ${{ steps.prep.outputs.service_name }} \
+          docker service create --name ${{ env.SERVICE_NAME }} \
             --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock \
             --env "LOG_LEVEL=debug" \
             --env "LOG_JSON=false" \
             --constraint 'node.role == manager' \
-            ${{ steps.prep.outputs.build_tag }}
+            ${{ env.BUILD_TAG }}
       -
         name: Test service
         run: |
-          TIMEOUT=$((SECONDS + ${{ steps.prep.outputs.running_timeout }}))
+          TIMEOUT=$((SECONDS + ${{ env.RUNNING_TIMEOUT }}))
           while read LOGLINE; do
             echo ${LOGLINE}
-            if [[ ${LOGLINE} == *"${{ steps.prep.outputs.running_log_check }}"* ]]; then
+            if [[ ${LOGLINE} == *"${{ env.RUNNING_LOG_CHECK }}"* ]]; then
               echo "🎉 Service up!"
               break
             fi
             if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "❌ Failed to run ${{ steps.prep.outputs.service_name }} service"
+              >&2 echo "❌ Failed to run ${{ env.SERVICE_NAME }} service"
               docker swarm leave --force > /dev/null 2>&1 || true
               exit 1
             fi
-          done < <(docker service logs -f ${{ steps.prep.outputs.service_name }} 2>&1)
+          done < <(docker service logs -f ${{ env.SERVICE_NAME }} 2>&1)
           docker swarm leave --force > /dev/null 2>&1 || true
