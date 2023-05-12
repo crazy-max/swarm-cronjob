@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/alecthomas/kong v0.7.1
-	github.com/distribution/distribution v2.8.1+incompatible
+	github.com/distribution/distribution v2.8.2+incompatible
 	github.com/docker/cli v23.0.5+incompatible
 	github.com/docker/docker v23.0.5+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
