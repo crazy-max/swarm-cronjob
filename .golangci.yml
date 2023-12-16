@@ -3,7 +3,6 @@ run:
 
 linters:
   enable:
-    - deadcode
     - depguard
     - gofmt
     - goimports
@@ -13,20 +12,21 @@ linters:
     - ineffassign
     - misspell
     - typecheck
-    - varcheck
     - errname
     - makezero
     - whitespace
+    - unused
   disable-all: true
 
 linters-settings:
   depguard:
-    list-type: blacklist
-    include-go-root: true
-    packages:
-      # The io/ioutil package has been deprecated.
-      # https://go.dev/doc/go1.16#ioutil
-      - io/ioutil
+    rules:
+      main:
+        deny:
+          # The io/ioutil package has been deprecated.
+          # https://go.dev/doc/go1.16#ioutil
+          - pkg: "io/ioutil"
+            desc: The io/ioutil package has been deprecated.
   importas:
     no-unaliased: true
 
@@ -35,3 +35,7 @@ issues:
     - linters:
         - revive
       text: "stutters"
+
+# show all
+max-issues-per-linter: 0
+max-same-issues: 0
