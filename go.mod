@@ -1,6 +1,6 @@
 module github.com/crazy-max/swarm-cronjob
 
-go 1.18
+go 1.21
 
 require (
 	github.com/alecthomas/kong v0.7.1
