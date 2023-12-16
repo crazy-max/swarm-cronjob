@@ -30,11 +30,10 @@ Documentation can be found on https://crazymax.dev/swarm-cronjob/
 
 ## Contributing
 
-Want to contribute? Awesome! The most basic way to show your support is to star the project, or to raise issues. If
-you want to open a pull request, please read the [contributing guidelines](.github/CONTRIBUTING.md).
-
-You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) or by
-making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely!
+Want to contribute? Awesome! The most basic way to show your support is to star
+the project, or to raise issues. You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max)
+or by making a [PayPal donation](https://www.paypal.me/crazyws) to ensure this
+journey continues indefinitely!
 
 Thanks again for your support, it is much appreciated! :pray:
 
