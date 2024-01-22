@@ -34,7 +34,7 @@ type DockerClient struct {
 
 // NewEnvClient initializes a new Docker API client based on environment variables
 func NewEnvClient() (*DockerClient, error) {
-	dockerAPICli, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.12"))
+	dockerAPICli, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.24"))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize Docker API client")
 	}
