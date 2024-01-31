@@ -97,9 +97,9 @@ jobs:
             *.cache-to=type=gha,scope=artifact-${{ env.PLATFORM_PAIR }},mode=max
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: swarm-cronjob
+          name: swarm-cronjob-${{ env.PLATFORM_PAIR }}
           path: ${{ env.DESTDIR }}
           if-no-files-found: error
 
@@ -113,10 +113,11 @@ jobs:
         uses: actions/checkout@v4
       -
         name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: swarm-cronjob
           path: ${{ env.DESTDIR }}
+          pattern: swarm-cronjob-*
+          merge-multiple: true
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
