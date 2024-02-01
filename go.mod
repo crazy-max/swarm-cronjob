@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/distribution/distribution v2.8.3+incompatible
-	github.com/docker/cli v24.0.7+incompatible
+	github.com/docker/cli v25.0.2+incompatible
 	github.com/docker/docker v24.0.7+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
