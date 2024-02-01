@@ -7,6 +7,11 @@ updates:
       interval: "daily"
       time: "08:00"
       timezone: "Europe/Paris"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "github.com/docker/cli"
+          - "github.com/docker/docker"
     labels:
       - "kind/dependencies"
       - "bot"
