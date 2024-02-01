@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.13.0 (2024/02/01)
+
+* Enables automatic API version negotiation for the docker client (#313)
+* Go 1.21 (#285 #284)
+* Alpine Linux 3.19 (#317)
+* Bump github.com/alecthomas/kong to 0.8.1 (#289)
+* Bump github.com/distribution/distribution to 2.8.3+incompatible (#259 #260 #302)
+* Bump github.com/docker/cli to 24.0.7+incompatible (#250 #290)
+* Bump github.com/docker/docker to 24.0.7+incompatible (#250 #290)
+* Bump github.com/opencontainers/image-spec to 1.0.2 (#239)
+* Bump github.com/prometheus/client_golang to 1.11.1 (#234)
+* Bump github.com/rs/zerolog from 1.29.0 to 1.31.0 (#245 #288)
+* Bump golang.org/x/crypto to 0.17.0 (#237 #303)
+* Bump golang.org/x/net to 0.17.0 (#238 #287)
+* Bump golang.org/x/sys to 0.16.0 (#252 #279 #301 #306)
+
 ## 1.12.0 (2023/02/14)
 
 * Go 1.19 (#214)
