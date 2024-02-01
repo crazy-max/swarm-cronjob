@@ -1,0 +1,1039 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "subject": [
+    {
+      "name": "404.html",
+      "digest": {
+        "sha256": "7683e707c4362282ba85b887ce474bdc667293529b2e37207c7d17de1f391626"
+      }
+    },
+    {
+      "name": "assets/favicon.ico",
+      "digest": {
+        "sha256": "0627e7388b1feebe40dfdfe5e40b20709672878154420dcc8d316f60ed27867e"
+      }
+    },
+    {
+      "name": "assets/images/favicon.png",
+      "digest": {
+        "sha256": "023854c43fc4b25b795ee4951c8019e3de0593ffeb6f918b5d1f2a9b47a57cfe"
+      }
+    },
+    {
+      "name": "assets/javascripts/bundle.6c7ad80a.min.js",
+      "digest": {
+        "sha256": "7b5b47e8d2f1bfa7bc9ea7711b30a421c0bb4839eeec4b2ad5eaf759c826a734"
+      }
+    },
+    {
+      "name": "assets/javascripts/bundle.6c7ad80a.min.js.map",
+      "digest": {
+        "sha256": "2ba88dabee42d017cbb5b662e180f24dc1f74c0a4fb0a009d06fda568317e464"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ar.min.js",
+      "digest": {
+        "sha256": "3907ff77c011255d725b98a3f5fc21da72a98429c6dd3fdbd470b0a97ffaa324"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.da.min.js",
+      "digest": {
+        "sha256": "2a12734048eae74e0a05e5c108fdf24c2b71dfcd8da712336ca9e3d27ab92956"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.de.min.js",
+      "digest": {
+        "sha256": "bcaa7c5c19bc730c05bb91e22ae0e386e1ac4a0580c42b7d94f9b8757aadadab"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.du.min.js",
+      "digest": {
+        "sha256": "452da04fe449b9c65c61384fec582dc63824bd4e559fae2c3926a7790b68e976"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.es.min.js",
+      "digest": {
+        "sha256": "dec4ec90bd6f478ca3e65636a8e3fedf512b23d01a51a01d7e7822f67ebbaaf8"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.fi.min.js",
+      "digest": {
+        "sha256": "681541fcf5b1987ad8b00766e9c06389ecf99c3d7ae817fa891f923f691b8668"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.fr.min.js",
+      "digest": {
+        "sha256": "4dd56aa2551e770ad26ef4b85092cd31447671e0e84b39514278547f54177377"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.hi.min.js",
+      "digest": {
+        "sha256": "631fff52e3623f2dfba35af076c6b8b5a450eeffe30a5cfac7458dab77cbe0a6"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.hu.min.js",
+      "digest": {
+        "sha256": "876c969bbf4a2b84738f4e0a14922ee331cb7c2193a621f65db7f836fdd33a38"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.it.min.js",
+      "digest": {
+        "sha256": "00a5073df2e922e5fded1c5a4d4011aec02472ab9d9182a7c6508d60b625c453"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ja.min.js",
+      "digest": {
+        "sha256": "c4fded308f633681a6ed53b6c10d8ca5916fdfd50f6b82ec914d725be0cb8bd6"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.jp.min.js",
+      "digest": {
+        "sha256": "04114edc36dc114edce5afbb3c7f795f45c77d8673c1edcdca5675ddab5d5199"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.multi.min.js",
+      "digest": {
+        "sha256": "9761f475ae79f36420ff714df9950efb264effcf9230efd55b511a0de899e979"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.nl.min.js",
+      "digest": {
+        "sha256": "399ef26d61ed2d5806f58ea723dfaca09f4a7c9b51e315bdd17482c8e3013a3e"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.no.min.js",
+      "digest": {
+        "sha256": "57f9db9290f9ed36080755f53ee342a04f55a5954e4add915d1c301a37464573"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.pt.min.js",
+      "digest": {
+        "sha256": "3a25d2abaa23063cf13fc56c19ae4cc5050cb6215115e9d08f4a6f4b78780067"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ro.min.js",
+      "digest": {
+        "sha256": "cfa26a8ea4293d81e8547ba2321d703a0fe9881f0721fca5f33a3f80bf156ee9"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.ru.min.js",
+      "digest": {
+        "sha256": "50ef3c0fab4a3f2d260e8973c63363aa0dcf02b559ea9d11d5f02b6197585c17"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.stemmer.support.min.js",
+      "digest": {
+        "sha256": "2e7213605846a18014ec750910cb18a8a4c60bb23200103b3fad9ef27b10c705"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.sv.min.js",
+      "digest": {
+        "sha256": "942b165bcc8218e3246fc4735af9b1c2f66514366d0000be051bf1bb896d413e"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.th.min.js",
+      "digest": {
+        "sha256": "348461266843e316b26820004a96d3fd87a1579829d244ce510c17293eef0439"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.tr.min.js",
+      "digest": {
+        "sha256": "e8bf57b1033b8bd92ea04a94c533015aa1a7f0a8d6830194b974e94e1e4aca3c"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.vi.min.js",
+      "digest": {
+        "sha256": "2e39c3fd7305f6e66fc0424796a7696cb8e36dc0f5c3a83ea1bc44dfe3fecb56"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/min/lunr.zh.min.js",
+      "digest": {
+        "sha256": "2273fa00429df17a458b481f411d2ecd6da7a950ac6e6cee2d1b2c5cffeefd6f"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/tinyseg.js",
+      "digest": {
+        "sha256": "1b044c239610ef65fceff6039567442bb1692d413f5ee8686fee81b1a3067761"
+      }
+    },
+    {
+      "name": "assets/javascripts/lunr/wordcut.js",
+      "digest": {
+        "sha256": "4972aa0ace30e614c2f6fb1eed634d2feea40d9c029842c708f18705d7f1f04a"
+      }
+    },
+    {
+      "name": "assets/javascripts/workers/search.b97dbffb.min.js",
+      "digest": {
+        "sha256": "93f1b45c21c81d2e036064040437c3d248b6e5aa9be673aa7db3504376efacd6"
+      }
+    },
+    {
+      "name": "assets/javascripts/workers/search.b97dbffb.min.js.map",
+      "digest": {
+        "sha256": "5b35925cf3fb80f8b8a0484985ea82b039df9a3737cdb92d04dd118709f3aad7"
+      }
+    },
+    {
+      "name": "assets/logo.png",
+      "digest": {
+        "sha256": "8b0d10ec1ca87bc25909dc9a2483e2bc3992a0331738de812a7d7c2849176314"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-114x114.png",
+      "digest": {
+        "sha256": "3e6eeb0b65409e2ce6e054d268e2b3435deff1c2e44760000b764bcfe86d0feb"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-120x120.png",
+      "digest": {
+        "sha256": "b4683dd38689cbcdde7049907de1eb320079386e4dd8232f0262288c28f6fc33"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-144x144.png",
+      "digest": {
+        "sha256": "0e3d81a80d998e79dad1a696c714e13e11e56424f0e435c594af07a07523ed6b"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-152x152.png",
+      "digest": {
+        "sha256": "1872bfc35ebf88a9e9b7332139a902e484baadae6921877714443627cc886857"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-57x57.png",
+      "digest": {
+        "sha256": "d3d3ea1bc8e88bd24aea49a2a37c6697bccf06f061d7e5f638ff69fb7a3f2d52"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-60x60.png",
+      "digest": {
+        "sha256": "9078b87a722f912721e8f740950ec1f28b3ce5d320750d45e69f43c2ac267e62"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-72x72.png",
+      "digest": {
+        "sha256": "b2378bcafcce7f0b52f894b5859a930b6faf8a0da948d82a61c70f0c1c221e02"
+      }
+    },
+    {
+      "name": "assets/meta/apple-touch-icon-76x76.png",
+      "digest": {
+        "sha256": "bcf4c7155fc895a857895098c7230aa81ff057a89c6bdcd9673588d2206c013a"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-128.png",
+      "digest": {
+        "sha256": "74253af4f5b94f7c962143347e63edbc7258c1788202e2094d20b047d1fbc70d"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-16x16.png",
+      "digest": {
+        "sha256": "49cf578ce40299f3a4f21e3ffcc9ced25f057ebc34ec115e5d7256a4bef0b67c"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-196x196.png",
+      "digest": {
+        "sha256": "e07cc1563127db47f52bb189c377e8819df62da07a33d3d729b528585e8e1dc4"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-32x32.png",
+      "digest": {
+        "sha256": "f8a2e48d21dc186659bcd823b0f994f7b24538381cfbe094cc6e3d45d9eede32"
+      }
+    },
+    {
+      "name": "assets/meta/favicon-96x96.png",
+      "digest": {
+        "sha256": "ce3cffee5fb980f781e4048a6d75976695969c476507d5869748a7c1986d3ea3"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-144x144.png",
+      "digest": {
+        "sha256": "0e3d81a80d998e79dad1a696c714e13e11e56424f0e435c594af07a07523ed6b"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-150x150.png",
+      "digest": {
+        "sha256": "01e92eddf6d88feded1f5f0ee02bb151837f67f6b33e66aa378d2ae1221d230b"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-310x150.png",
+      "digest": {
+        "sha256": "7a41eb53c71b85d26d928dd0d01b3b596eab197275f3b74682448695e60149c7"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-310x310.png",
+      "digest": {
+        "sha256": "1c0bfe94f40bcafc8affb9398f9c95e0c23606d239dac9e1abd8ea7c30ff4480"
+      }
+    },
+    {
+      "name": "assets/meta/mstile-70x70.png",
+      "digest": {
+        "sha256": "74253af4f5b94f7c962143347e63edbc7258c1788202e2094d20b047d1fbc70d"
+      }
+    },
+    {
+      "name": "assets/stylesheets/extra.css",
+      "digest": {
+        "sha256": "ff48902377715f22891315e3954dcf16adcbbfc3c513eaec6d5068d208568ed6"
+      }
+    },
+    {
+      "name": "assets/stylesheets/main.1d29e8d0.min.css",
+      "digest": {
+        "sha256": "1d29e8d0a6f01fd50cbcfa6960f1d3c431ea7c153d27b65a20c59ffb947e9ffc"
+      }
+    },
+    {
+      "name": "assets/stylesheets/main.1d29e8d0.min.css.map",
+      "digest": {
+        "sha256": "1bc5cff4936e22f385cfc819d94b6ab23b24a4c90fba7de02eda71f96cbb9e7e"
+      }
+    },
+    {
+      "name": "assets/stylesheets/palette.cbb835fc.min.css",
+      "digest": {
+        "sha256": "cbb835fc311266a2002524bfe4b2bb8a09d8d87fbdf6bab95089bd892dfd75ff"
+      }
+    },
+    {
+      "name": "assets/stylesheets/palette.cbb835fc.min.css.map",
+      "digest": {
+        "sha256": "3b3fe45236401bfbbe4c07bf26a1b5405a73b52de9e72c43a9d6a9e514aa5875"
+      }
+    },
+    {
+      "name": "changelog/index.html",
+      "digest": {
+        "sha256": "fdab3a92f0c54f4632693d42e1943cd1b6ec8ea3cee644ba671150ae8a403a75"
+      }
+    },
+    {
+      "name": "contributing/index.html",
+      "digest": {
+        "sha256": "149caeb478ada67369ed61e77f85aa8d3b305b3b2b876f0bcb119e642f3762b1"
+      }
+    },
+    {
+      "name": "donate/index.html",
+      "digest": {
+        "sha256": "d1744abcbd85e6019a83a508269a898cfc6b00788fa3032435350233919284e2"
+      }
+    },
+    {
+      "name": "examples/dump-mariadb/index.html",
+      "digest": {
+        "sha256": "145254bb52658db39bb548a83e83ca3e3f9071c8a3c5f87b1aafee90a16c7d80"
+      }
+    },
+    {
+      "name": "examples/prune-swarm-nodes/index.html",
+      "digest": {
+        "sha256": "29dd7a446816ee533ee922ec2cd6b6c3a574d053518814ba2490269b28f0f9f0"
+      }
+    },
+    {
+      "name": "examples/renovate/index.html",
+      "digest": {
+        "sha256": "00038681a458d654d0247e980fbeeb6ad8b564d5db54a362234cf3d3ea6da3cc"
+      }
+    },
+    {
+      "name": "faq/index.html",
+      "digest": {
+        "sha256": "48aa66867ac7d7fecd39b052b4a5234be3c2752e6044aa76b921cdddbf39691e"
+      }
+    },
+    {
+      "name": "index.html",
+      "digest": {
+        "sha256": "169e2dfd062a8f7b2c614b0509efaa5e05098308427fe4c59f1717beed33a140"
+      }
+    },
+    {
+      "name": "install/binary/index.html",
+      "digest": {
+        "sha256": "9bba6a5360612e868af9b8ec2bb33155ad94059f4ffbc1b0ae4d3f4159b27a56"
+      }
+    },
+    {
+      "name": "install/docker/index.html",
+      "digest": {
+        "sha256": "a1851ac438ca7e4e760c41edbab17115a1ed2c61a46b424c905ed0498a6c1886"
+      }
+    },
+    {
+      "name": "install/linux-service/index.html",
+      "digest": {
+        "sha256": "621c0dd9ccbc9b38e0c243c6143c81794e4dd340c1f789ab7e488ae5909006b3"
+      }
+    },
+    {
+      "name": "reporting-issue/index.html",
+      "digest": {
+        "sha256": "af258b8f1b64cbd7d32b25310228597479cb6c2eed8043950c8f52ffe6c6637d"
+      }
+    },
+    {
+      "name": "search/search_index.json",
+      "digest": {
+        "sha256": "8a28469025d90654819b95b7bc529ac6c142854dea6e42b1b19fcf9d11d31c52"
+      }
+    },
+    {
+      "name": "sitemap.xml",
+      "digest": {
+        "sha256": "d83b00cd246bebdf3d83d7c9eec4bda5e2b5f30d9b3b2b986d74f4a18442d61c"
+      }
+    },
+    {
+      "name": "sitemap.xml.gz",
+      "digest": {
+        "sha256": "9a178f10b1c0eea905b7e3dbdd799d15dfdbc29a9bceded5e5cc1e2cbbb40830"
+      }
+    },
+    {
+      "name": "usage/cli/index.html",
+      "digest": {
+        "sha256": "0e045503532a247c0446731496d2c2f4b8a8b837d94e60dfb58cc2c738eeabd4"
+      }
+    },
+    {
+      "name": "usage/docker-labels/index.html",
+      "digest": {
+        "sha256": "777d709b01c0ba4f80f97dbc093e4880c7f05994697c7de4a6f1d62908a09c0f"
+      }
+    },
+    {
+      "name": "usage/get-started/index.html",
+      "digest": {
+        "sha256": "996a7679fec7a16148af2092ce6dd5f3ec525241108475d6ead90c4d97004f8e"
+      }
+    }
+  ],
+  "predicate": {
+    "builder": {
+      "id": "https://github.com/crazy-max/swarm-cronjob/actions/runs/7739046957"
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/docker/dockerfile@1",
+        "digest": {
+          "sha256": "ac85f380a63b13dfcefa89046420e1781752bab202122f8f50032edf31be0021"
+        }
+      },
+      {
+        "uri": "pkg:docker/squidfunk/mkdocs-material@8.3.9?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "cf3ab925e641cef688f30bd8cfd547ddb72fcca542525a490849f2a50f57d817"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "docs.Dockerfile"
+      },
+      "parameters": {
+        "frontend": "gateway.v0",
+        "args": {
+          "cmdline": "docker/dockerfile:1",
+          "source": "docker/dockerfile:1",
+          "target": "release"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    },
+    "buildConfig": {
+      "llbDefinition": [
+        {
+          "id": "step0",
+          "op": {
+            "Op": {
+              "source": {
+                "identifier": "docker-image://docker.io/squidfunk/mkdocs-material:8.3.9@sha256:cf3ab925e641cef688f30bd8cfd547ddb72fcca542525a490849f2a50f57d817"
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          }
+        },
+        {
+          "id": "step1",
+          "op": {
+            "Op": {
+              "exec": {
+                "meta": {
+                  "args": [
+                    "/bin/sh",
+                    "-c",
+                    "apk add --no-cache git git-fast-import openssl   \u0026\u0026 apk add --no-cache --virtual .build gcc musl-dev   \u0026\u0026 pip install --no-cache-dir     'lunr'     'markdown-include'     'mkdocs-awesome-pages-plugin'     'mkdocs-exclude'     'mkdocs-git-revision-date-localized-plugin'     'mkdocs-macros-plugin'   \u0026\u0026 apk del .build gcc musl-dev   \u0026\u0026 rm -rf /tmp/*"
+                  ],
+                  "env": [
+                    "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "LANG=C.UTF-8",
+                    "GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568",
+                    "PYTHON_VERSION=3.9.2",
+                    "PYTHON_PIP_VERSION=21.0.1",
+                    "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/b60e2320d9e8d02348525bd74e871e466afdf77c/get-pip.py",
+                    "PYTHON_GET_PIP_SHA256=c3b81e5d06371e135fb3156dc7d8fd6270735088428c4a9a5ec1f342e2024565",
+                    "PACKAGES=/usr/local/lib/python3.9/site-packages",
+                    "PYTHONDONTWRITEBYTECODE=1"
+                  ],
+                  "cwd": "/docs",
+                  "removeMountStubsRecursive": true
+                },
+                "mounts": [
+                  {
+                    "input": 0,
+                    "dest": "/",
+                    "output": 0
+                  }
+                ]
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step0:0"
+          ]
+        },
+        {
+          "id": "step2",
+          "op": {
+            "Op": {
+              "source": {
+                "identifier": "local://context",
+                "attrs": {
+                  "local.excludepatterns": "[\"bin\"]",
+                  "local.sharedkeyhint": "context"
+                }
+              }
+            },
+            "constraints": {}
+          }
+        },
+        {
+          "id": "step3",
+          "op": {
+            "Op": {
+              "exec": {
+                "meta": {
+                  "args": [
+                    "/bin/sh",
+                    "-c",
+                    "mkdocs build --strict --site-dir /out"
+                  ],
+                  "env": [
+                    "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "LANG=C.UTF-8",
+                    "GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568",
+                    "PYTHON_VERSION=3.9.2",
+                    "PYTHON_PIP_VERSION=21.0.1",
+                    "PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/b60e2320d9e8d02348525bd74e871e466afdf77c/get-pip.py",
+                    "PYTHON_GET_PIP_SHA256=c3b81e5d06371e135fb3156dc7d8fd6270735088428c4a9a5ec1f342e2024565",
+                    "PACKAGES=/usr/local/lib/python3.9/site-packages",
+                    "PYTHONDONTWRITEBYTECODE=1"
+                  ],
+                  "cwd": "/docs",
+                  "removeMountStubsRecursive": true
+                },
+                "mounts": [
+                  {
+                    "input": 0,
+                    "dest": "/",
+                    "output": 0
+                  },
+                  {
+                    "input": 1,
+                    "dest": "/docs",
+                    "output": -1,
+                    "readonly": true
+                  }
+                ]
+              }
+            },
+            "platform": {
+              "Architecture": "amd64",
+              "OS": "linux"
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step1:0",
+            "step2:0"
+          ]
+        },
+        {
+          "id": "step4",
+          "op": {
+            "Op": {
+              "file": {
+                "actions": [
+                  {
+                    "input": -1,
+                    "secondaryInput": 0,
+                    "output": 0,
+                    "Action": {
+                      "copy": {
+                        "src": "/out",
+                        "dest": "/",
+                        "mode": -1,
+                        "followSymlink": true,
+                        "dirCopyContents": true,
+                        "createDestPath": true,
+                        "allowWildcard": true,
+                        "allowEmptyWildcard": true,
+                        "timestamp": -1
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "constraints": {}
+          },
+          "inputs": [
+            "step3:0"
+          ]
+        },
+        {
+          "id": "step5",
+          "op": {
+            "Op": null
+          },
+          "inputs": [
+            "step4:0"
+          ]
+        }
+      ],
+      "digestMapping": {
+        "sha256:1065b8e7cc896f1c3e7dc395fbcf59d67c72867efa2c5c3f329d9eeb847abdcc": "step1",
+        "sha256:45a2808b431308a300ab4613afef890515d66441bbca8abdaa01c58b91a39df2": "step4",
+        "sha256:98017a729a4df069c45d463c7e2789d9c298d8e53ad9e5984cdc089d4771e11b": "step2",
+        "sha256:c921f045542f6928a7b00b9f14ff6bd60bd9c01f24eeb6b65708d39a2dd8c497": "step3",
+        "sha256:ce65f5a76018788d9d8e2b705cc11cbeb74a215732f518434ec98b695f1e1c46": "step5",
+        "sha256:d7d7289376b7ad109fb3f548f20f0d7d6dba7e0cd07e126a1300527c5675aa42": "step0"
+      }
+    },
+    "metadata": {
+      "buildInvocationID": "vr7deifjmyfmyytv4yxuyb2d7",
+      "buildStartedOn": "2024-02-01T09:30:29.945535671Z",
+      "buildFinishedOn": "2024-02-01T09:30:47.857064114Z",
+      "completeness": {
+        "parameters": true,
+        "environment": true,
+        "materials": false
+      },
+      "reproducible": false,
+      "https://mobyproject.org/buildkit@v1#metadata": {
+        "vcs": {
+          "revision": "e285890c9bd708ac0b91e8d7a549d1e60e5431d2",
+          "source": "https://github.com/crazy-max/swarm-cronjob"
+        },
+        "source": {
+          "locations": {
+            "step0": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 5
+                      },
+                      "end": {
+                        "line": 5
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step1": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 6
+                      },
+                      "end": {
+                        "line": 6
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 7
+                      },
+                      "end": {
+                        "line": 7
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 8
+                      },
+                      "end": {
+                        "line": 8
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 9
+                      },
+                      "end": {
+                        "line": 9
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 10
+                      },
+                      "end": {
+                        "line": 10
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 11
+                      },
+                      "end": {
+                        "line": 11
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 12
+                      },
+                      "end": {
+                        "line": 12
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 13
+                      },
+                      "end": {
+                        "line": 13
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 14
+                      },
+                      "end": {
+                        "line": 14
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 15
+                      },
+                      "end": {
+                        "line": 15
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 16
+                      },
+                      "end": {
+                        "line": 16
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step2": {},
+            "step3": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 19
+                      },
+                      "end": {
+                        "line": 19
+                      }
+                    },
+                    {
+                      "start": {
+                        "line": 20
+                      },
+                      "end": {
+                        "line": 20
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "step4": {
+              "locations": [
+                {
+                  "ranges": [
+                    {
+                      "start": {
+                        "line": 23
+                      },
+                      "end": {
+                        "line": 23
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "infos": [
+            {
+              "filename": "docs.Dockerfile",
+              "language": "Dockerfile",
+              "data": "IyBzeW50YXg9ZG9ja2VyL2RvY2tlcmZpbGU6MQoKQVJHIE1LRE9DU19WRVJTSU9OPSI4LjMuOSIKCkZST00gc3F1aWRmdW5rL21rZG9jcy1tYXRlcmlhbDoke01LRE9DU19WRVJTSU9OfSBBUyBiYXNlClJVTiBhcGsgYWRkIC0tbm8tY2FjaGUgZ2l0IGdpdC1mYXN0LWltcG9ydCBvcGVuc3NsIFwKICAmJiBhcGsgYWRkIC0tbm8tY2FjaGUgLS12aXJ0dWFsIC5idWlsZCBnY2MgbXVzbC1kZXYgXAogICYmIHBpcCBpbnN0YWxsIC0tbm8tY2FjaGUtZGlyIFwKICAgICdsdW5yJyBcCiAgICAnbWFya2Rvd24taW5jbHVkZScgXAogICAgJ21rZG9jcy1hd2Vzb21lLXBhZ2VzLXBsdWdpbicgXAogICAgJ21rZG9jcy1leGNsdWRlJyBcCiAgICAnbWtkb2NzLWdpdC1yZXZpc2lvbi1kYXRlLWxvY2FsaXplZC1wbHVnaW4nIFwKICAgICdta2RvY3MtbWFjcm9zLXBsdWdpbicgXAogICYmIGFwayBkZWwgLmJ1aWxkIGdjYyBtdXNsLWRldiBcCiAgJiYgcm0gLXJmIC90bXAvKgoKRlJPTSBiYXNlIEFTIGdlbmVyYXRlClJVTiAtLW1vdW50PXR5cGU9YmluZCx0YXJnZXQ9LiBcCiAgbWtkb2NzIGJ1aWxkIC0tc3RyaWN0IC0tc2l0ZS1kaXIgL291dAoKRlJPTSBzY3JhdGNoIEFTIHJlbGVhc2UKQ09QWSAtLWZyb209Z2VuZXJhdGUgL291dCAvCg==",
+              "llbDefinition": [
+                {
+                  "id": "step0",
+                  "op": {
+                    "Op": {
+                      "source": {
+                        "identifier": "local://dockerfile",
+                        "attrs": {
+                          "local.differ": "none",
+                          "local.followpaths": "[\"docs.Dockerfile\",\"docs.Dockerfile.dockerignore\"]",
+                          "local.sharedkeyhint": "dockerfile"
+                        }
+                      }
+                    },
+                    "constraints": {}
+                  }
+                },
+                {
+                  "id": "step1",
+                  "op": {
+                    "Op": null
+                  },
+                  "inputs": [
+                    "step0:0"
+                  ]
+                }
+              ],
+              "digestMapping": {
+                "sha256:23ca982ac334f2c596e2695bf2aae01214094c151803303d6c089487f4dbb7ec": "step1",
+                "sha256:859d3516f1a272fbd4e62df7b430659e52fa7748bf000cecfc9546e29dea4328": "step0"
+              }
+            }
+          ]
+        },
+        "layers": {
+          "step0:0": [
+            [
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:ca3cd42a7c9525f6ce3d64c1a70982613a8235f0cc057ec9244052921853ef15",
+                "size": 2811947
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:1d917aee477c10b5ea813a6463dd3f433b3f4dc7d85ca28c17912f4ab8f58e4d",
+                "size": 656231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:7bc50e7d1ae37a8a84d4107e5b458752e3825d63d629e97c2e9d5e30b92e928d",
+                "size": 11410400
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:83ca130858d18454191089846378c03c93e566dcbd862b54c69aef5eade1c5da",
+                "size": 231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:3d2c0e52073b216758824f9d38f4ecf60b8d774bcbfe609b0d3e14f3891b4c55",
+                "size": 2164509
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+                "size": 32
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:0142aa88c946772330e89170317b7ecceaa8a7cfb53dd84a7f6e7cc119f91806",
+                "size": 2087246
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:106c235eb6a2e90e7b0e9756d78b5397eeab1a7180933fe4deeed214c9e3bcb4",
+                "size": 308
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:87773a68fc9a46749bc87db76c9e9332f97b2c749ba61762cc15d30e20aa0989",
+                "size": 1319
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4057fb5406499a08d39ddd46551c79815ecc946e847515a19a1531352c50a3e5",
+                "size": 3368
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:561941bd8c81ea21c3b57c07a021fbdb8c997b8fced7f0f232dd17c857c79e1b",
+                "size": 920
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:700e96758dccf375a01a6cf382bada70a00a8a3eda040f223bfc3465955d4d5b",
+                "size": 1549
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:c3b0c2205e6baad053b1603e7f82992b424093f8de38d57ae39d53dc0993c101",
+                "size": 20968464
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:352d9a9f2e061725ed866ae5aaeb2e771aacb51b1512598e7e4cb09582249131",
+                "size": 93
+              }
+            ],
+            [
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:ca3cd42a7c9525f6ce3d64c1a70982613a8235f0cc057ec9244052921853ef15",
+                "size": 2811947
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:1d917aee477c10b5ea813a6463dd3f433b3f4dc7d85ca28c17912f4ab8f58e4d",
+                "size": 656231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:7bc50e7d1ae37a8a84d4107e5b458752e3825d63d629e97c2e9d5e30b92e928d",
+                "size": 11410400
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:83ca130858d18454191089846378c03c93e566dcbd862b54c69aef5eade1c5da",
+                "size": 231
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:3d2c0e52073b216758824f9d38f4ecf60b8d774bcbfe609b0d3e14f3891b4c55",
+                "size": 2164509
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+                "size": 32
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:0142aa88c946772330e89170317b7ecceaa8a7cfb53dd84a7f6e7cc119f91806",
+                "size": 2087246
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:106c235eb6a2e90e7b0e9756d78b5397eeab1a7180933fe4deeed214c9e3bcb4",
+                "size": 308
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:87773a68fc9a46749bc87db76c9e9332f97b2c749ba61762cc15d30e20aa0989",
+                "size": 1319
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:4057fb5406499a08d39ddd46551c79815ecc946e847515a19a1531352c50a3e5",
+                "size": 3368
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:561941bd8c81ea21c3b57c07a021fbdb8c997b8fced7f0f232dd17c857c79e1b",
+                "size": 920
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:700e96758dccf375a01a6cf382bada70a00a8a3eda040f223bfc3465955d4d5b",
+                "size": 1549
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:c3b0c2205e6baad053b1603e7f82992b424093f8de38d57ae39d53dc0993c101",
+                "size": 20968464
+              },
+              {
+                "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                "digest": "sha256:352d9a9f2e061725ed866ae5aaeb2e771aacb51b1512598e7e4cb09582249131",
+                "size": 93
+              }
+            ]
+          ]
+        }
+      }
+    }
+  }
+}
