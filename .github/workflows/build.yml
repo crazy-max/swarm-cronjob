@@ -90,11 +90,26 @@ jobs:
         uses: docker/bake-action@v4
         with:
           targets: artifact
+          provenance: mode=max
+          sbom: true
           pull: true
           set: |
             *.platform=${{ matrix.platform }}
             *.cache-from=type=gha,scope=artifact-${{ env.PLATFORM_PAIR }}
             *.cache-to=type=gha,scope=artifact-${{ env.PLATFORM_PAIR }},mode=max
+      -
+        name: Rename provenance and sbom
+        working-directory: ${{ env.DESTDIR }}/artifact
+        run: |
+          binname=$(find . -name 'swarm-cronjob_*')
+          filename=$(basename "$binname" | sed -E 's/\.(tar\.gz|zip)$//')
+          mv "provenance.json" "${filename}.provenance.json"
+          mv "sbom-binary.spdx.json" "${filename}.sbom.json"
+          find . -name 'sbom*.json' -exec rm {} \;
+      -
+        name: List artifacts
+        run: |
+          tree -nh ${{ env.DESTDIR }}
       -
         name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -126,6 +141,7 @@ jobs:
         uses: docker/bake-action@v4
         with:
           targets: release
+          provenance: false
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v1
@@ -205,6 +221,8 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
           targets: image-all
+          provenance: mode=max
+          sbom: true
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
           set: |
