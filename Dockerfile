@@ -89,6 +89,6 @@ FROM scratch AS release
 COPY --link --from=releaser /out /
 
 FROM alpine:${ALPINE_VERSION}
-RUN apk --update --no-cache add ca-certificates openssl
+RUN apk --update --no-cache add ca-certificates openssl tzdata
 COPY --from=build /usr/bin/swarm-cronjob /usr/local/bin/swarm-cronjob
 ENTRYPOINT [ "swarm-cronjob" ]
