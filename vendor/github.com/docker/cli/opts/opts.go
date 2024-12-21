@@ -224,13 +224,17 @@ type ValidatorFctType func(val string) (string, error)
 // ValidatorFctListType defines a validator function that returns a validated list of string and/or an error
 type ValidatorFctListType func(val string) ([]string, error)
 
-// ValidateIPAddress validates an Ip address.
+// ValidateIPAddress validates if the given value is a correctly formatted
+// IP address, and returns the value in normalized form. Leading and trailing
+// whitespace is allowed, but it does not allow IPv6 addresses surrounded by
+// square brackets ("[::1]").
+//
+// Refer to [net.ParseIP] for accepted formats.
 func ValidateIPAddress(val string) (string, error) {
-	ip := net.ParseIP(strings.TrimSpace(val))
-	if ip != nil {
+	if ip := net.ParseIP(strings.TrimSpace(val)); ip != nil {
 		return ip.String(), nil
 	}
-	return "", fmt.Errorf("%s is not an ip address", val)
+	return "", fmt.Errorf("IP address is not correctly formatted: %s", val)
 }
 
 // ValidateMACAddress validates a MAC address.
@@ -261,6 +265,8 @@ func validateDomain(val string) (string, error) {
 	}
 	return "", fmt.Errorf("%s is not a valid domain", val)
 }
+
+const whiteSpaces = " \t"
 
 // ValidateLabel validates that the specified string is a valid label, and returns it.
 //
@@ -397,7 +403,7 @@ func ParseCPUs(value string) (int64, error) {
 	}
 	nano := cpu.Mul(cpu, big.NewRat(1e9, 1))
 	if !nano.IsInt() {
-		return 0, fmt.Errorf("value is too precise")
+		return 0, errors.New("value is too precise")
 	}
 	return nano.Num().Int64(), nil
 }
@@ -405,14 +411,14 @@ func ParseCPUs(value string) (int64, error) {
 // ParseLink parses and validates the specified string as a link format (name:alias)
 func ParseLink(val string) (string, string, error) {
 	if val == "" {
-		return "", "", fmt.Errorf("empty string specified for links")
+		return "", "", errors.New("empty string specified for links")
 	}
 	// We expect two parts, but restrict to three to allow detecting invalid formats.
 	arr := strings.SplitN(val, ":", 3)
 
 	// TODO(thaJeztah): clean up this logic!!
 	if len(arr) > 2 {
-		return "", "", fmt.Errorf("bad format for links: %s", val)
+		return "", "", errors.New("bad format for links: " + val)
 	}
 	// TODO(thaJeztah): this should trim the "/" prefix as well??
 	if len(arr) == 1 {

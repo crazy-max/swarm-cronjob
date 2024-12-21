@@ -18,9 +18,9 @@ import (
 type Client interface {
 	DistributionInspect(ctx context.Context, image, encodedAuth string) (registry.DistributionInspect, error)
 	RetrieveAuthTokenFromImage(ctx context.Context, image string) (string, error)
-	ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (types.ServiceUpdateResponse, error)
+	ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error)
 	ServiceInspectWithRaw(ctx context.Context, serviceID string, opts types.ServiceInspectOptions) (swarm.Service, []byte, error)
-	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
+	Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error)
 
 	ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error)
 	Service(name string) (*model.ServiceInfo, error)
@@ -68,7 +68,7 @@ func (c *DockerClient) RetrieveAuthTokenFromImage(ctx context.Context, image str
 // ServiceUpdate updates a Service. The version number is required to avoid conflicting writes.
 // It should be the value as set *before* the update. You can find this value in the Meta field
 // of swarm.Service, which can be found using ServiceInspectWithRaw.
-func (c *DockerClient) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (types.ServiceUpdateResponse, error) {
+func (c *DockerClient) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error) {
 	return c.api.ServiceUpdate(ctx, serviceID, version, service, options)
 }
 
@@ -81,7 +81,7 @@ func (c *DockerClient) ServiceInspectWithRaw(ctx context.Context, serviceID stri
 // by cancelling the context. Once the stream has been completely read an io.EOF error will
 // be sent over the error channel. If an error is sent all processing will be stopped. It's up
 // to the caller to reopen the stream in the event of an error by reinvoking this method.
-func (c *DockerClient) Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error) {
+func (c *DockerClient) Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error) {
 	return c.api.Events(ctx, options)
 }
 

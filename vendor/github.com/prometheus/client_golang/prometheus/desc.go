@@ -19,8 +19,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cespare/xxhash/v2"
-	//nolint:staticcheck // Ignore SA1019. Need to keep deprecated package for compatibility.
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/common/model"
 
@@ -51,7 +49,7 @@ type Desc struct {
 	// constLabelPairs contains precalculated DTO label pairs based on
 	// the constant labels.
 	constLabelPairs []*dto.LabelPair
-	// variableLabels contains names of labels for which the metric
+	// VariableLabels contains names of labels for which the metric
 	// maintains variable values.
 	variableLabels []string
 	// id is a hash of the values of the ConstLabels and fqName. This
@@ -69,7 +67,7 @@ type Desc struct {
 
 // NewDesc allocates and initializes a new Desc. Errors are recorded in the Desc
 // and will be reported on registration time. variableLabels and constLabels can
-// be nil if no such labels should be set. fqName must not be empty.
+// be nil if no such labels should be set. fqName and help must not be empty.
 //
 // variableLabels only contain the label names. Their label values are variable
 // and therefore not part of the Desc. (They are managed within the Metric.)
@@ -81,6 +79,10 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 		fqName:         fqName,
 		help:           help,
 		variableLabels: variableLabels,
+	}
+	if help == "" {
+		d.err = errors.New("empty help string")
+		return d
 	}
 	if !model.IsValidMetricName(model.LabelValue(fqName)) {
 		d.err = fmt.Errorf("%q is not a valid metric name", fqName)
@@ -95,7 +97,7 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 	// First add only the const label names and sort them...
 	for labelName := range constLabels {
 		if !checkLabelName(labelName) {
-			d.err = fmt.Errorf("%q is not a valid label name for metric %q", labelName, fqName)
+			d.err = fmt.Errorf("%q is not a valid label name", labelName)
 			return d
 		}
 		labelNames = append(labelNames, labelName)
@@ -117,7 +119,7 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 	// dimension with a different mix between preset and variable labels.
 	for _, labelName := range variableLabels {
 		if !checkLabelName(labelName) {
-			d.err = fmt.Errorf("%q is not a valid label name for metric %q", labelName, fqName)
+			d.err = fmt.Errorf("%q is not a valid label name", labelName)
 			return d
 		}
 		labelNames = append(labelNames, "$"+labelName)
@@ -128,24 +130,24 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 		return d
 	}
 
-	xxh := xxhash.New()
+	vh := hashNew()
 	for _, val := range labelValues {
-		xxh.WriteString(val)
-		xxh.Write(separatorByteSlice)
+		vh = hashAdd(vh, val)
+		vh = hashAddByte(vh, separatorByte)
 	}
-	d.id = xxh.Sum64()
+	d.id = vh
 	// Sort labelNames so that order doesn't matter for the hash.
 	sort.Strings(labelNames)
 	// Now hash together (in this order) the help string and the sorted
 	// label names.
-	xxh.Reset()
-	xxh.WriteString(help)
-	xxh.Write(separatorByteSlice)
+	lh := hashNew()
+	lh = hashAdd(lh, help)
+	lh = hashAddByte(lh, separatorByte)
 	for _, labelName := range labelNames {
-		xxh.WriteString(labelName)
-		xxh.Write(separatorByteSlice)
+		lh = hashAdd(lh, labelName)
+		lh = hashAddByte(lh, separatorByte)
 	}
-	d.dimHash = xxh.Sum64()
+	d.dimHash = lh
 
 	d.constLabelPairs = make([]*dto.LabelPair, 0, len(constLabels))
 	for n, v := range constLabels {
@@ -154,7 +156,7 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 			Value: proto.String(v),
 		})
 	}
-	sort.Sort(labelPairSorter(d.constLabelPairs))
+	sort.Sort(LabelPairSorter(d.constLabelPairs))
 	return d
 }
 
