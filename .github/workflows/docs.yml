@@ -13,6 +13,7 @@ on:
 
 env:
   DESTDIR: ./bin
+  DOCKER_BUILD_SUMMARY: false
 
 jobs:
   publish:
@@ -30,6 +31,7 @@ jobs:
         name: Build docs
         uses: docker/bake-action@v5
         with:
+          provenance: false
           targets: docs
       -
         name: Check GitHub Pages status
