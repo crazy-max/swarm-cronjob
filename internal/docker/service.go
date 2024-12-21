@@ -2,13 +2,13 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"sort"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/pkg/errors"
 )
 
 // ServiceList return all services.
@@ -104,7 +104,7 @@ func (c *DockerClient) Service(name string) (*model.ServiceInfo, error) {
 	if err != nil {
 		return nil, err
 	} else if len(service) == 0 {
-		return nil, fmt.Errorf("%s service not found", name)
+		return nil, errors.Errorf("%s service not found", name)
 	}
 
 	return service[0], nil
