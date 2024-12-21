@@ -17,9 +17,6 @@ github.com/beorn7/perks/quantile
 # github.com/cespare/xxhash/v2 v2.1.1
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/distribution/distribution v2.8.3+incompatible
-## explicit
-github.com/distribution/distribution/reference
 # github.com/distribution/reference v0.5.0
 ## explicit; go 1.20
 github.com/distribution/reference
@@ -157,7 +154,6 @@ github.com/morikuni/aec
 # github.com/opencontainers/go-digest v1.0.0
 ## explicit; go 1.13
 github.com/opencontainers/go-digest
-github.com/opencontainers/go-digest/digestset
 # github.com/opencontainers/image-spec v1.0.2
 ## explicit
 github.com/opencontainers/image-spec/specs-go
