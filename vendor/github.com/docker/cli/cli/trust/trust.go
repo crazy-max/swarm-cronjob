@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/distribution/reference"
 	"github.com/docker/cli/cli/config"
-	"github.com/docker/distribution/reference"
 	"github.com/docker/distribution/registry/client/auth"
 	"github.com/docker/distribution/registry/client/auth/challenge"
 	"github.com/docker/distribution/registry/client/transport"
@@ -119,7 +119,6 @@ func GetNotaryRepository(in io.Reader, out io.Writer, userAgent string, repoInfo
 		Dial: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
-			DualStack: true,
 		}).Dial,
 		TLSHandshakeTimeout: 10 * time.Second,
 		TLSClientConfig:     cfg,
@@ -158,7 +157,6 @@ func GetNotaryRepository(in io.Reader, out io.Writer, userAgent string, repoInfo
 	scope := auth.RepositoryScope{
 		Repository: repoInfo.Name.Name(),
 		Actions:    actions,
-		Class:      repoInfo.Class, // TODO(thaJeztah): Class is no longer needed for plugins and can likely be removed; see https://github.com/docker/cli/pull/4114#discussion_r1145430825
 	}
 	creds := simpleCredentialStore{auth: *authConfig}
 	tokenHandlerOptions := auth.TokenHandlerOptions{
@@ -262,8 +260,8 @@ func GetSignableRoles(repo client.Repository, target *client.Target) ([]data.Rol
 		return signableRoles, nil
 	}
 
-	// there are delegation roles, find every delegation role we have a key for, and
-	// attempt to sign into into all those roles.
+	// there are delegation roles, find every delegation role we have a key for,
+	// and attempt to sign in to all those roles.
 	for _, delegationRole := range allDelegationRoles {
 		// We do not support signing any delegation role that isn't a direct child of the targets role.
 		// Also don't bother checking the keys if we can't add the target

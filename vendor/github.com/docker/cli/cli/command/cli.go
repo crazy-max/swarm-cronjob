@@ -1,3 +1,6 @@
+// FIXME(thaJeztah): remove once we are a module; the go:build directive prevents go from downgrading language version to go1.16:
+//go:build go1.22
+
 package command
 
 import (
@@ -41,7 +44,7 @@ const defaultInitTimeout = 2 * time.Second
 type Streams interface {
 	In() *streams.In
 	Out() *streams.Out
-	Err() io.Writer
+	Err() *streams.Out
 }
 
 // Cli represents the docker command line client.
@@ -49,7 +52,7 @@ type Cli interface {
 	Client() client.APIClient
 	Streams
 	SetIn(in *streams.In)
-	Apply(ops ...DockerCliOption) error
+	Apply(ops ...CLIOption) error
 	ConfigFile() *configfile.ConfigFile
 	ServerInfo() ServerInfo
 	NotaryClient(imgRefAndAuth trust.ImageRefAndAuth, actions []string) (notaryclient.Repository, error)
@@ -62,6 +65,7 @@ type Cli interface {
 	ContextStore() store.Store
 	CurrentContext() string
 	DockerEndpoint() docker.Endpoint
+	TelemetryClient
 }
 
 // DockerCli is an instance the docker command line client.
@@ -71,7 +75,7 @@ type DockerCli struct {
 	options            *cliflags.ClientOptions
 	in                 *streams.In
 	out                *streams.Out
-	err                io.Writer
+	err                *streams.Out
 	client             client.APIClient
 	serverInfo         ServerInfo
 	contentTrust       bool
@@ -82,6 +86,14 @@ type DockerCli struct {
 	dockerEndpoint     docker.Endpoint
 	contextStoreConfig store.Config
 	initTimeout        time.Duration
+	res                telemetryResource
+
+	// baseCtx is the base context used for internal operations. In the future
+	// this may be replaced by explicitly passing a context to functions that
+	// need it.
+	baseCtx context.Context
+
+	enableGlobalMeter, enableGlobalTracer bool
 }
 
 // DefaultVersion returns api.defaultVersion.
@@ -114,7 +126,7 @@ func (cli *DockerCli) Out() *streams.Out {
 }
 
 // Err returns the writer used for stderr
-func (cli *DockerCli) Err() io.Writer {
+func (cli *DockerCli) Err() *streams.Out {
 	return cli.err
 }
 
@@ -174,9 +186,48 @@ func (cli *DockerCli) BuildKitEnabled() (bool, error) {
 	if _, ok := aliasMap["builder"]; ok {
 		return true, nil
 	}
-	// otherwise, assume BuildKit is enabled but
-	// not if wcow reported from server side
-	return cli.ServerInfo().OSType != "windows", nil
+
+	si := cli.ServerInfo()
+	if si.BuildkitVersion == types.BuilderBuildKit {
+		// The daemon advertised BuildKit as the preferred builder; this may
+		// be either a Linux daemon or a Windows daemon with experimental
+		// BuildKit support enabled.
+		return true, nil
+	}
+
+	// otherwise, assume BuildKit is enabled for Linux, but disabled for
+	// Windows / WCOW, which does not yet support BuildKit by default.
+	return si.OSType != "windows", nil
+}
+
+// HooksEnabled returns whether plugin hooks are enabled.
+func (cli *DockerCli) HooksEnabled() bool {
+	// legacy support DOCKER_CLI_HINTS env var
+	if v := os.Getenv("DOCKER_CLI_HINTS"); v != "" {
+		enabled, err := strconv.ParseBool(v)
+		if err != nil {
+			return false
+		}
+		return enabled
+	}
+	// use DOCKER_CLI_HOOKS env var value if set and not empty
+	if v := os.Getenv("DOCKER_CLI_HOOKS"); v != "" {
+		enabled, err := strconv.ParseBool(v)
+		if err != nil {
+			return false
+		}
+		return enabled
+	}
+	featuresMap := cli.ConfigFile().Features
+	if v, ok := featuresMap["hooks"]; ok {
+		enabled, err := strconv.ParseBool(v)
+		if err != nil {
+			return false
+		}
+		return enabled
+	}
+	// default to false
+	return false
 }
 
 // ManifestStore returns a store for local manifests
@@ -189,16 +240,13 @@ func (cli *DockerCli) ManifestStore() manifeststore.Store {
 // registry
 func (cli *DockerCli) RegistryClient(allowInsecure bool) registryclient.RegistryClient {
 	resolver := func(ctx context.Context, index *registry.IndexInfo) registry.AuthConfig {
-		return ResolveAuthConfig(ctx, cli, index)
+		return ResolveAuthConfig(cli.ConfigFile(), index)
 	}
 	return registryclient.NewRegistryClient(resolver, UserAgent(), allowInsecure)
 }
 
-// InitializeOpt is the type of the functional options passed to DockerCli.Initialize
-type InitializeOpt func(dockerCli *DockerCli) error
-
 // WithInitializeClient is passed to DockerCli.Initialize by callers who wish to set a particular API Client for use by the CLI.
-func WithInitializeClient(makeClient func(dockerCli *DockerCli) (client.APIClient, error)) InitializeOpt {
+func WithInitializeClient(makeClient func(dockerCli *DockerCli) (client.APIClient, error)) CLIOption {
 	return func(dockerCli *DockerCli) error {
 		var err error
 		dockerCli.client, err = makeClient(dockerCli)
@@ -208,7 +256,7 @@ func WithInitializeClient(makeClient func(dockerCli *DockerCli) (client.APIClien
 
 // Initialize the dockerCli runs initialization that must happen after command
 // line flags are parsed.
-func (cli *DockerCli) Initialize(opts *cliflags.ClientOptions, ops ...InitializeOpt) error {
+func (cli *DockerCli) Initialize(opts *cliflags.ClientOptions, ops ...CLIOption) error {
 	for _, o := range ops {
 		if err := o(cli); err != nil {
 			return err
@@ -236,6 +284,15 @@ func (cli *DockerCli) Initialize(opts *cliflags.ClientOptions, ops ...Initialize
 			return ResolveDefaultContext(cli.options, cli.contextStoreConfig)
 		},
 	}
+
+	// TODO(krissetto): pass ctx to the funcs instead of using this
+	if cli.enableGlobalMeter {
+		cli.createGlobalMeterProvider(cli.baseCtx)
+	}
+	if cli.enableGlobalTracer {
+		cli.createGlobalTracerProvider(cli.baseCtx)
+	}
+
 	return nil
 }
 
@@ -260,22 +317,20 @@ func NewAPIClientFromFlags(opts *cliflags.ClientOptions, configFile *configfile.
 }
 
 func newAPIClientFromEndpoint(ep docker.Endpoint, configFile *configfile.ConfigFile) (client.APIClient, error) {
-	clientOpts, err := ep.ClientOpts()
+	opts, err := ep.ClientOpts()
 	if err != nil {
 		return nil, err
 	}
-	customHeaders := make(map[string]string, len(configFile.HTTPHeaders))
-	for k, v := range configFile.HTTPHeaders {
-		customHeaders[k] = v
+	if len(configFile.HTTPHeaders) > 0 {
+		opts = append(opts, client.WithHTTPHeaders(configFile.HTTPHeaders))
 	}
-	customHeaders["User-Agent"] = UserAgent()
-	clientOpts = append(clientOpts, client.WithHTTPHeaders(customHeaders))
-	return client.NewClientWithOpts(clientOpts...)
+	opts = append(opts, withCustomHeadersFromEnv(), client.WithUserAgent(UserAgent()))
+	return client.NewClientWithOpts(opts...)
 }
 
 func resolveDockerEndpoint(s store.Reader, contextName string) (docker.Endpoint, error) {
 	if s == nil {
-		return docker.Endpoint{}, fmt.Errorf("no context store initialized")
+		return docker.Endpoint{}, errors.New("no context store initialized")
 	}
 	ctxMeta, err := s.GetMetadata(contextName)
 	if err != nil {
@@ -325,8 +380,7 @@ func (cli *DockerCli) getInitTimeout() time.Duration {
 }
 
 func (cli *DockerCli) initializeFromClient() {
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, cli.getInitTimeout())
+	ctx, cancel := context.WithTimeout(cli.baseCtx, cli.getInitTimeout())
 	defer cancel()
 
 	ping, err := cli.client.Ping(ctx)
@@ -364,7 +418,7 @@ func (cli *DockerCli) ContextStore() store.Store {
 // order of preference:
 //
 //  1. The "--context" command-line option.
-//  2. The "DOCKER_CONTEXT" environment variable.
+//  2. The "DOCKER_CONTEXT" environment variable ([EnvOverrideContext]).
 //  3. The current context as configured through the in "currentContext"
 //     field in the CLI configuration file ("~/.docker/config.json").
 //  4. If no context is configured, use the "default" context.
@@ -396,7 +450,7 @@ func (cli *DockerCli) CurrentContext() string {
 // occur when trying to use it.
 //
 // Refer to [DockerCli.CurrentContext] above for further details.
-func resolveContextName(opts *cliflags.ClientOptions, config *configfile.ConfigFile) string {
+func resolveContextName(opts *cliflags.ClientOptions, cfg *configfile.ConfigFile) string {
 	if opts != nil && opts.Context != "" {
 		return opts.Context
 	}
@@ -406,12 +460,12 @@ func resolveContextName(opts *cliflags.ClientOptions, config *configfile.ConfigF
 	if os.Getenv(client.EnvOverrideHost) != "" {
 		return DefaultContextName
 	}
-	if ctxName := os.Getenv("DOCKER_CONTEXT"); ctxName != "" {
+	if ctxName := os.Getenv(EnvOverrideContext); ctxName != "" {
 		return ctxName
 	}
-	if config != nil && config.CurrentContext != "" {
+	if cfg != nil && cfg.CurrentContext != "" {
 		// We don't validate if this context exists: errors may occur when trying to use it.
-		return config.CurrentContext
+		return cfg.CurrentContext
 	}
 	return DefaultContextName
 }
@@ -446,13 +500,16 @@ func (cli *DockerCli) initialize() error {
 				return
 			}
 		}
+		if cli.baseCtx == nil {
+			cli.baseCtx = context.Background()
+		}
 		cli.initializeFromClient()
 	})
 	return cli.initErr
 }
 
 // Apply all the operation on the cli
-func (cli *DockerCli) Apply(ops ...DockerCliOption) error {
+func (cli *DockerCli) Apply(ops ...CLIOption) error {
 	for _, op := range ops {
 		if err := op(cli); err != nil {
 			return err
@@ -481,15 +538,15 @@ type ServerInfo struct {
 // NewDockerCli returns a DockerCli instance with all operators applied on it.
 // It applies by default the standard streams, and the content trust from
 // environment.
-func NewDockerCli(ops ...DockerCliOption) (*DockerCli, error) {
-	defaultOps := []DockerCliOption{
+func NewDockerCli(ops ...CLIOption) (*DockerCli, error) {
+	defaultOps := []CLIOption{
 		WithContentTrustFromEnv(),
 		WithDefaultContextStoreConfig(),
 		WithStandardStreams(),
 	}
 	ops = append(defaultOps, ops...)
 
-	cli := &DockerCli{}
+	cli := &DockerCli{baseCtx: context.Background()}
 	if err := cli.Apply(ops...); err != nil {
 		return nil, err
 	}
@@ -504,7 +561,7 @@ func getServerHost(hosts []string, tlsOptions *tlsconfig.Options) (string, error
 	case 1:
 		host = hosts[0]
 	default:
-		return "", errors.New("Please specify only one -H")
+		return "", errors.New("Specify only one -H")
 	}
 
 	return dopts.ParseHost(tlsOptions != nil, host)
@@ -516,7 +573,7 @@ func UserAgent() string {
 }
 
 var defaultStoreEndpoints = []store.NamedTypeGetter{
-	store.EndpointTypeGetter(docker.DockerEndpoint, func() interface{} { return &docker.EndpointMeta{} }),
+	store.EndpointTypeGetter(docker.DockerEndpoint, func() any { return &docker.EndpointMeta{} }),
 }
 
 // RegisterDefaultStoreEndpoints registers a new named endpoint
@@ -530,7 +587,7 @@ func RegisterDefaultStoreEndpoints(ep ...store.NamedTypeGetter) {
 // DefaultContextStoreConfig returns a new store.Config with the default set of endpoints configured.
 func DefaultContextStoreConfig() store.Config {
 	return store.NewConfig(
-		func() interface{} { return &DockerContext{} },
+		func() any { return &DockerContext{} },
 		defaultStoreEndpoints...,
 	)
 }

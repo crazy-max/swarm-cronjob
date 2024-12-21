@@ -2,6 +2,7 @@ package opts
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -12,6 +13,8 @@ const (
 	networkOptAlias       = "alias"
 	networkOptIPv4Address = "ip"
 	networkOptIPv6Address = "ip6"
+	networkOptMacAddress  = "mac-address"
+	networkOptLinkLocalIP = "link-local-ip"
 	driverOpt             = "driver-opt"
 )
 
@@ -23,7 +26,8 @@ type NetworkAttachmentOpts struct {
 	Links        []string // TODO add support for links in the csv notation of `--network`
 	IPv4Address  string
 	IPv6Address  string
-	LinkLocalIPs []string // TODO add support for LinkLocalIPs in the csv notation of `--network` ?
+	LinkLocalIPs []string
+	MacAddress   string
 }
 
 // NetworkOpt represents a network config in swarm mode.
@@ -32,7 +36,7 @@ type NetworkOpt struct {
 }
 
 // Set networkopts value
-func (n *NetworkOpt) Set(value string) error {
+func (n *NetworkOpt) Set(value string) error { //nolint:gocyclo
 	longSyntax, err := regexp.MatchString(`\w+=\w+(,\w+=\w+)*`, value)
 	if err != nil {
 		return err
@@ -66,6 +70,10 @@ func (n *NetworkOpt) Set(value string) error {
 				netOpt.IPv4Address = val
 			case networkOptIPv6Address:
 				netOpt.IPv6Address = val
+			case networkOptMacAddress:
+				netOpt.MacAddress = val
+			case networkOptLinkLocalIP:
+				netOpt.LinkLocalIPs = append(netOpt.LinkLocalIPs, val)
 			case driverOpt:
 				key, val, err = parseDriverOpt(val)
 				if err != nil {
@@ -76,11 +84,11 @@ func (n *NetworkOpt) Set(value string) error {
 				}
 				netOpt.DriverOpts[key] = val
 			default:
-				return fmt.Errorf("invalid field key %s", key)
+				return errors.New("invalid field key " + key)
 			}
 		}
 		if len(netOpt.Target) == 0 {
-			return fmt.Errorf("network name/id is not specified")
+			return errors.New("network name/id is not specified")
 		}
 	} else {
 		netOpt.Target = value
@@ -119,7 +127,7 @@ func parseDriverOpt(driverOpt string) (string, string, error) {
 	// TODO(thaJeztah): should value be converted to lowercase as well, or only the key?
 	key, value, ok := strings.Cut(strings.ToLower(driverOpt), "=")
 	if !ok || key == "" {
-		return "", "", fmt.Errorf("invalid key value pair format in driver options")
+		return "", "", errors.New("invalid key value pair format in driver options")
 	}
 	key = strings.TrimSpace(key)
 	value = strings.TrimSpace(value)

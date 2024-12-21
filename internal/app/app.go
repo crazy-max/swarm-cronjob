@@ -7,7 +7,7 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mitchellh/mapstructure"
 	cron "github.com/robfig/cron/v3"
@@ -65,7 +65,7 @@ func (sc *SwarmCronjob) Run() error {
 	filter := filters.NewArgs()
 	filter.Add("type", "service")
 
-	msgs, errs := sc.docker.Events(context.Background(), types.EventsOptions{
+	msgs, errs := sc.docker.Events(context.Background(), events.ListOptions{
 		Filters: filter,
 	})
 
