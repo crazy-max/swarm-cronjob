@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.14.0 (2024/12/24)
+
+* Add `tzdata` package to Docker image (#337)
+* Go 1.23 (#372)
+* Alpine Linux 3.21 (#372)
+* Bump github.com/alecthomas/kong from 0.8.1 to 1.6.0 (#325 #374)
+* Bump github.com/distribution/reference to 0.6.0 (#373)
+* Bump github.com/docker/cli to 27.4.1+incompatible (#378)
+* Bump github.com/docker/docker to 27.4.1+incompatible (#378)
+* Bump github.com/rs/zerolog to 1.33.0 (#320 #345)
+* Bump golang.org/x/sys from 0.16.0 to 0.28.0 (#333 #346 #375)
+
 ## 1.13.0 (2024/02/01)
 
 * Enables automatic API version negotiation for the docker client (#313)
