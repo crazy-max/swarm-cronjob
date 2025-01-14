@@ -5,8 +5,8 @@ go 1.23.0
 require (
 	github.com/alecthomas/kong v1.6.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/cli v27.4.1+incompatible
-	github.com/docker/docker v27.4.1+incompatible
+	github.com/docker/cli v27.5.0+incompatible
+	github.com/docker/docker v27.5.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
