@@ -5,8 +5,8 @@ go 1.23.0
 require (
 	github.com/alecthomas/kong v1.6.0
 	github.com/distribution/reference v0.6.0
-	github.com/docker/cli v27.4.1+incompatible
-	github.com/docker/docker v27.4.1+incompatible
+	github.com/docker/cli v28.0.0+incompatible
+	github.com/docker/docker v28.0.0+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
@@ -38,6 +38,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/miekg/pkcs11 v1.0.2 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
@@ -50,6 +51,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect
 	github.com/prometheus/common v0.0.0-20180110214958-89604d197083 // indirect
 	github.com/prometheus/procfs v0.0.0-20180125133057-cb4147076ac7 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
