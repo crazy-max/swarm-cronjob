@@ -16,9 +16,10 @@ import (
 
 // SwarmCronjob represents an active swarm-cronjob object
 type SwarmCronjob struct {
-	docker docker.Client
-	cron   *cron.Cron
-	jobs   map[string]cron.EntryID
+	docker  docker.Client
+	cron    *cron.Cron
+	jobs    map[string]cron.EntryID
+	runOnce map[string]bool
 }
 
 // New creates new swarm-cronjob instance
@@ -31,7 +32,8 @@ func New() (*SwarmCronjob, error) {
 		cron: cron.New(cron.WithParser(cron.NewParser(
 			cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor),
 		)),
-		jobs: make(map[string]cron.EntryID),
+		jobs:    make(map[string]cron.EntryID),
+		runOnce: make(map[string]bool),
 	}, err
 }
 
@@ -75,11 +77,11 @@ func (sc *SwarmCronjob) Run() error {
 		case err := <-errs:
 			log.Fatal().Err(err).Msg("Event channel failed")
 		case msg := <-msgs:
-			err := mapstructure.Decode(msg.Actor.Attributes, &event)
-			if err != nil {
+			if err := mapstructure.Decode(msg.Actor.Attributes, &event); err != nil {
 				log.Warn().Msgf("Cannot decode event, %v", err)
 				continue
 			}
+
 			log.Debug().
 				Str("service", event.Service).
 				Str("newstate", event.UpdateState.New).
@@ -128,39 +130,47 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	for labelKey, labelValue := range service.Labels {
 		switch labelKey {
 		case "swarm.cronjob.enable":
-			wc.Job.Enable, err = strconv.ParseBool(labelValue)
-			if err != nil {
+			if wc.Job.Enable, err = strconv.ParseBool(labelValue); err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
+
 		case "swarm.cronjob.schedule":
 			wc.Job.Schedule = labelValue
+
 		case "swarm.cronjob.skip-running":
-			wc.Job.SkipRunning, err = strconv.ParseBool(labelValue)
-			if err != nil {
+			if wc.Job.SkipRunning, err = strconv.ParseBool(labelValue); err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
+
 		case "swarm.cronjob.replicas":
-			wc.Job.Replicas, err = strconv.ParseUint(labelValue, 10, 64)
-			if err != nil {
+			if wc.Job.Replicas, err = strconv.ParseUint(labelValue, 10, 64); err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			} else if wc.Job.Replicas < 1 {
 				log.Error().Str("service", service.Name).Msgf("%s must be greater than or equal to one", labelKey)
 			}
+
 		case "swarm.cronjob.registry-auth":
-			wc.Job.RegistryAuth, err = strconv.ParseBool(labelValue)
-			if err != nil {
+			if wc.Job.RegistryAuth, err = strconv.ParseBool(labelValue); err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
+
 		case "swarm.cronjob.query-registry":
 			queryRegistry, err := strconv.ParseBool(labelValue)
 			if err != nil {
 				log.Error().Str("service", service.Name).Err(err).Msgf("Cannot parse %s value of label %s", labelValue, labelKey)
 			}
 			wc.Job.QueryRegistry = &queryRegistry
+
 		case "swarm.cronjob.scaledown":
 			if labelValue == "true" {
 				log.Debug().Str("service", service.Name).Msg("Scale down detected. Skipping cronjob")
 				return false, nil
+			}
+
+		case "swarm.cronjob.run-once":
+			if labelValue == "true" {
+				sc.runOnce[service.Name] = true
+				log.Debug().Str("service", service.Name).Msgf("Enabled run once for the job %s", service.Name)
 			}
 		}
 	}
@@ -179,6 +189,13 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	// Add/Update job
 	if jobFound {
 		sc.removeJob(serviceName, jobID)
+
+		// check if is to run job only once, then removes
+		if sc.runOnce[service.Name] {
+			log.Info().Str("service", service.Name).Msgf("Job %s already scheduled to run once, skipping", wc.Job.Name)
+			delete(sc.runOnce, serviceName)
+			return true, err
+		}
 		log.Debug().Str("service", service.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
 		log.Info().Str("service", service.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
