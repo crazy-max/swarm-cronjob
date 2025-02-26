@@ -6,34 +6,41 @@ import (
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
+	"github.com/crazy-max/swarm-cronjob/internal/scheduler"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mitchellh/mapstructure"
-	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
 
-// SwarmCronjob represents an active swarm-cronjob object
-type SwarmCronjob struct {
-	docker  docker.Client
-	cron    *cron.Cron
-	jobs    map[string]cron.EntryID
-	runOnce map[string]bool
-}
+type (
+	Jobs map[string]scheduler.Uid
 
-// New creates new swarm-cronjob instance
+	// SwarmCronjob represents an active swarm-cronjob object
+	SwarmCronjob struct {
+		docker    docker.Client
+		scheduler *scheduler.Scheduler
+		jobs      Jobs
+		runOnce   map[string]bool
+	}
+)
+
+// New setup new swarm-cronjob instance
 func New() (*SwarmCronjob, error) {
 	log.Debug().Msg("Creating Docker API client")
 	d, err := docker.NewEnvClient()
 
+	scheduler, err := scheduler.NewScheduler(true)
+	if err != nil {
+		return nil, err
+	}
+
 	return &SwarmCronjob{
-		docker: d,
-		cron: cron.New(cron.WithParser(cron.NewParser(
-			cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor),
-		)),
-		jobs:    make(map[string]cron.EntryID),
-		runOnce: make(map[string]bool),
+		docker:    d,
+		scheduler: scheduler,
+		jobs:      make(Jobs),
+		runOnce:   make(map[string]bool),
 	}, err
 }
 
@@ -53,14 +60,14 @@ func (sc *SwarmCronjob) Run() error {
 
 	// Add services as cronjobs
 	for _, service := range services {
-		if _, err := sc.crudJob(service.Name); err != nil {
+		if _, err := sc.crudJob(service.Name, false); err != nil {
 			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Name)
 		}
 	}
 
 	// Start cron routine
 	log.Debug().Msg("Starting the cron scheduler")
-	sc.cron.Start()
+	sc.scheduler.Start()
 
 	// Listen Docker events
 	log.Debug().Msg("Listening docker events...")
@@ -71,7 +78,10 @@ func (sc *SwarmCronjob) Run() error {
 		Filters: filter,
 	})
 
-	var event model.ServiceEvent
+	var (
+		event  model.ServiceEvent
+		deploy bool
+	)
 	for {
 		select {
 		case err := <-errs:
@@ -87,19 +97,24 @@ func (sc *SwarmCronjob) Run() error {
 				Str("newstate", event.UpdateState.New).
 				Str("oldstate", event.UpdateState.Old).
 				Msg("Event triggered")
-			processed, err := sc.crudJob(event.Service)
+
+			if event.UpdateState.New == "" && event.UpdateState.Old == "" {
+				deploy = true
+			}
+			processed, err := sc.crudJob(event.Service, deploy)
 			if err != nil {
 				log.Error().Str("service", event.Service).Err(err).Msg("Cannot manage job")
 				continue
+
 			} else if processed {
-				log.Debug().Msgf("Number of cronjob tasks: %d", len(sc.cron.Entries()))
+				log.Debug().Msgf("Number of cronjob tasks: %d", sc.scheduler.CountJobs())
 			}
 		}
 	}
 }
 
 // crudJob adds, updates or removes cron job service
-func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
+func (sc *SwarmCronjob) crudJob(serviceName string, deploy bool) (bool, error) {
 	// Find existing job
 	jobID, jobFound := sc.jobs[serviceName]
 
@@ -171,11 +186,13 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 			if labelValue == "true" {
 				sc.runOnce[service.Name] = true
 				log.Debug().Str("service", service.Name).Msgf("Enabled run once for the job %s", service.Name)
+			} else {
+				sc.runOnce[service.Name] = false
 			}
 		}
 	}
 
-	// Disabled or non-cron service
+	// Check if is disabled or is a non-cron service
 	if !wc.Job.Enable {
 		if jobFound {
 			log.Info().Str("service", service.Name).Msg("Disable cronjob")
@@ -188,36 +205,57 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 
 	// Add/Update job
 	if jobFound {
-		sc.removeJob(serviceName, jobID)
-
-		// check if is to run job only once, then removes
+		// check if is to run job only once
 		if sc.runOnce[service.Name] {
-			log.Info().Str("service", service.Name).Msgf("Job %s already scheduled to run once, skipping", wc.Job.Name)
-			delete(sc.runOnce, serviceName)
+			// check if the defined service got an update
+			if deploy {
+				sc.removeJob(serviceName, jobID)
+			}
+			log.Info().Str("service", service.Name).Msgf("Job %s only scheduled to run once, skipping", wc.Job.Name)
 			return true, err
 		}
+
+		sc.removeJob(serviceName, jobID)
 		log.Debug().Str("service", service.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
-		log.Info().Str("service", service.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
+		if sc.runOnce[service.Name] {
+			log.Info().Str("service", service.Name).Msgf("Add one time job to be run after %s seconds", wc.Job.Schedule)
+		} else {
+			log.Info().Str("service", service.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
+		}
 	}
 
-	jobID, err = sc.cron.AddJob(wc.Job.Schedule, wc)
-	if err != nil {
-		return false, err
+	var job scheduler.Job
+	// check if current service is configured to run only once
+	if sc.runOnce[service.Name] {
+		if job, err = sc.scheduler.OneTimeJob(wc.Job.Schedule, func() {
+			defer wc.Run()
+			log.Debug().Str("service", service.Name).Msgf("Triggered one time job %s ...", wc.Job.Name)
+		}); err != nil {
+			return false, err
+		}
+	} else {
+
+		// by default set service as a Cron Job
+		if job, err = sc.scheduler.CronJob(wc.Job.Schedule, func() {
+			wc.Run()
+		}); err != nil {
+			return false, err
+		}
 	}
 
-	sc.jobs[serviceName] = jobID
+	sc.jobs[serviceName] = job.ID()
 	return true, err
 }
 
-// Close closes swarm-cronjob
+// Close stops swarm-cronjob jobs to be processed
 func (sc *SwarmCronjob) Close() {
-	if sc.cron != nil {
-		sc.cron.Stop()
+	if sc.scheduler != nil {
+		sc.scheduler.Stop()
 	}
 }
 
-func (sc *SwarmCronjob) removeJob(serviceName string, id cron.EntryID) {
+func (sc *SwarmCronjob) removeJob(serviceName string, id scheduler.Uid) {
+	defer sc.scheduler.RemoveJob(id)
 	delete(sc.jobs, serviceName)
-	sc.cron.Remove(id)
 }
