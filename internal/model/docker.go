@@ -41,8 +41,9 @@ type ServiceMode string
 
 // Services modes available
 const (
-	ServiceModeReplicated = ServiceMode("replicated")
-	ServiceModeGlobal     = ServiceMode("global")
+	ServiceModeReplicated    = ServiceMode("replicated")
+	ServiceModeReplicatedJob = ServiceMode("replicated-job")
+	ServiceModeGlobal        = ServiceMode("global")
 )
 
 // TaskInfo represents attributes of a task
