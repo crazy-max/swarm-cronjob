@@ -89,3 +89,43 @@ Once ready, deploy your global cron stack on the swarm cluster:
 ```shell
 docker stack deploy -c global.yml global
 ```
+
+You can also use replicated-job mode services with swarm-cronjob. This mode is ideal for job-based tasks that need to run with specific concurrency limits and completion tracking.
+
+To create a replicated-job service, create a new stack:
+
+```yaml
+version: "3.8"
+
+services:
+  backup-job:
+    image: busybox
+    command: ["sh", "-c", "echo 'Backup job executed at:' && date && sleep 5"]
+    deploy:
+      mode: replicated-job
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 */30 * * * *"
+        - "swarm.cronjob.skip-running=false"
+        - "swarm.cronjob.replicas=2"
+      restart_policy:
+        condition: none
+```
+
+Similar conditions apply as with other modes, but with key differences:
+
+* Set `mode` to `replicated-job`
+* **Must** set `replicas: 0` to ensure the job starts with `MaxConcurrent: 0` (required for proper initialization)
+* Use `swarm.cronjob.replicas` to set the desired `MaxConcurrent` value for job execution
+* Requires Docker Compose version 3.8 or higher for replicated-job support
+* The `swarm.cronjob.replicas` label controls how many tasks can run concurrently when the job is triggered
+
+!!! warning "Initial MaxConcurrent Requirement"
+    Replicated-job services **must** be created with `replicas: 0` initially. This sets `MaxConcurrent: 0` in the Docker service, which swarm-cronjob requires to properly manage job scheduling. The `swarm.cronjob.replicas` label will be used to set the actual concurrency limit when jobs are triggered.
+
+Once ready, deploy your replicated-job stack on the swarm cluster:
+
+```shell
+docker stack deploy -c backup-job.yml backup
+```
