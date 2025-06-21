@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  test:
+    image: busybox
+    command: ["sh", "-c", "echo 'Basic replicated job executed at:' && date"]
+    deploy:
+      mode: replicated-job
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0/30 * * * * *"
+        - "swarm.cronjob.skip-running=false"
+        - "swarm.cronjob.replicas=1"
+      restart_policy:
+        condition: none

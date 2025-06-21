@@ -51,16 +51,20 @@ func (c *Client) Run() {
 		Uint64("tasks_active", service.Actives).
 		Str("status", service.UpdateStatus).Msg("Start job")
 
-	// Set number of replicas in replicated mode
-	if service.Mode == model.ServiceModeReplicated {
-		if c.Job.Replicas > 1 {
-			// Need to scale down service to 0 to fix an issue if replicas > 1
-			// See https://github.com/crazy-max/swarm-cronjob/issues/16
-			if serviceUp, err = c.scaleDown(serviceUp); err != nil {
-				log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot scaled down")
-			}
+	// Set number of replicas based on service mode
+	if c.Job.Replicas > 1 {
+		// Need to scale down service to 0 to fix an issue if replicas > 1
+		// See https://github.com/crazy-max/swarm-cronjob/issues/16
+		if serviceUp, err = c.scaleDown(serviceUp); err != nil {
+			log.Error().Str("service", c.Job.Name).Err(err).Msg("Cannot scaled down")
 		}
+	}
+
+	switch service.Mode {
+	case model.ServiceModeReplicated:
 		*serviceUp.Spec.Mode.Replicated.Replicas = c.Job.Replicas
+	case model.ServiceModeReplicatedJob:
+		*serviceUp.Spec.Mode.ReplicatedJob.MaxConcurrent = c.Job.Replicas
 	}
 
 	// Set ForceUpdate with Version to ensure update
@@ -95,7 +99,12 @@ func (c *Client) Run() {
 }
 
 func (c *Client) scaleDown(serviceRaw swarm.Service) (swarm.Service, error) {
-	*serviceRaw.Spec.Mode.Replicated.Replicas = 0
+	switch {
+	case serviceRaw.Spec.Mode.Replicated != nil:
+		*serviceRaw.Spec.Mode.Replicated.Replicas = 0
+	case serviceRaw.Spec.Mode.ReplicatedJob != nil:
+		*serviceRaw.Spec.Mode.ReplicatedJob.MaxConcurrent = 0
+	}
 	serviceRaw.Spec.Labels["swarm.cronjob.scaledown"] = "true"
 	serviceRaw.Spec.TaskTemplate.ForceUpdate = serviceRaw.Version.Index
 
