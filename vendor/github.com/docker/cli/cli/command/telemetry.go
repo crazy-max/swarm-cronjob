@@ -4,17 +4,19 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/docker/distribution/uuid"
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
+	otelsdk "go.opentelemetry.io/otel/sdk"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -54,11 +56,11 @@ func (cli *DockerCli) Resource() *resource.Resource {
 	return cli.res.Get()
 }
 
-func (cli *DockerCli) TracerProvider() trace.TracerProvider {
+func (*DockerCli) TracerProvider() trace.TracerProvider {
 	return otel.GetTracerProvider()
 }
 
-func (cli *DockerCli) MeterProvider() metric.MeterProvider {
+func (*DockerCli) MeterProvider() metric.MeterProvider {
 	return otel.GetMeterProvider()
 }
 
@@ -142,10 +144,10 @@ func defaultResourceOptions() []resource.Option {
 			// of the CLI is its own instance. Without this, downstream
 			// OTEL processors may think the same process is restarting
 			// continuously.
-			semconv.ServiceInstanceID(uuid.Generate().String()),
+			semconv.ServiceInstanceID(uuid.NewString()),
 		),
 		resource.WithFromEnv(),
-		resource.WithTelemetrySDK(),
+		resource.WithDetectors(telemetrySDK{}),
 	}
 }
 
@@ -156,7 +158,10 @@ func (r *telemetryResource) AppendOptions(opts ...resource.Option) {
 	r.opts = append(r.opts, opts...)
 }
 
-type serviceNameDetector struct{}
+type (
+	serviceNameDetector struct{}
+	telemetrySDK        struct{}
+)
 
 func (serviceNameDetector) Detect(ctx context.Context) (*resource.Resource, error) {
 	return resource.StringDetector(
@@ -166,6 +171,16 @@ func (serviceNameDetector) Detect(ctx context.Context) (*resource.Resource, erro
 			return filepath.Base(os.Args[0]), nil
 		},
 	).Detect(ctx)
+}
+
+// Detect returns a *Resource that describes the OpenTelemetry SDK used.
+func (telemetrySDK) Detect(context.Context) (*resource.Resource, error) {
+	return resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.TelemetrySDKName("opentelemetry"),
+		semconv.TelemetrySDKLanguageGo,
+		semconv.TelemetrySDKVersion(otelsdk.Version()),
+	), nil
 }
 
 // cliReader is an implementation of Reader that will automatically
@@ -215,4 +230,50 @@ func (r *cliReader) ForceFlush(ctx context.Context) error {
 // they really shouldn't.
 func deltaTemporality(_ sdkmetric.InstrumentKind) metricdata.Temporality {
 	return metricdata.DeltaTemporality
+}
+
+// resourceAttributesEnvVar is the name of the envvar that includes additional
+// resource attributes for OTEL as defined in the [OpenTelemetry specification].
+//
+// [OpenTelemetry specification]: https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration
+const resourceAttributesEnvVar = "OTEL_RESOURCE_ATTRIBUTES"
+
+func filterResourceAttributesEnvvar() {
+	if v := os.Getenv(resourceAttributesEnvVar); v != "" {
+		if filtered := filterResourceAttributes(v); filtered != "" {
+			_ = os.Setenv(resourceAttributesEnvVar, filtered)
+		} else {
+			_ = os.Unsetenv(resourceAttributesEnvVar)
+		}
+	}
+}
+
+// dockerCLIAttributePrefix is the prefix for any docker cli OTEL attributes.
+// When updating, make sure to also update the copy in cli-plugins/manager.
+//
+// TODO(thaJeztah): move telemetry-related code to an (internal) package to reduce dependency on cli/command in cli-plugins, which has too many imports.
+const dockerCLIAttributePrefix = "docker.cli."
+
+func filterResourceAttributes(s string) string {
+	if trimmed := strings.TrimSpace(s); trimmed == "" {
+		return trimmed
+	}
+
+	pairs := strings.Split(s, ",")
+	elems := make([]string, 0, len(pairs))
+	for _, p := range pairs {
+		k, _, found := strings.Cut(p, "=")
+		if !found {
+			// Do not interact with invalid otel resources.
+			elems = append(elems, p)
+			continue
+		}
+
+		// Skip attributes that have our docker.cli prefix.
+		if strings.HasPrefix(k, dockerCLIAttributePrefix) {
+			continue
+		}
+		elems = append(elems, p)
+	}
+	return strings.Join(elems, ",")
 }
