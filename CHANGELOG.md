@@ -1,16 +1,29 @@
 # Changelog
 
+## 1.15.0 (2025/12/31)
+
+* Go 1.25 (#406)
+* Alpine Linux 3.23 (#410)
+* Switch to `github.com/go-viper/mapstructure` (#413)
+* Bump github.com/alecthomas/kong to 1.10.0 (#400)
+* Bump github.com/docker/cli to 28.5.2 (#411)
+* Bump github.com/docker/docker to 28.5.2 (#411)
+* Bump github.com/prometheus/client_golang to 1.11.1 (#379)
+* Bump github.com/rs/zerolog to 1.34.0 (#399)
+* Bump golang.org/x/crypto to 0.45.0 (#408)
+* Bump golang.org/x/sys to 0.39.0 (#396)
+
 ## 1.14.0 (2024/12/24)
 
 * Add `tzdata` package to Docker image (#337)
 * Go 1.23 (#372)
 * Alpine Linux 3.21 (#372)
-* Bump github.com/alecthomas/kong from 0.8.1 to 1.6.0 (#325 #374)
+* Bump github.com/alecthomas/kong to 1.6.0 (#325 #374)
 * Bump github.com/distribution/reference to 0.6.0 (#373)
 * Bump github.com/docker/cli to 27.4.1+incompatible (#378)
 * Bump github.com/docker/docker to 27.4.1+incompatible (#378)
 * Bump github.com/rs/zerolog to 1.33.0 (#320 #345)
-* Bump golang.org/x/sys from 0.16.0 to 0.28.0 (#333 #346 #375)
+* Bump golang.org/x/sys to 0.28.0 (#333 #346 #375)
 
 ## 1.13.0 (2024/02/01)
 
@@ -23,7 +36,7 @@
 * Bump github.com/docker/docker to 24.0.7+incompatible (#250 #290)
 * Bump github.com/opencontainers/image-spec to 1.0.2 (#239)
 * Bump github.com/prometheus/client_golang to 1.11.1 (#234)
-* Bump github.com/rs/zerolog from 1.29.0 to 1.31.0 (#245 #288)
+* Bump github.com/rs/zerolog to 1.31.0 (#245 #288)
 * Bump golang.org/x/crypto to 0.17.0 (#237 #303)
 * Bump golang.org/x/net to 0.17.0 (#238 #287)
 * Bump golang.org/x/sys to 0.16.0 (#252 #279 #301 #306)
@@ -33,12 +46,12 @@
 * Go 1.19 (#214)
 * Alpine Linux 3.17 (#223)
 * Enhance workflow (#215)
-* Bump github.com/alecthomas/kong from 0.6.1 to 0.7.1 (#220)
-* Bump github.com/docker/cli from 20.10.17+incompatible to 20.10.22+incompatible (#221)
-* Bump github.com/docker/docker from 20.10.17+incompatible to 20.10.22+incompatible (#222)
+* Bump github.com/alecthomas/kong to 0.7.1 (#220)
+* Bump github.com/docker/cli to 20.10.22+incompatible (#221)
+* Bump github.com/docker/docker to 20.10.22+incompatible (#222)
 * Bump golang.org/x/sys to 0.5.0 (#224 #230)
-* Bump github.com/rs/zerolog from 1.27.0 to 1.29.0 (#207 #227)
-* Bump github.com/docker/distribution from 2.7.1+incompatible to 2.8.0+incompatible (#233)
+* Bump github.com/rs/zerolog to 1.29.0 (#207 #227)
+* Bump github.com/docker/distribution to 2.8.0+incompatible (#233)
 
 ## 1.11.0 (2022/07/17)
 
@@ -50,11 +63,11 @@
 * Move `syscall` to `golang.org/x/sys`
 * MkDocs Material 8.3.9 (#205)
 * Enhance dockerfiles (#163)
-* Bump github.com/alecthomas/kong from 0.2.17 to 0.6.1 (#152 #162 #165 #176 #200)
-* Bump github.com/docker/cli from 20.10.8 to 20.10.17 (#149 #160 #197)
-* Bump github.com/docker/docker from 20.10.8 to 20.10.17 (#148 #159 #196)
-* Bump github.com/mitchellh/mapstructure from 1.4.1 to 1.5.0 (#145 #155 #181)
-* Bump github.com/rs/zerolog from 1.24.0 to 1.27.0 (#144 #150 #162 #198)
+* Bump github.com/alecthomas/kong to 0.6.1 (#152 #162 #165 #176 #200)
+* Bump github.com/docker/cli to 20.10.17 (#149 #160 #197)
+* Bump github.com/docker/docker to 20.10.17 (#148 #159 #196)
+* Bump github.com/mitchellh/mapstructure to 1.5.0 (#145 #155 #181)
+* Bump github.com/rs/zerolog to 1.27.0 (#144 #150 #162 #198)
 
 ## 1.10.0 (2021/09/05)
 
@@ -65,9 +78,9 @@
 * MkDocs Materials 7.2.6 (#143)
 * Remove `linux/s390x` Docker platform support (for now)
 * Switch to goreleaser-xx (#111)
-* Bump github.com/rs/zerolog from 1.20.0 to 1.24.0 (#131 #137 #142)
-* Bump github.com/mitchellh/mapstructure from 1.4.0 to 1.4.1 (#103)
-* Bump github.com/alecthomas/kong from 0.2.12 to 0.2.16 (#106 #112)
+* Bump github.com/rs/zerolog to 1.24.0 (#131 #137 #142)
+* Bump github.com/mitchellh/mapstructure to 1.4.1 (#103)
+* Bump github.com/alecthomas/kong to 0.2.16 (#106 #112)
 
 ## 1.9.0 (2021/01/03)
 
@@ -82,15 +95,14 @@
 * Docker client v20.10.1
 * Remove support for `freebsd/*` (moby/moby#38818)
 * Handle registry auth from spec (#92)
-* Bump github.com/mitchellh/mapstructure from 1.3.3 to 1.4.0 (#88)
-* Bump github.com/alecthomas/kong from 0.2.11 to 0.2.12 (#89)
 * Docker image also available on [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/swarm-cronjob)
-* Bump github.com/rs/zerolog from 1.19.0 to 1.20.0 (#68)
 * Docs website with mkdocs
-* Switch to [Docker actions](https://github.com/docker/build-push-action)
 * Add notes about timezone (#43)
 * Add renovate example (#42)
 * Add MariaDB dump example (#35)
+* Bump github.com/mitchellh/mapstructure to 1.4.0 (#88)
+* Bump github.com/alecthomas/kong to 0.2.12 (#89)
+* Bump github.com/rs/zerolog to 1.20.0 (#68)
 
 ## 1.8.0 (2020/04/06)
 
