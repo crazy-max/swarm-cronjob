@@ -26,6 +26,9 @@ type Path struct {
 
 	// True if this Path element was created as the result of a resolver.
 	Resolved bool
+
+	// Remaining tokens after this node
+	remainder []Token
 }
 
 // Node returns the Node associated with this Path, or nil if Path is a non-Node.
@@ -64,6 +67,15 @@ func (p *Path) Visitable() Visitable {
 	return nil
 }
 
+// Remainder returns the remaining unparsed args after this Path element.
+func (p *Path) Remainder() []string {
+	args := []string{}
+	for _, token := range p.remainder {
+		args = append(args, token.String())
+	}
+	return args
+}
+
 // Context contains the current parse context.
 type Context struct {
 	*Kong
@@ -87,14 +99,15 @@ type Context struct {
 // This just constructs a new trace. To fully apply the trace you must call Reset(), Resolve(),
 // Validate() and Apply().
 func Trace(k *Kong, args []string) (*Context, error) {
+	s := Scan(args...).AllowHyphenPrefixedParameters(k.allowHyphenated)
 	c := &Context{
 		Kong: k,
 		Args: args,
 		Path: []*Path{
-			{App: k.Model, Flags: k.Model.Flags},
+			{App: k.Model, Flags: k.Model.Flags, remainder: s.PeekAll()},
 		},
 		values:   map[*Value]reflect.Value{},
-		scan:     Scan(args...),
+		scan:     s,
 		bindings: bindings{},
 	}
 	c.Error = c.trace(c.Model.Node)
@@ -102,7 +115,7 @@ func Trace(k *Kong, args []string) (*Context, error) {
 }
 
 // Bind adds bindings to the Context.
-func (c *Context) Bind(args ...interface{}) {
+func (c *Context) Bind(args ...any) {
 	c.bindings.add(args...)
 }
 
@@ -111,7 +124,7 @@ func (c *Context) Bind(args ...interface{}) {
 // This will typically have to be called like so:
 //
 //	BindTo(impl, (*MyInterface)(nil))
-func (c *Context) BindTo(impl, iface interface{}) {
+func (c *Context) BindTo(impl, iface any) {
 	c.bindings.addTo(impl, iface)
 }
 
@@ -119,8 +132,20 @@ func (c *Context) BindTo(impl, iface interface{}) {
 //
 // This is useful when the Run() function of different commands require different values that may
 // not all be initialisable from the main() function.
-func (c *Context) BindToProvider(provider interface{}) error {
-	return c.bindings.addProvider(provider)
+//
+// "provider" must be a function with the signature func(...) (T, error) or func(...) T,
+// where ... will be recursively injected with bound values.
+func (c *Context) BindToProvider(provider any) error {
+	return c.bindings.addProvider(provider, false /* singleton */)
+}
+
+// BindSingletonProvider allows binding of provider functions.
+// The provider will be called once and the result cached.
+//
+// "provider" must be a function with the signature func(...) (T, error) or func(...) T,
+// where ... will be recursively injected with bound values.
+func (c *Context) BindSingletonProvider(provider any) error {
+	return c.bindings.addProvider(provider, true /* singleton */)
 }
 
 // Value returns the value for a particular path element.
@@ -306,7 +331,7 @@ func (c *Context) AddResolver(resolver Resolver) {
 }
 
 // FlagValue returns the set value of a flag if it was encountered and exists, or its default value.
-func (c *Context) FlagValue(flag *Flag) interface{} {
+func (c *Context) FlagValue(flag *Flag) any {
 	for _, trace := range c.Path {
 		if trace.Flag == flag {
 			v, ok := c.values[trace.Flag.Value]
@@ -465,6 +490,7 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 				c.Path = append(c.Path, &Path{
 					Parent:     node,
 					Positional: arg,
+					remainder:  c.scan.PeekAll(),
 				})
 				positional++
 				break
@@ -496,9 +522,10 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 				if branch.Type == CommandNode && branch.Name == token.Value {
 					c.scan.Pop()
 					c.Path = append(c.Path, &Path{
-						Parent:  node,
-						Command: branch,
-						Flags:   branch.Flags,
+						Parent:    node,
+						Command:   branch,
+						Flags:     branch.Flags,
+						remainder: c.scan.PeekAll(),
 					})
 					return c.trace(branch)
 				}
@@ -510,9 +537,10 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 					arg := branch.Argument
 					if err := arg.Parse(c.scan, c.getValue(arg)); err == nil {
 						c.Path = append(c.Path, &Path{
-							Parent:   node,
-							Argument: branch,
-							Flags:    branch.Flags,
+							Parent:    node,
+							Argument:  branch,
+							Flags:     branch.Flags,
+							remainder: c.scan.PeekAll(),
 						})
 						return c.trace(branch)
 					}
@@ -523,9 +551,10 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 			// matches, take the branch of the default command
 			if node.DefaultCmd != nil && node.DefaultCmd.Tag.Default == "withargs" {
 				c.Path = append(c.Path, &Path{
-					Parent:  node,
-					Command: node.DefaultCmd,
-					Flags:   node.DefaultCmd.Flags,
+					Parent:    node,
+					Command:   node.DefaultCmd,
+					Flags:     node.DefaultCmd.Flags,
+					remainder: c.scan.PeekAll(),
 				})
 				return c.trace(node.DefaultCmd)
 			}
@@ -538,19 +567,25 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 	return c.maybeSelectDefault(flags, node)
 }
 
+// IgnoreDefault can be implemented by flags that want to be applied before any default commands.
+type IgnoreDefault interface {
+	IgnoreDefault()
+}
+
 // End of the line, check for a default command, but only if we're not displaying help,
 // otherwise we'd only ever display the help for the default command.
 func (c *Context) maybeSelectDefault(flags []*Flag, node *Node) error {
 	for _, flag := range flags {
-		if flag.Name == "help" && flag.Set {
+		if _, ok := flag.Target.Interface().(IgnoreDefault); ok && flag.Set {
 			return nil
 		}
 	}
 	if node.DefaultCmd != nil {
 		c.Path = append(c.Path, &Path{
-			Parent:  node.DefaultCmd,
-			Command: node.DefaultCmd,
-			Flags:   node.DefaultCmd.Flags,
+			Parent:    node.DefaultCmd,
+			Command:   node.DefaultCmd,
+			Flags:     node.DefaultCmd.Flags,
+			remainder: c.scan.PeekAll(),
 		})
 	}
 	return nil
@@ -572,7 +607,7 @@ func (c *Context) Resolve() error {
 			}
 
 			// Pick the last resolved value.
-			var selected interface{}
+			var selected any
 			for _, resolver := range resolvers {
 				s, err := resolver.Resolve(c, path, flag)
 				if err != nil {
@@ -595,8 +630,9 @@ func (c *Context) Resolve() error {
 				return err
 			}
 			inserted = append(inserted, &Path{
-				Flag:     flag,
-				Resolved: true,
+				Flag:      flag,
+				Resolved:  true,
+				remainder: c.scan.PeekAll(),
 			})
 		}
 	}
@@ -740,7 +776,10 @@ func (c *Context) parseFlag(flags []*Flag, match string) (err error) {
 			}
 			flag.Value.Apply(value)
 		}
-		c.Path = append(c.Path, &Path{Flag: flag})
+		c.Path = append(c.Path, &Path{
+			Flag:      flag,
+			remainder: c.scan.PeekAll(),
+		})
 		return nil
 	}
 	return &unknownFlagError{Cause: findPotentialCandidates(match, candidates, "unknown flag %s", match)}
@@ -757,7 +796,7 @@ func (e *unknownFlagError) Unwrap() error { return e.Cause }
 func (e *unknownFlagError) Error() string { return e.Cause.Error() }
 
 // Call an arbitrary function filling arguments with bound values.
-func (c *Context) Call(fn any, binds ...interface{}) (out []interface{}, err error) {
+func (c *Context) Call(fn any, binds ...any) (out []any, err error) {
 	fv := reflect.ValueOf(fn)
 	bindings := c.Kong.bindings.clone().add(binds...).add(c).merge(c.bindings)
 	return callAnyFunction(fv, bindings)
@@ -769,7 +808,7 @@ func (c *Context) Call(fn any, binds ...interface{}) (out []interface{}, err err
 //
 // Any passed values will be bindable to arguments of the target Run() method. Additionally,
 // all parent nodes in the command structure will be bound.
-func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
+func (c *Context) RunNode(node *Node, binds ...any) (err error) {
 	type targetMethod struct {
 		node   *Node
 		method reflect.Value
@@ -789,7 +828,7 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 					methodt := t.Method(i)
 					if strings.HasPrefix(methodt.Name, "Provide") {
 						method := p.Method(i)
-						if err := methodBinds.addProvider(method.Interface()); err != nil {
+						if err := methodBinds.addProvider(method.Interface(), false /* singleton */); err != nil {
 							return fmt.Errorf("%s.%s: %w", t.Name(), methodt.Name, err)
 						}
 					}
@@ -803,11 +842,6 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 	if len(methods) == 0 {
 		return fmt.Errorf("no Run() method found in hierarchy of %s", c.Selected().Summary())
 	}
-	_, err = c.Apply()
-	if err != nil {
-		return err
-	}
-
 	for _, method := range methods {
 		if err = callFunction(method.method, method.binds); err != nil {
 			return err
@@ -820,7 +854,7 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 //
 // Any passed values will be bindable to arguments of the target Run() method. Additionally,
 // all parent nodes in the command structure will be bound.
-func (c *Context) Run(binds ...interface{}) (err error) {
+func (c *Context) Run(binds ...any) (err error) {
 	node := c.Selected()
 	if node == nil {
 		if len(c.Path) == 0 {
@@ -832,7 +866,9 @@ func (c *Context) Run(binds ...interface{}) (err error) {
 			if method.IsValid() {
 				node = selected
 			}
-		} else {
+		}
+
+		if node == nil {
 			return fmt.Errorf("no command selected")
 		}
 	}
@@ -847,6 +883,11 @@ func (c *Context) Run(binds ...interface{}) (err error) {
 func (c *Context) PrintUsage(summary bool) error {
 	options := c.helpOptions
 	options.Summary = summary
+	return c.printHelp(options)
+}
+
+func (c *Context) printHelp(options HelpOptions) error {
+	options.ValueFormatter = c.Kong.helpFormatter
 	return c.help(options, c)
 }
 
@@ -1092,7 +1133,7 @@ func checkAndMissing(paths []*Path) error {
 	return nil
 }
 
-func findPotentialCandidates(needle string, haystack []string, format string, args ...interface{}) error {
+func findPotentialCandidates(needle string, haystack []string, format string, args ...any) error {
 	if len(haystack) == 0 {
 		return fmt.Errorf(format, args...)
 	}
