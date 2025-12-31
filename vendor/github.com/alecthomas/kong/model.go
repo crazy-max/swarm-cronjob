@@ -69,7 +69,7 @@ func (n *Node) Leaf() bool {
 // Find a command/argument/flag by pointer to its field.
 //
 // Returns nil if not found. Panics if ptr is not a pointer.
-func (n *Node) Find(ptr interface{}) *Node {
+func (n *Node) Find(ptr any) *Node {
 	key := reflect.ValueOf(ptr)
 	if key.Kind() != reflect.Ptr {
 		panic("expected a pointer")
@@ -167,6 +167,9 @@ func (n *Node) Summary() string {
 		allFlags = append(allFlags, n.Parent.Flags...)
 	}
 	for _, flag := range allFlags {
+		if _, ok := flag.Target.Interface().(helpFlag); ok {
+			continue
+		}
 		if !flag.Required {
 			summary += " [flags]"
 			break
@@ -433,7 +436,7 @@ func (f *Flag) FormatPlaceHolder() string {
 		return placeholderHelper.PlaceHolder(f)
 	}
 	tail := ""
-	if f.Value.IsSlice() && f.Value.Tag.Sep != -1 {
+	if f.Value.IsSlice() && f.Value.Tag.Sep != -1 && f.Tag.Type == "" {
 		tail += string(f.Value.Tag.Sep) + "..."
 	}
 	if f.PlaceHolder != "" {
@@ -446,7 +449,7 @@ func (f *Flag) FormatPlaceHolder() string {
 		return f.Default + tail
 	}
 	if f.Value.IsMap() {
-		if f.Value.Tag.MapSep != -1 {
+		if f.Value.Tag.MapSep != -1 && f.Tag.Type == "" {
 			tail = string(f.Value.Tag.MapSep) + "..."
 		}
 		return "KEY=VALUE" + tail

@@ -55,6 +55,16 @@ func Exit(exit func(int)) Option {
 	})
 }
 
+// WithHyphenPrefixedParameters enables or disables hyphen-prefixed parameters.
+//
+// These are disabled by default.
+func WithHyphenPrefixedParameters(enable bool) Option {
+	return OptionFunc(func(k *Kong) error {
+		k.allowHyphenated = enable
+		return nil
+	})
+}
+
 type embedded struct {
 	strct any
 	tags  []string
@@ -79,7 +89,7 @@ type dynamicCommand struct {
 	help  string
 	group string
 	tags  []string
-	cmd   interface{}
+	cmd   any
 }
 
 // DynamicCommand registers a dynamically constructed command with the root of the CLI.
@@ -87,12 +97,8 @@ type dynamicCommand struct {
 // This is useful for command-line structures that are extensible via user-provided plugins.
 //
 // "tags" is a list of extra tag strings to parse, in the form <key>:"<value>".
-func DynamicCommand(name, help, group string, cmd interface{}, tags ...string) Option {
+func DynamicCommand(name, help, group string, cmd any, tags ...string) Option {
 	return OptionFunc(func(k *Kong) error {
-		if run := getMethod(reflect.Indirect(reflect.ValueOf(cmd)), "Run"); !run.IsValid() {
-			return fmt.Errorf("kong: DynamicCommand %q must be a type with a 'Run' method; got %T", name, cmd)
-		}
-
 		k.dynamicCommands = append(k.dynamicCommands, &dynamicCommand{
 			name:  name,
 			help:  help,
@@ -119,6 +125,40 @@ func NoDefaultHelp() Option {
 func PostBuild(fn func(*Kong) error) Option {
 	return OptionFunc(func(k *Kong) error {
 		k.postBuildOptions = append(k.postBuildOptions, OptionFunc(fn))
+		return nil
+	})
+}
+
+// WithBeforeReset registers a hook to run before fields values are reset to their defaults
+// (as specified in the grammar) or to zero values.
+func WithBeforeReset(fn any) Option {
+	return withHook("BeforeReset", fn)
+}
+
+// WithBeforeResolve registers a hook to run before resolvers are applied.
+func WithBeforeResolve(fn any) Option {
+	return withHook("BeforeResolve", fn)
+}
+
+// WithBeforeApply registers a hook to run before command line arguments are applied to the grammar.
+func WithBeforeApply(fn any) Option {
+	return withHook("BeforeApply", fn)
+}
+
+// WithAfterApply registers a hook to run after values are applied to the grammar and validated.
+func WithAfterApply(fn any) Option {
+	return withHook("AfterApply", fn)
+}
+
+// withHook registers a named hook.
+func withHook(name string, fn any) Option {
+	value := reflect.ValueOf(fn)
+	if value.Kind() != reflect.Func {
+		panic(fmt.Errorf("expected function, got %s", value.Type()))
+	}
+
+	return OptionFunc(func(k *Kong) error {
+		k.hooks[name] = append(k.hooks[name], value)
 		return nil
 	})
 }
@@ -156,7 +196,7 @@ func KindMapper(kind reflect.Kind, mapper Mapper) Option {
 }
 
 // ValueMapper registers a mapper to a field value.
-func ValueMapper(ptr interface{}, mapper Mapper) Option {
+func ValueMapper(ptr any, mapper Mapper) Option {
 	return OptionFunc(func(k *Kong) error {
 		k.registry.RegisterValue(ptr, mapper)
 		return nil
@@ -191,7 +231,7 @@ func Writers(stdout, stderr io.Writer) Option {
 //	  	AfterApply(...) error
 //
 // Called before validation/assignment, and immediately after validation/assignment, respectively.
-func Bind(args ...interface{}) Option {
+func Bind(args ...any) Option {
 	return OptionFunc(func(k *Kong) error {
 		k.bindings.add(args...)
 		return nil
@@ -201,7 +241,7 @@ func Bind(args ...interface{}) Option {
 // BindTo allows binding of implementations to interfaces.
 //
 //	BindTo(impl, (*iface)(nil))
-func BindTo(impl, iface interface{}) Option {
+func BindTo(impl, iface any) Option {
 	return OptionFunc(func(k *Kong) error {
 		k.bindings.addTo(impl, iface)
 		return nil
@@ -210,15 +250,33 @@ func BindTo(impl, iface interface{}) Option {
 
 // BindToProvider binds an injected value to a provider function.
 //
-// The provider function must have the signature:
+// The provider function must have one of the following signatures:
 //
-//	func() (interface{}, error)
+//	func(...) (T, error)
+//	func(...) T
+//
+// Where arguments to the function are injected by Kong.
 //
 // This is useful when the Run() function of different commands require different values that may
 // not all be initialisable from the main() function.
-func BindToProvider(provider interface{}) Option {
+func BindToProvider(provider any) Option {
 	return OptionFunc(func(k *Kong) error {
-		return k.bindings.addProvider(provider)
+		return k.bindings.addProvider(provider, false /* singleton */)
+	})
+}
+
+// BindSingletonProvider binds an injected value to a provider function.
+// The provider function must have the signature:
+//
+//	func(...) (T, error)
+//	func(...) T
+//
+// Unlike [BindToProvider], the provider function will only be called
+// at most once, and the result will be cached and reused
+// across multiple recipients of the injected value.
+func BindSingletonProvider(provider any) Option {
+	return OptionFunc(func(k *Kong) error {
+		return k.bindings.addProvider(provider, true /* singleton */)
 	})
 }
 

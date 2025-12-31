@@ -15,7 +15,7 @@ var (
 	callbackReturnSignature = reflect.TypeOf((*error)(nil)).Elem()
 )
 
-func failField(parent reflect.Value, field reflect.StructField, format string, args ...interface{}) error {
+func failField(parent reflect.Value, field reflect.StructField, format string, args ...any) error {
 	name := parent.Type().Name()
 	if name == "" {
 		name = "<anonymous struct>"
@@ -24,7 +24,7 @@ func failField(parent reflect.Value, field reflect.StructField, format string, a
 }
 
 // Must creates a new Parser or panics if there is an error.
-func Must(ast interface{}, options ...Option) *Kong {
+func Must(ast any, options ...Option) *Kong {
 	k, err := New(ast, options...)
 	if err != nil {
 		panic(err)
@@ -56,27 +56,30 @@ type Kong struct {
 	registry     *Registry
 	ignoreFields []*regexp.Regexp
 
-	noDefaultHelp bool
-	usageOnError  usageOnError
-	help          HelpPrinter
-	shortHelp     HelpPrinter
-	helpFormatter HelpValueFormatter
-	helpOptions   HelpOptions
-	helpFlag      *Flag
-	groups        []Group
-	vars          Vars
-	flagNamer     func(string) string
+	noDefaultHelp   bool
+	allowHyphenated bool
+	usageOnError    usageOnError
+	help            HelpPrinter
+	shortHelp       HelpPrinter
+	helpFormatter   HelpValueFormatter
+	helpOptions     HelpOptions
+	helpFlag        *Flag
+	groups          []Group
+	vars            Vars
+	flagNamer       func(string) string
 
 	// Set temporarily by Options. These are applied after build().
 	postBuildOptions []Option
 	embedded         []embedded
 	dynamicCommands  []*dynamicCommand
+
+	hooks map[string][]reflect.Value
 }
 
 // New creates a new Kong parser on grammar.
 //
 // See the README (https://github.com/alecthomas/kong) for usage instructions.
-func New(grammar interface{}, options ...Option) (*Kong, error) {
+func New(grammar any, options ...Option) (*Kong, error) {
 	k := &Kong{
 		Exit:          os.Exit,
 		Stdout:        os.Stdout,
@@ -84,6 +87,7 @@ func New(grammar interface{}, options ...Option) (*Kong, error) {
 		registry:      NewRegistry().RegisterDefaults(),
 		vars:          Vars{},
 		bindings:      bindings{},
+		hooks:         make(map[string][]reflect.Value),
 		helpFormatter: DefaultHelpValueFormatter,
 		ignoreFields:  make([]*regexp.Regexp, 0),
 		flagNamer: func(s string) string {
@@ -245,8 +249,11 @@ func (k *Kong) interpolateValue(value *Value, vars Vars) (err error) {
 		vars = vars.CloneWith(varsContributor.Vars(value))
 	}
 
-	if value.Enum, err = interpolate(value.Enum, vars, nil); err != nil {
-		return fmt.Errorf("enum for %s: %s", value.Summary(), err)
+	initialVars := vars.CloneWith(nil)
+	for n, v := range initialVars {
+		if vars[n], err = interpolate(v, initialVars, nil); err != nil {
+			return fmt.Errorf("variable %s for %s: %s", n, value.Summary(), err)
+		}
 	}
 
 	if value.Default, err = interpolate(value.Default, vars, nil); err != nil {
@@ -270,6 +277,11 @@ func (k *Kong) interpolateValue(value *Value, vars Vars) (err error) {
 		if len(value.Flag.Envs) != 0 {
 			updatedVars["env"] = value.Flag.Envs[0]
 		}
+
+		value.Flag.PlaceHolder, err = interpolate(value.Flag.PlaceHolder, vars, updatedVars)
+		if err != nil {
+			return fmt.Errorf("placeholder value for %s: %s", value.Summary(), err)
+		}
 	}
 	value.Help, err = interpolate(value.Help, vars, updatedVars)
 	if err != nil {
@@ -283,7 +295,7 @@ func (k *Kong) extraFlags() []*Flag {
 	if k.noDefaultHelp {
 		return nil
 	}
-	var helpTarget helpValue
+	var helpTarget helpFlag
 	value := reflect.ValueOf(&helpTarget).Elem()
 	helpFlag := &Flag{
 		Short: 'h',
@@ -311,11 +323,11 @@ func (k *Kong) extraFlags() []*Flag {
 // invalid one, which will report a normal error).
 func (k *Kong) Parse(args []string) (ctx *Context, err error) {
 	ctx, err = Trace(k, args)
-	if err != nil {
-		return nil, err
+	if err != nil { // Trace is not expected to return an err
+		return nil, &ParseError{error: err, Context: ctx, exitCode: exitUsageError}
 	}
 	if ctx.Error != nil {
-		return nil, &ParseError{error: ctx.Error, Context: ctx}
+		return nil, &ParseError{error: ctx.Error, Context: ctx, exitCode: exitUsageError}
 	}
 	if err = k.applyHook(ctx, "BeforeReset"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
@@ -332,11 +344,11 @@ func (k *Kong) Parse(args []string) (ctx *Context, err error) {
 	if err = k.applyHook(ctx, "BeforeApply"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
 	}
-	if _, err = ctx.Apply(); err != nil {
+	if _, err = ctx.Apply(); err != nil { // Apply is not expected to return an err
 		return nil, &ParseError{error: err, Context: ctx}
 	}
 	if err = ctx.Validate(); err != nil {
-		return nil, &ParseError{error: err, Context: ctx}
+		return nil, &ParseError{error: err, Context: ctx, exitCode: exitUsageError}
 	}
 	if err = k.applyHook(ctx, "AfterApply"); err != nil {
 		return nil, &ParseError{error: err, Context: ctx}
@@ -361,20 +373,28 @@ func (k *Kong) applyHook(ctx *Context, name string) error {
 		default:
 			panic("unsupported Path")
 		}
-		method := getMethod(value, name)
-		if !method.IsValid() {
-			continue
-		}
-		binds := k.bindings.clone()
-		binds.add(ctx, trace)
-		binds.add(trace.Node().Vars().CloneWith(k.vars))
-		binds.merge(ctx.bindings)
-		if err := callFunction(method, binds); err != nil {
-			return err
+		for _, method := range k.getMethods(value, name) {
+			binds := k.bindings.clone()
+			binds.add(ctx, trace)
+			binds.add(trace.Node().Vars().CloneWith(k.vars))
+			binds.merge(ctx.bindings)
+			if err := callFunction(method, binds); err != nil {
+				return err
+			}
 		}
 	}
 	// Path[0] will always be the app root.
 	return k.applyHookToDefaultFlags(ctx, ctx.Path[0].Node(), name)
+}
+
+func (k *Kong) getMethods(value reflect.Value, name string) []reflect.Value {
+	return append(
+		// Identify callbacks by reflecting on value
+		getMethods(value, name),
+
+		// Identify callbacks that were registered with a kong.Option
+		k.hooks[name]...,
+	)
 }
 
 // Call hook on any unset flags with default values.
@@ -392,20 +412,18 @@ func (k *Kong) applyHookToDefaultFlags(ctx *Context, node *Node, name string) er
 			if !flag.HasDefault || ctx.values[flag.Value].IsValid() || !flag.Target.IsValid() {
 				continue
 			}
-			method := getMethod(flag.Target, name)
-			if !method.IsValid() {
-				continue
-			}
-			path := &Path{Flag: flag}
-			if err := callFunction(method, binds.clone().add(path)); err != nil {
-				return next(err)
+			for _, method := range getMethods(flag.Target, name) {
+				path := &Path{Flag: flag}
+				if err := callFunction(method, binds.clone().add(path)); err != nil {
+					return next(err)
+				}
 			}
 		}
 		return next(nil)
 	})
 }
 
-func formatMultilineMessage(w io.Writer, leaders []string, format string, args ...interface{}) {
+func formatMultilineMessage(w io.Writer, leaders []string, format string, args ...any) {
 	lines := strings.Split(strings.TrimRight(fmt.Sprintf(format, args...), "\n"), "\n")
 	leader := ""
 	for _, l := range leaders {
@@ -421,25 +439,27 @@ func formatMultilineMessage(w io.Writer, leaders []string, format string, args .
 }
 
 // Printf writes a message to Kong.Stdout with the application name prefixed.
-func (k *Kong) Printf(format string, args ...interface{}) *Kong {
+func (k *Kong) Printf(format string, args ...any) *Kong {
 	formatMultilineMessage(k.Stdout, []string{k.Model.Name}, format, args...)
 	return k
 }
 
 // Errorf writes a message to Kong.Stderr with the application name prefixed.
-func (k *Kong) Errorf(format string, args ...interface{}) *Kong {
+func (k *Kong) Errorf(format string, args ...any) *Kong {
 	formatMultilineMessage(k.Stderr, []string{k.Model.Name, "error"}, format, args...)
 	return k
 }
 
-// Fatalf writes a message to Kong.Stderr with the application name prefixed then exits with a non-zero status.
-func (k *Kong) Fatalf(format string, args ...interface{}) {
+// Fatalf writes a message to Kong.Stderr with the application name prefixed then exits with status 1.
+func (k *Kong) Fatalf(format string, args ...any) {
 	k.Errorf(format, args...)
 	k.Exit(1)
 }
 
 // FatalIfErrorf terminates with an error message if err != nil.
-func (k *Kong) FatalIfErrorf(err error, args ...interface{}) {
+// If the error implements the ExitCoder interface, the ExitCode() method is called and
+// the application exits with that status. Otherwise, the application exits with status 1.
+func (k *Kong) FatalIfErrorf(err error, args ...any) {
 	if err == nil {
 		return
 	}
@@ -452,14 +472,15 @@ func (k *Kong) FatalIfErrorf(err error, args ...interface{}) {
 	if errors.As(err, &parseErr) {
 		switch k.usageOnError {
 		case fullUsage:
-			_ = k.help(k.helpOptions, parseErr.Context)
+			_ = parseErr.Context.printHelp(k.helpOptions)
 			fmt.Fprintln(k.Stdout)
 		case shortUsage:
 			_ = k.shortHelp(k.helpOptions, parseErr.Context)
 			fmt.Fprintln(k.Stdout)
 		}
 	}
-	k.Fatalf("%s", msg)
+	k.Errorf("%s", msg)
+	k.Exit(exitCodeFromError(err))
 }
 
 // LoadConfig from path using the loader configured via Configuration(loader).
