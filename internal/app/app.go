@@ -9,7 +9,7 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
