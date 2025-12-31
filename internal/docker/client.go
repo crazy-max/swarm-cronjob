@@ -6,7 +6,6 @@ import (
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/docker/cli/cli/command"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/api/types/swarm"
@@ -18,8 +17,8 @@ import (
 type Client interface {
 	DistributionInspect(ctx context.Context, image, encodedAuth string) (registry.DistributionInspect, error)
 	RetrieveAuthTokenFromImage(ctx context.Context, image string) (string, error)
-	ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error)
-	ServiceInspectWithRaw(ctx context.Context, serviceID string, opts types.ServiceInspectOptions) (swarm.Service, []byte, error)
+	ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options swarm.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error)
+	ServiceInspectWithRaw(ctx context.Context, serviceID string, opts swarm.ServiceInspectOptions) (swarm.Service, []byte, error)
 	Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error)
 
 	ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error)
@@ -68,12 +67,12 @@ func (c *DockerClient) RetrieveAuthTokenFromImage(ctx context.Context, image str
 // ServiceUpdate updates a Service. The version number is required to avoid conflicting writes.
 // It should be the value as set *before* the update. You can find this value in the Meta field
 // of swarm.Service, which can be found using ServiceInspectWithRaw.
-func (c *DockerClient) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error) {
+func (c *DockerClient) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options swarm.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error) {
 	return c.api.ServiceUpdate(ctx, serviceID, version, service, options)
 }
 
 // ServiceInspectWithRaw returns the service information and the raw data.
-func (c *DockerClient) ServiceInspectWithRaw(ctx context.Context, serviceID string, opts types.ServiceInspectOptions) (swarm.Service, []byte, error) {
+func (c *DockerClient) ServiceInspectWithRaw(ctx context.Context, serviceID string, opts swarm.ServiceInspectOptions) (swarm.Service, []byte, error) {
 	return c.api.ServiceInspectWithRaw(ctx, serviceID, opts)
 }
 

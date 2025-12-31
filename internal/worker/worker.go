@@ -67,7 +67,7 @@ func (c *Client) Run() {
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
 	// Update options
-	updateOpts := types.ServiceUpdateOptions{}
+	updateOpts := swarm.ServiceUpdateOptions{}
 	if c.Job.RegistryAuth {
 		encodedAuth, err := c.Docker.RetrieveAuthTokenFromImage(context.Background(), serviceUp.Spec.TaskTemplate.ContainerSpec.Image)
 		if err != nil {
@@ -99,7 +99,7 @@ func (c *Client) scaleDown(serviceRaw swarm.Service) (swarm.Service, error) {
 	serviceRaw.Spec.Labels["swarm.cronjob.scaledown"] = "true"
 	serviceRaw.Spec.TaskTemplate.ForceUpdate = serviceRaw.Version.Index
 
-	_, err := c.Docker.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, types.ServiceUpdateOptions{})
+	_, err := c.Docker.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, swarm.ServiceUpdateOptions{})
 	if err != nil {
 		return swarm.Service{}, err
 	}

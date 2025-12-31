@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/pkg/errors"
@@ -13,7 +12,7 @@ import (
 
 // ServiceList return all services.
 func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.ServiceInfo, error) {
-	opts := types.ServiceListOptions{
+	opts := swarm.ServiceListOptions{
 		Filters: filters.NewArgs(),
 	}
 	if args.Name != "" {
@@ -34,7 +33,7 @@ func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.Servic
 	})
 
 	// nodes
-	nodes, err := c.api.NodeList(context.Background(), types.NodeListOptions{})
+	nodes, err := c.api.NodeList(context.Background(), swarm.NodeListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +45,7 @@ func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.Servic
 	}
 
 	// tasks
-	taskOpts := types.TaskListOptions{
+	taskOpts := swarm.TaskListOptions{
 		Filters: filters.NewArgs(),
 	}
 	for _, service := range services {
