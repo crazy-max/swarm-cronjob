@@ -35,7 +35,7 @@ jobs:
       -
         name: Validate matrix
         id: validate
-        uses: docker/bake-action/subaction/matrix@v6
+        uses: docker/bake-action/subaction/matrix@v7
         with:
           target: validate
         env:
@@ -43,7 +43,7 @@ jobs:
       -
         name: Artifact matrix
         id: artifact
-        uses: docker/bake-action/subaction/matrix@v6
+        uses: docker/bake-action/subaction/matrix@v7
         with:
           target: artifact-all
           fields: platforms
@@ -65,7 +65,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Validate
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           targets: ${{ matrix.target }}
@@ -98,7 +98,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Build
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           targets: artifact
@@ -151,7 +151,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Build
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           targets: release
@@ -223,7 +223,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           files: |
