@@ -83,10 +83,14 @@ func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.Servic
 		if service.UpdateStatus != nil {
 			res[i].UpdateStatus = string(service.UpdateStatus.State)
 		}
-		if service.Spec.Mode.Replicated != nil && service.Spec.Mode.Replicated.Replicas != nil {
+		switch {
+		case service.Spec.Mode.Replicated != nil && service.Spec.Mode.Replicated.Replicas != nil:
 			res[i].Mode = model.ServiceModeReplicated
 			res[i].Replicas = *service.Spec.Mode.Replicated.Replicas
-		} else if service.Spec.Mode.Global != nil {
+		case service.Spec.Mode.ReplicatedJob != nil:
+			res[i].Mode = model.ServiceModeReplicatedJob
+			res[i].Replicas = *service.Spec.Mode.ReplicatedJob.MaxConcurrent
+		case service.Spec.Mode.Global != nil:
 			res[i].Mode = model.ServiceModeGlobal
 			res[i].Replicas = tasksNoShutdown[service.ID]
 		}
