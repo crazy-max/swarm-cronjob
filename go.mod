@@ -1,6 +1,6 @@
 module github.com/crazy-max/swarm-cronjob
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/alecthomas/kong v1.13.0
@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.34.0
-	golang.org/x/sys v0.39.0
+	golang.org/x/sys v0.42.0
 )
 
 require (
