@@ -2,23 +2,12 @@ package docker
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 
 	"github.com/distribution/reference"
 	"github.com/docker/cli/cli/command"
 	registrytypes "github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/registry"
 )
-
-// encodeAuthToBase64 serializes the auth configuration as JSON base64 payload
-func encodeAuthToBase64(authConfig registrytypes.AuthConfig) (string, error) {
-	buf, err := json.Marshal(authConfig)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(buf), nil
-}
 
 // resolveAuthConfig is like registry.ResolveAuthConfig, but if using the
 // default index, it uses the default index name for the daemon's platform,
@@ -28,7 +17,6 @@ func resolveAuthConfig(_ context.Context, cli command.Cli, index *registrytypes.
 	if index.Official {
 		configKey = registry.IndexServer
 	}
-
 	a, _ := cli.ConfigFile().GetAuthConfig(configKey)
 	return registrytypes.AuthConfig(a)
 }
@@ -40,7 +28,7 @@ func retrieveAuthTokenFromImage(ctx context.Context, cli command.Cli, image stri
 	if err != nil {
 		return "", err
 	}
-	encodedAuth, err := encodeAuthToBase64(authConfig)
+	encodedAuth, err := registrytypes.EncodeAuthConfig(authConfig)
 	if err != nil {
 		return "", err
 	}
