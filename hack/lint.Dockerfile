@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION="1.25"
+ARG GO_VERSION="1.26"
 ARG ALPINE_VERSION="3.23"
-ARG GOLANGCI_LINT_VERSION="v2.1.6"
+ARG GOLANGCI_LINT_VERSION="v2.11.4"
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 ENV GOFLAGS="-buildvcs=false"
