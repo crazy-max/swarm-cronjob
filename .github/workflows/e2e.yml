@@ -17,8 +17,6 @@ on:
 env:
   BUILD_TAG: 'swarm-cronjob:local'
   SERVICE_NAME: 'swarm-cronjob'
-  RUNNING_TIMEOUT: '120'
-  RUNNING_LOG_CHECK: 'Number of cronjob tasks: 7'
 
 jobs:
   e2e:
@@ -64,19 +62,10 @@ jobs:
             --constraint 'node.role == manager' \
             ${{ env.BUILD_TAG }}
       -
-        name: Test service
-        run: |
-          TIMEOUT=$((SECONDS + ${{ env.RUNNING_TIMEOUT }}))
-          while read LOGLINE; do
-            echo ${LOGLINE}
-            if [[ ${LOGLINE} == *"${{ env.RUNNING_LOG_CHECK }}"* ]]; then
-              echo "🎉 Service up!"
-              break
-            fi
-            if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "❌ Failed to run ${{ env.SERVICE_NAME }} service"
-              docker swarm leave --force > /dev/null 2>&1 || true
-              exit 1
-            fi
-          done < <(docker service logs -f ${{ env.SERVICE_NAME }} 2>&1)
-          docker swarm leave --force > /dev/null 2>&1 || true
+        name: Check service logs
+        uses: crazy-max/.github/.github/actions/container-logs-check@c0330b414db4cc26a27bbd6f896af62395634183 # main
+        with:
+          name: ${{ env.SERVICE_NAME }}
+          type: service
+          log_check: "Number of cronjob tasks: 7"
+          timeout: 120
