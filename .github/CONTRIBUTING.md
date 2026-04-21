@@ -12,9 +12,10 @@ to the public under the [project's open source license](../LICENSE).
 3. Create a new branch: `git checkout -b my-branch-name`
 4. Make your changes
 5. Validate: `docker buildx bake validate`
-6. Build the project: `docker buildx bake artifact-all image-all`
-7. Push to your fork and [submit a pull request](https://github.com/crazy-max/swarm-cronjob/compare)
-8. Pat your self on the back and wait for your pull request to be reviewed and merged.
+6. Test your code: `docker buildx bake test`
+7. Build the project: `docker buildx bake artifact-all image-all`
+8. Push to your fork and [submit a pull request](https://github.com/crazy-max/swarm-cronjob/compare)
+9. Pat your self on the back and wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
