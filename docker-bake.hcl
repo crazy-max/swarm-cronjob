@@ -89,6 +89,12 @@ target "image-all" {
   ]
 }
 
+target "test" {
+  inherits = ["_common"]
+  target = "test-coverage"
+  output = ["${DESTDIR}/coverage"]
+}
+
 target "vendor" {
   inherits = ["_common"]
   dockerfile = "./hack/vendor.Dockerfile"

@@ -24,6 +24,20 @@ RUN --mount=target=. <<EOT
   echo "$version" | tee /tmp/.version
 EOT
 
+FROM base AS test
+ENV CGO_ENABLED=1
+RUN apk add --no-cache gcc linux-headers musl-dev
+RUN --mount=type=bind,target=. \
+    --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build <<EOT
+  set -ex
+  go test -v -coverprofile=/tmp/coverage.txt -covermode=atomic -race ./...
+  go tool cover -func=/tmp/coverage.txt
+EOT
+
+FROM scratch AS test-coverage
+COPY --from=test /tmp/coverage.txt /coverage.txt
+
 FROM base AS build
 ARG TARGETPLATFORM
 RUN --mount=type=bind,target=. \
