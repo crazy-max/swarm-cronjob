@@ -5,32 +5,34 @@ import (
 	"sort"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/client"
 )
 
 // TaskList return all running tasks of a service.
 func (c *DockerClient) TaskList(service string) ([]*model.TaskInfo, error) {
-	tasksFilters := filters.NewArgs()
-	tasksFilters.Add("service", service)
-	tasks, err := c.api.TaskList(context.Background(), swarm.TaskListOptions{
+	tasksFilters := make(client.Filters).Add("service", service)
+	tasksRes, err := c.api.TaskList(context.Background(), client.TaskListOptions{
 		Filters: tasksFilters,
 	})
-	if err != nil || len(tasks) == 0 {
+	if err != nil {
 		return nil, err
 	}
-
+	tasks := tasksRes.Items
+	if len(tasks) == 0 {
+		return nil, nil
+	}
 	sort.Slice(tasks, func(i, j int) bool {
 		return tasks[i].UpdatedAt.After(tasks[j].UpdatedAt)
 	})
+
 	nodes := make(map[string]string)
 	for _, t := range tasks {
 		if _, ok := nodes[t.NodeID]; !ok {
-			if node, _, e := c.api.NodeInspectWithRaw(context.Background(), t.NodeID); e == nil {
-				if node.Spec.Name == "" {
-					nodes[t.NodeID] = node.Description.Hostname
+			if result, e := c.api.NodeInspect(context.Background(), t.NodeID, client.NodeInspectOptions{}); e == nil {
+				if result.Node.Spec.Name == "" {
+					nodes[t.NodeID] = result.Node.Description.Hostname
 				} else {
-					nodes[t.NodeID] = node.Spec.Name
+					nodes[t.NodeID] = result.Node.Spec.Name
 				}
 			} else {
 				nodes[t.NodeID] = ""

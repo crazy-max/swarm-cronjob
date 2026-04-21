@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -31,9 +31,9 @@ func newDockerTestClient(t *testing.T, routes map[string]http.HandlerFunc) (*Doc
 	}))
 	t.Cleanup(server.Close)
 
-	apiClient, err := client.NewClientWithOpts(
+	apiClient, err := client.New(
 		client.WithHost(server.URL),
-		client.WithVersion("1.47"),
+		client.WithAPIVersion("1.47"),
 		client.WithHTTPClient(server.Client()),
 	)
 	require.NoError(t, err)

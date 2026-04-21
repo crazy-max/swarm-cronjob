@@ -7,9 +7,8 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/filters"
 	"github.com/go-viper/mapstructure/v2"
+	"github.com/moby/moby/client"
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -62,10 +61,9 @@ func (sc *SwarmCronjob) Run() error {
 
 	// Listen Docker events
 	log.Debug().Msg("Listening docker events...")
-	filter := filters.NewArgs()
-	filter.Add("type", "service")
+	filter := make(client.Filters).Add("type", "service")
 
-	msgs, errs := sc.docker.Events(context.Background(), events.ListOptions{
+	msgs, errs := sc.docker.Events(context.Background(), client.EventsListOptions{
 		Filters: filter,
 	})
 

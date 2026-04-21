@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
 )
 
 // ServiceEvent represents attributes of a service event

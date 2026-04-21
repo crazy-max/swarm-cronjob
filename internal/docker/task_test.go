@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
 	"github.com/stretchr/testify/require"
 )
 

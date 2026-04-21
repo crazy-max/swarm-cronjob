@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/registry"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/events"
+	"github.com/moby/moby/api/types/registry"
+	"github.com/moby/moby/api/types/swarm"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,7 +30,7 @@ type serviceUpdateCall struct {
 	replicas  *uint64
 	labels    map[string]string
 	force     uint64
-	options   swarm.ServiceUpdateOptions
+	options   client.ServiceUpdateOptions
 }
 
 func (s *workerDockerStub) DistributionInspect(context.Context, string, string) (registry.DistributionInspect, error) {
@@ -42,7 +42,7 @@ func (s *workerDockerStub) RetrieveAuthTokenFromImage(context.Context, string) (
 	return s.authToken, s.authErr
 }
 
-func (s *workerDockerStub) ServiceUpdate(_ context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options swarm.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error) {
+func (s *workerDockerStub) ServiceUpdate(_ context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options client.ServiceUpdateOptions) (client.ServiceUpdateResult, error) {
 	call := serviceUpdateCall{
 		serviceID: serviceID,
 		version:   version,
@@ -55,14 +55,14 @@ func (s *workerDockerStub) ServiceUpdate(_ context.Context, serviceID string, ve
 		*call.replicas = *service.Mode.Replicated.Replicas
 	}
 	s.updateCalls = append(s.updateCalls, call)
-	return swarm.ServiceUpdateResponse{}, s.updateErr
+	return client.ServiceUpdateResult{}, s.updateErr
 }
 
-func (s *workerDockerStub) ServiceInspectWithRaw(context.Context, string, swarm.ServiceInspectOptions) (swarm.Service, []byte, error) {
+func (s *workerDockerStub) ServiceInspectWithRaw(context.Context, string, client.ServiceInspectOptions) (swarm.Service, []byte, error) {
 	return swarm.Service{}, nil, nil
 }
 
-func (s *workerDockerStub) Events(context.Context, events.ListOptions) (<-chan events.Message, <-chan error) {
+func (s *workerDockerStub) Events(context.Context, client.EventsListOptions) (<-chan events.Message, <-chan error) {
 	return nil, nil
 }
 
@@ -148,7 +148,7 @@ func TestRunScalesDownReplicatedServiceBeforeUpdating(t *testing.T) {
 	require.EqualValues(t, 2, *finalUpdate.replicas)
 	require.NotContains(t, finalUpdate.labels, "swarm.cronjob.scaledown")
 	require.EqualValues(t, 8, finalUpdate.force)
-	require.Equal(t, types.RegistryAuthFromSpec, finalUpdate.options.RegistryAuthFrom)
+	require.Equal(t, swarm.RegistryAuthFromSpec, finalUpdate.options.RegistryAuthFrom)
 }
 
 func TestRunUsesRegistryAuthAndQueryRegistryFlags(t *testing.T) {

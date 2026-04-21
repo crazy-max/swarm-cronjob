@@ -5,8 +5,8 @@ import (
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
+	"github.com/moby/moby/client"
 	"github.com/rs/zerolog/log"
 )
 
@@ -67,7 +67,7 @@ func (c *Client) Run() {
 	serviceUp.Spec.TaskTemplate.ForceUpdate = serviceUp.Version.Index
 
 	// Update options
-	updateOpts := swarm.ServiceUpdateOptions{}
+	updateOpts := client.ServiceUpdateOptions{}
 	if c.Job.RegistryAuth {
 		encodedAuth, err := c.Docker.RetrieveAuthTokenFromImage(context.Background(), serviceUp.Spec.TaskTemplate.ContainerSpec.Image)
 		if err != nil {
@@ -78,7 +78,7 @@ func (c *Client) Run() {
 			updateOpts.EncodedRegistryAuth = encodedAuth
 		}
 	} else {
-		updateOpts.RegistryAuthFrom = types.RegistryAuthFromSpec
+		updateOpts.RegistryAuthFrom = swarm.RegistryAuthFromSpec
 	}
 	if c.Job.QueryRegistry != nil {
 		updateOpts.QueryRegistry = *c.Job.QueryRegistry
@@ -99,7 +99,7 @@ func (c *Client) scaleDown(serviceRaw swarm.Service) (swarm.Service, error) {
 	serviceRaw.Spec.Labels["swarm.cronjob.scaledown"] = "true"
 	serviceRaw.Spec.TaskTemplate.ForceUpdate = serviceRaw.Version.Index
 
-	_, err := c.Docker.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, swarm.ServiceUpdateOptions{})
+	_, err := c.Docker.ServiceUpdate(context.Background(), serviceRaw.ID, serviceRaw.Version, serviceRaw.Spec, client.ServiceUpdateOptions{})
 	if err != nil {
 		return swarm.Service{}, err
 	}
