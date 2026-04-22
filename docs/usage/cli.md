@@ -24,9 +24,9 @@ Flags:
 
 ## Environment variables
 
-Following environment variables can be used in place:
+The following environment variables can be used instead:
 
-| Name               | Default       | Description   |
-|--------------------|---------------|---------------|
-| `LOG_LEVEL`        | `info`        | Log level output |
-| `LOG_JSON`         | `false`       | Enable JSON logging output |
+| Name        | Default | Description                |
+|-------------|---------|----------------------------|
+| `LOG_LEVEL` | `info`  | Log level                  |
+| `LOG_JSON`  | `false` | Enable JSON logging output |

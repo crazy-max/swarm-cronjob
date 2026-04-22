@@ -10,8 +10,6 @@ space-separated field at the beginning of the cron spec, of the form `CRON_TZ=As
 For example:
 
 ```yaml
-version: "3.2"
-
 services:
   test:
     image: busybox

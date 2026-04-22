@@ -24,11 +24,11 @@ File a single issue per problem and feature request.
 * Do not enumerate multiple bugs or feature requests in the same issue.
 * Do not add your issue as a comment to an existing issue unless it's for the identical input. Many issues look similar, but have different causes.
 
-The more information you can provide, the more likely someone will be successful reproducing the issue and finding a fix.
+The more information you provide, the more likely someone will be able to reproduce the issue and find a fix.
 
 You are now ready to [create a new issue]({{ config.repo_url }}issues/new/choose)!
 
 ## Closure policy
 
 * Issues that don't have the information requested above (when applicable) will be closed immediately and the poster directed to the support guidelines.
-* Issues that go a week without a response from original poster are subject to closure at our discretion.
+* Issues that go a week without a response from the original poster may be closed at our discretion.

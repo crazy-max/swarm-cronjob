@@ -2,7 +2,7 @@
 
 ## Download
 
-swarm-cronjob binaries are available on [releases]({{ config.repo_url }}releases/latest) page.
+swarm-cronjob binaries are available on the [releases]({{ config.repo_url }}releases/latest) page.
 
 Choose the archive matching the destination platform:
 
@@ -24,10 +24,10 @@ Choose the archive matching the destination platform:
 And extract swarm-cronjob:
 
 ```shell
-wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_x86_64.tar.gz | tar -zxvf - swarm-cronjob
+wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_amd64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
-After getting the binary, it can be tested with [`./swarm-cronjob --help`](../usage/cli.md) command and moved to a
+After downloading the binary, you can test it with [`./swarm-cronjob --help`](../usage/cli.md) and then move it to a
 permanent location.
 
 ## Server configuration
@@ -36,7 +36,7 @@ Steps below are the recommended server configuration.
 
 ### Prepare environment
 
-Create user to run swarm-cronjob (ex. `swarm-cronjob`)
+Create a user to run swarm-cronjob, for example `swarm-cronjob`:
 
 ```shell
 groupadd swarm-cronjob
@@ -51,7 +51,7 @@ cp swarm-cronjob /usr/local/bin/swarm-cronjob
 
 ## Running swarm-cronjob
 
-After the above steps, two options to run swarm-cronjob:
+After the steps above, you have two options to run swarm-cronjob:
 
 ### 1. Creating a service file (recommended)
 
@@ -64,12 +64,12 @@ See how to create [Linux service](linux-service.md) to start swarm-cronjob autom
 ```
 
 !!! note
-    When launched manually, swarm-cronjob can be killed using `Ctrl+C`
+    When launched manually, swarm-cronjob can be stopped with `Ctrl+C`.
 
 ## Updating to a new version
 
 You can update to a new version of swarm-cronjob by stopping it, replacing the binary at `/usr/local/bin/swarm-cronjob`
 and restarting the instance.
 
-If you have carried out the installation steps as described above, the binary should have the generic name
+If you followed the installation steps above, the binary should keep the generic name
 `swarm-cronjob`. Do not change this, i.e. to include the version number.

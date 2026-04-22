@@ -1,6 +1,6 @@
 # Contributing
 
-Hi there! I'm thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
+Thanks for your interest in contributing to this project.
 
 Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license)
 to the public under the [project's open source license]({{ config.repo_url }}/blob/master/LICENSE).
@@ -15,7 +15,7 @@ to the public under the [project's open source license]({{ config.repo_url }}/bl
 6. Test your code: `docker buildx bake test`
 7. Build the project: `docker buildx bake artifact-all image-all`
 8. Push to your fork and [submit a pull request]({{ config.repo_url }}compare)
-9. Pat your self on the back and wait for your pull request to be reviewed and merged.
+9. Wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
