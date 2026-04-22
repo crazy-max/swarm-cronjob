@@ -7,14 +7,14 @@ to the public under the [project's open source license]({{ config.repo_url }}/bl
 
 ## Submitting a pull request
 
-1. [Fork]({{ config.repo_url }}fork) and clone the repository
+1. [Fork]({{ config.repo_url }}/fork) and clone the repository
 2. Configure and install the dependencies: `go mod download`
 3. Create a new branch: `git checkout -b my-branch-name`
 4. Make your changes
 5. Validate: `docker buildx bake validate`
 6. Test your code: `docker buildx bake test`
 7. Build the project: `docker buildx bake artifact-all image-all`
-8. Push to your fork and [submit a pull request]({{ config.repo_url }}compare)
+8. Push to your fork and [submit a pull request]({{ config.repo_url }}/compare)
 9. Wait for your pull request to be reviewed and merged.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:

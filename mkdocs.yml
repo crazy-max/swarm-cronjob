@@ -96,7 +96,8 @@ plugins:
       type: iso_datetime
       enable_creation_date: true
       fallback_to_build_date: true
-  - macros
+  - macros:
+      module_name: hack/mkdocs_macros
   - search:
       lang:
         - en

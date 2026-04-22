@@ -2,29 +2,29 @@
 
 ## Download
 
-swarm-cronjob binaries are available on the [releases]({{ config.repo_url }}releases/latest) page.
+swarm-cronjob binaries are available on the [releases]({{ config.repo_url }}/releases/latest) page.
 
 Choose the archive matching the destination platform:
 
-* [swarm-cronjob_{{ git.tag | trim('v') }}_darwin_amd64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_amd64.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_darwin_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_darwin_arm64.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_386.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_386.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_amd64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_amd64.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_arm64.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv5.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv5.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv6.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_armv7.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_ppc64le.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_ppc64le.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_riscv64.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_riscv64.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_linux_s390x.tar.gz]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_s390x.tar.gz)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_windows_386.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_windows_386.zip)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_windows_amd64.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_windows_amd64.zip)
-* [swarm-cronjob_{{ git.tag | trim('v') }}_windows_arm64.zip]({{ config.repo_url }}/releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_windows_arm64.zip)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_darwin_amd64.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_darwin_amd64.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_darwin_arm64.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_darwin_arm64.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_386.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_386.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_amd64.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_amd64.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_arm64.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_arm64.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv5.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv5.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv6.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv6.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv7.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_armv7.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_ppc64le.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_ppc64le.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_riscv64.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_riscv64.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_s390x.tar.gz]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_s390x.tar.gz)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_386.zip]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_386.zip)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_amd64.zip]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_amd64.zip)
+* [swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_arm64.zip]({{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_windows_arm64.zip)
 
 And extract swarm-cronjob:
 
 ```shell
-wget -qO- {{ config.repo_url }}releases/download/v{{ git.tag | trim('v') }}/swarm-cronjob_{{ git.tag | trim('v') }}_linux_amd64.tar.gz | tar -zxvf - swarm-cronjob
+wget -qO- {{ config.repo_url }}/releases/download/{{ latest_stable_tag }}/swarm-cronjob_{{ latest_stable_tag | trim('v') }}_linux_amd64.tar.gz | tar -zxvf - swarm-cronjob
 ```
 
 After downloading the binary, you can test it with [`./swarm-cronjob --help`](../usage/cli.md) and then move it to a
