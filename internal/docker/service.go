@@ -79,6 +79,7 @@ func (c *DockerClient) ServiceList(args *model.ServiceListArgs) ([]*model.Servic
 			Image:     normalizeImage(service.Spec.TaskTemplate.ContainerSpec.Image),
 			Labels:    service.Spec.Labels,
 			Actives:   running[service.ID],
+			Busy:      tasksNoShutdown[service.ID],
 			UpdatedAt: service.UpdatedAt.Local(),
 			Rollback:  service.PreviousSpec != nil,
 		}

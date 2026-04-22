@@ -168,6 +168,7 @@ func TestServiceList(t *testing.T) {
 	require.Equal(t, model.ServiceModeReplicated, replicatedService.Mode)
 	require.EqualValues(t, 3, replicatedService.Replicas)
 	require.EqualValues(t, 1, replicatedService.Actives)
+	require.EqualValues(t, 2, replicatedService.Busy)
 	require.True(t, replicatedService.Rollback)
 	require.Equal(t, string(swarm.UpdateStateCompleted), replicatedService.UpdateStatus)
 	require.Equal(t, updatedAt.Local(), replicatedService.UpdatedAt)
@@ -178,6 +179,7 @@ func TestServiceList(t *testing.T) {
 	require.Equal(t, model.ServiceModeGlobal, globalService.Mode)
 	require.EqualValues(t, 1, globalService.Replicas)
 	require.EqualValues(t, 1, globalService.Actives)
+	require.EqualValues(t, 1, globalService.Busy)
 	require.False(t, globalService.Rollback)
 	require.Empty(t, globalService.UpdateStatus)
 }
