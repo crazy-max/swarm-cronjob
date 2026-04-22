@@ -1,5 +1,7 @@
 # Support [![](https://isitmaintained.com/badge/resolution/crazy-max/swarm-cronjob.svg)](https://isitmaintained.com/project/crazy-max/swarm-cronjob)
 
+First, [be respectful](https://github.com/kossnocorp/opensource.how/blob/classic/README.md).
+
 ## Reporting an issue
 
 Please do a search in [open issues](https://github.com/crazy-max/swarm-cronjob/issues?utf8=%E2%9C%93&q=) to see if the issue or feature request has already been filed.

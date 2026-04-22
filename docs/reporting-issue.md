@@ -2,7 +2,7 @@
 
 ## Before submitting an issue
 
-First, [be a good guy](https://github.com/kossnocorp/etiquette/blob/master/README.md).
+First, [be respectful](https://github.com/kossnocorp/opensource.how/blob/classic/README.md).
 
 Please do a search in [open issues]({{ config.repo_url }}issues?utf8=%E2%9C%93&q=) to see if the issue or feature
 request has already been filed.
