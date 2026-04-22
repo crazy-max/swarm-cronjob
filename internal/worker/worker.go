@@ -46,9 +46,18 @@ func (c *Client) Run() {
 			Msg("Skip running job")
 		return
 	}
+	if c.Job.SkipRunning && service.Busy > 0 {
+		log.Warn().Str("service", c.Job.Name).
+			Uint64("tasks_active", service.Actives).
+			Uint64("tasks_busy", service.Busy).
+			Str("status", service.UpdateStatus).
+			Msg("Skip busy job")
+		return
+	}
 
 	log.Info().Str("service", c.Job.Name).
 		Uint64("tasks_active", service.Actives).
+		Uint64("tasks_busy", service.Busy).
 		Str("status", service.UpdateStatus).Msg("Start job")
 
 	// Set number of replicas in replicated mode

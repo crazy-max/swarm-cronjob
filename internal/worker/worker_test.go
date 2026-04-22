@@ -89,7 +89,35 @@ func TestRunSkipsUpdateWhenJobIsAlreadyActive(t *testing.T) {
 			{
 				Name:    "backup",
 				Actives: 2,
+				Busy:    2,
 				Raw:     replicatedService("svc-1", "backup", 7, 1, "busybox:latest"),
+			},
+		},
+	}
+
+	client := Client{
+		Docker: stub,
+		Job: model.Job{
+			Name:        "backup",
+			SkipRunning: true,
+			Replicas:    1,
+		},
+	}
+
+	client.Run()
+
+	require.Empty(t, stub.updateCalls)
+	require.Zero(t, stub.authCalls)
+}
+
+func TestRunSkipsUpdateWhenJobIsBusyButNotYetRunning(t *testing.T) {
+	stub := &workerDockerStub{
+		serviceResponses: []*model.ServiceInfo{
+			{
+				Name:         "backup",
+				Busy:         1,
+				UpdateStatus: string(swarm.UpdateStateUpdating),
+				Raw:          replicatedService("svc-1", "backup", 7, 1, "busybox:latest"),
 			},
 		},
 	}
