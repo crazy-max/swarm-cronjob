@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
@@ -16,9 +17,13 @@ import (
 )
 
 type appDockerStub struct {
-	service     *model.ServiceInfo
-	serviceErr  error
-	serviceHits int
+	service        *model.ServiceInfo
+	serviceErr     error
+	serviceHits    int
+	serviceList    []*model.ServiceInfo
+	serviceListErr error
+	eventMsgs      <-chan events.Message
+	eventErrs      <-chan error
 }
 
 func (s *appDockerStub) DistributionInspect(context.Context, string, string) (registry.DistributionInspect, error) {
@@ -38,7 +43,7 @@ func (s *appDockerStub) ServiceInspectWithRaw(context.Context, string, client.Se
 }
 
 func (s *appDockerStub) Events(context.Context, client.EventsListOptions) (<-chan events.Message, <-chan error) {
-	return nil, nil
+	return s.eventMsgs, s.eventErrs
 }
 
 func (s *appDockerStub) Service(string) (*model.ServiceInfo, error) {
@@ -50,7 +55,10 @@ func (s *appDockerStub) Service(string) (*model.ServiceInfo, error) {
 }
 
 func (s *appDockerStub) ServiceList(*model.ServiceListArgs) ([]*model.ServiceInfo, error) {
-	return nil, nil
+	if s.serviceListErr != nil {
+		return nil, s.serviceListErr
+	}
+	return s.serviceList, nil
 }
 
 func (s *appDockerStub) TaskList(string) ([]*model.TaskInfo, error) {
@@ -204,6 +212,51 @@ func TestCrudJobSkipsScaledownServicesWithoutReplacingCurrentEntry(t *testing.T)
 	require.Equal(t, existingID, sc.jobs["backup"])
 	require.True(t, sc.cron.Entry(existingID).Valid())
 	require.Equal(t, existingEntry.ID, sc.cron.Entry(existingID).ID)
+}
+
+func TestRunReturnsWhenContextCanceled(t *testing.T) {
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	sc := newTestSwarmCronjob(&appDockerStub{
+		serviceList: []*model.ServiceInfo{},
+		eventMsgs:   make(chan events.Message),
+		eventErrs:   make(chan error),
+	})
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- sc.Run(ctx)
+	}()
+
+	select {
+	case err := <-errCh:
+		t.Fatalf("Run returned before cancellation: %v", err)
+	case <-time.After(100 * time.Millisecond):
+	}
+
+	cancel(nil)
+
+	select {
+	case err := <-errCh:
+		require.NoError(t, err)
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for Run to return after cancellation")
+	}
+}
+
+func TestRunReturnsEventChannelError(t *testing.T) {
+	eventErrs := make(chan error, 1)
+	eventErrs <- errors.New("boom")
+
+	sc := newTestSwarmCronjob(&appDockerStub{
+		serviceList: []*model.ServiceInfo{},
+		eventMsgs:   make(chan events.Message),
+		eventErrs:   eventErrs,
+	})
+
+	err := sc.Run(context.Background())
+	require.EqualError(t, err, "event channel failed: boom")
 }
 
 func newTestSwarmCronjob(dockerClient *appDockerStub) *SwarmCronjob {

@@ -10,6 +10,7 @@ import (
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/moby/moby/client"
+	"github.com/pkg/errors"
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
@@ -36,15 +37,15 @@ func New() (*SwarmCronjob, error) {
 }
 
 // Run starts swarm-cronjob process
-func (sc *SwarmCronjob) Run() error {
-	services, err := sc.docker.ServiceList(&model.ServiceListArgs{
+func (sc *SwarmCronjob) Run(ctx context.Context) error {
+	services, servErr := sc.docker.ServiceList(&model.ServiceListArgs{
 		Labels: []string{
 			"swarm.cronjob.enable",
 			"swarm.cronjob.schedule",
 		},
 	})
-	if err != nil {
-		return err
+	if servErr != nil {
+		return servErr
 	}
 	log.Debug().Msgf("%d scheduled services found through labels", len(services))
 
@@ -56,21 +57,40 @@ func (sc *SwarmCronjob) Run() error {
 
 	log.Debug().Msg("Starting the cron scheduler")
 	sc.cron.Start()
+	defer func() {
+		<-sc.cron.Stop().Done()
+	}()
 	sc.logScheduledJobs()
 
 	log.Debug().Msg("Listening docker events...")
 	filter := make(client.Filters).Add("type", "service")
 
-	msgs, errs := sc.docker.Events(context.Background(), client.EventsListOptions{
+	msgs, errs := sc.docker.Events(ctx, client.EventsListOptions{
 		Filters: filter,
 	})
 
 	var event model.ServiceEvent
-	for {
+	for msgs != nil || errs != nil {
 		select {
-		case err := <-errs:
-			log.Fatal().Err(err).Msg("Event channel failed")
-		case msg := <-msgs:
+		case <-ctx.Done():
+			return nil
+		case err, ok := <-errs:
+			if !ok {
+				errs = nil
+				continue
+			}
+			if err == nil {
+				continue
+			}
+			if errors.Is(err, context.Canceled) && context.Cause(ctx) != nil {
+				return nil
+			}
+			return errors.Wrap(err, "event channel failed")
+		case msg, ok := <-msgs:
+			if !ok {
+				msgs = nil
+				continue
+			}
 			err := mapstructure.Decode(msg.Actor.Attributes, &event)
 			if err != nil {
 				log.Warn().Msgf("Cannot decode event, %v", err)
@@ -85,11 +105,14 @@ func (sc *SwarmCronjob) Run() error {
 			if err != nil {
 				log.Error().Str("service", event.Service).Err(err).Msg("Cannot manage job")
 				continue
-			} else if processed {
+			}
+			if processed {
 				log.Debug().Msgf("Number of cronjob tasks: %d", len(sc.cron.Entries()))
 			}
 		}
 	}
+
+	return nil
 }
 
 // crudJob adds, updates or removes cron job service
@@ -183,13 +206,6 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	sc.jobs[serviceName] = jobID
 	sc.logScheduledJob(serviceName, jobID)
 	return true, err
-}
-
-// Close closes swarm-cronjob
-func (sc *SwarmCronjob) Close() {
-	if sc.cron != nil {
-		sc.cron.Stop()
-	}
 }
 
 func (sc *SwarmCronjob) removeJob(serviceName string, id cron.EntryID) {

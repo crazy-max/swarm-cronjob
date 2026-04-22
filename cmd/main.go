@@ -1,29 +1,30 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
-	"runtime"
+	"syscall"
 	_ "time/tzdata"
 
 	"github.com/alecthomas/kong"
 	"github.com/crazy-max/swarm-cronjob/internal/app"
 	"github.com/crazy-max/swarm-cronjob/internal/logging"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	sc      *app.SwarmCronjob
-	cli     model.Cli
-	version = "dev"
-)
+var version = "dev"
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	var err error
+	if err := run(); err != nil {
+		log.Fatal().Err(err).Send()
+	}
+}
 
-	// Parse command line
+func run() error {
+	cli := model.Cli{}
 	_ = kong.Parse(&cli,
 		kong.Name("swarm-cronjob"),
 		kong.Description(`Create jobs on a time-based schedule on Swarm. More info: https://github.com/crazy-max/swarm-cronjob`),
@@ -36,30 +37,24 @@ func main() {
 			Summary: true,
 		}))
 
-	// Init
 	logging.Configure(&cli)
 	log.Info().Msgf("Starting swarm-cronjob %s", version)
 
-	// Handle os signals
-	channel := make(chan os.Signal, 1)
-	signal.Notify(channel, os.Interrupt, SIGTERM)
-	go func() {
-		sig := <-channel
-		if sc != nil {
-			sc.Close()
-		}
-		log.Warn().Msgf("Caught signal %v", sig)
-		os.Exit(1)
-	}()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	// Init
-	sc, err = app.New()
+	sc, err := app.New()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Cannot initialize swarm-cronjob")
+		return errors.Wrap(err, "cannot initialize swarm-cronjob")
 	}
 
-	// Run
-	if err := sc.Run(); err != nil {
-		log.Panic().Err(err).Msg("")
+	if err := sc.Run(ctx); err != nil {
+		return errors.Wrap(err, "cannot run swarm-cronjob")
 	}
+
+	if cause := context.Cause(ctx); cause != nil {
+		log.Warn().Msg(cause.Error())
+	}
+
+	return nil
 }
