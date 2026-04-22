@@ -1,8 +1,6 @@
 # Dump MariaDB database
 
 ```yaml
-version: "3.2"
-
 services:
   db:
     image: mariadb:10.4

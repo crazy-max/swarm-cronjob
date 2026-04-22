@@ -65,9 +65,15 @@ markdown_extensions:
       base_path: docs
   - meta
   - pymdownx.details
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      repo_url_shortener: true
+      provider: github
+      user: crazy-max
+      repo: swarm-cronjob
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
@@ -77,6 +83,12 @@ markdown_extensions:
       permalink: true
 
 plugins:
+  - privacy:
+      assets: false
+      links: true
+      links_attr_map:
+        target: _blank
+      links_noopener: true
   - exclude:
       glob:
         - "_overrides/*"
@@ -84,7 +96,8 @@ plugins:
       type: iso_datetime
       enable_creation_date: true
       fallback_to_build_date: true
-  - macros
+  - macros:
+      module_name: hack/mkdocs_macros
   - search:
       lang:
         - en

@@ -1,11 +1,11 @@
-# Run as service on Debian based distro
+# Run as a service on Debian-based distributions
 
 ## Using systemd
 
 !!! warning
     Make sure to follow the instructions to [install from binary](binary.md) before.
 
-To create a new service, paste this content in `/etc/systemd/system/swarm-cronjob.service`:
+To create a new service, save the following content to `/etc/systemd/system/swarm-cronjob.service`:
 
 ```
 [Unit]
@@ -27,7 +27,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Change the user, group, and other required startup values following your needs.
+Adjust the user, group, and any other startup values to match your environment.
 
 Enable and start swarm-cronjob at boot:
 

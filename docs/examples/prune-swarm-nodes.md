@@ -1,8 +1,6 @@
 # Prune Swarm nodes
 
 ```yaml
-version: "3.2"
-
 services:
   prune-nodes:
     image: docker

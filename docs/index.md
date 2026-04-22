@@ -9,24 +9,26 @@
   <br /><a href="https://goreportcard.com/report/github.com/crazy-max/swarm-cronjob"><img src="https://goreportcard.com/badge/github.com/crazy-max/swarm-cronjob?style=flat-square" alt="Go Report"></a>
   <a href="https://codecov.io/gh/crazy-max/swarm-cronjob"><img src="https://img.shields.io/codecov/c/github/crazy-max/swarm-cronjob?logo=codecov&style=flat-square" alt="Codecov"></a>
   <a href="https://github.com/sponsors/crazy-max"><img src="https://img.shields.io/badge/sponsor-crazy--max-181717.svg?logo=github&style=flat-square" alt="Become a sponsor"></a>
-  <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
+  <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate PayPal"></a>
 </p>
 
 ---
 
 ## What is swarm-cronjob?
 
-**swarm-cronjob** creates jobs on a time-based schedule on [Swarm](https://docs.docker.com/engine/swarm/) with a
-dedicated service in a distributed manner that configures itself automatically and dynamically through
-[labels](https://docs.docker.com/engine/reference/commandline/service_create/#set-metadata-on-a-service--l---label)
-and Docker API.
+**swarm-cronjob** is a scheduler for [Docker Swarm](https://docs.docker.com/engine/swarm/).
+You define a cron-style schedule with [service labels](https://docs.docker.com/engine/reference/commandline/service_create/#set-metadata-on-a-service--l---label),
+and swarm-cronjob turns that service into a recurring job. It watches the
+Docker API, keeps its configuration in sync as services are added or updated,
+and runs scheduled workloads directly inside your Swarm cluster.
 
 ## Features
 
-* Continuously updates its configuration (no restart)
-* Cron implementation through go routines
-* Allow to skip a job if the service is currently running
-* Timezone can be changed for the scheduler
+* Label-driven configuration, define schedules directly on Swarm services
+* Automatic service discovery and configuration reloads, no restart required
+* Cron-style scheduling for recurring jobs inside your Swarm cluster
+* Overlap control, can skip a run if the target service is already running
+* Configurable scheduler time zone
 
 ## License
 

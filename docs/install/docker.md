@@ -2,19 +2,19 @@
 
 ## About
 
-swarm-cronjob provides automatically updated Docker :whale: images within several registries:
+swarm-cronjob provides automatically updated Docker :whale: images in several registries:
 
-| Registry                                                                                         | Image                           |
-|--------------------------------------------------------------------------------------------------|---------------------------------|
-| [Docker Hub](https://hub.docker.com/r/crazymax/swarm-cronjob/)                             | `crazymax/swarm-cronjob`                 |
-| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/swarm-cronjob)  | `ghcr.io/crazy-max/swarm-cronjob`        |
+| Registry                                                                                                 | Image                             |
+|----------------------------------------------------------------------------------------------------------|-----------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/swarm-cronjob/)                                           | `crazymax/swarm-cronjob`          |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/swarm-cronjob) | `ghcr.io/crazy-max/swarm-cronjob` |
 
-It is possible to always use the latest stable tag or to use another service that handles updating Docker images.
+You can use the latest stable tag or rely on another service to keep Docker images up to date.
 
 !!! note
     Want to be notified of new releases? Check out :bell: [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
 
-Following platforms for this image are available:
+The following platforms are available for this image:
 
 ```
 $ docker run --rm mplatform/mquery crazymax/swarm-cronjob:latest
@@ -32,8 +32,6 @@ Image: crazymax/swarm-cronjob:latest
 ## Usage
 
 ```yaml
-version: "3.2"
-
 services:
   swarm-cronjob:
     image: crazymax/swarm-cronjob
@@ -66,4 +64,4 @@ docker service create --name swarm_cronjob \
   crazymax/swarm-cronjob
 ```
 
-You are now ready to [deploy cronjob based services with swarm](../usage/get-started.md).
+You are now ready to [deploy cronjob-based services with Swarm](../usage/get-started.md).

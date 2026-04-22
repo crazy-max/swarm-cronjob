@@ -1,8 +1,6 @@
 # Renovate
 
 ```yaml
-version: "3.8"
-
 services:
   renovate:
     image: "renovate/renovate:slim"
