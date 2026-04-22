@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"slices"
 	"strconv"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
@@ -36,7 +37,6 @@ func New() (*SwarmCronjob, error) {
 
 // Run starts swarm-cronjob process
 func (sc *SwarmCronjob) Run() error {
-	// Find scheduled services
 	services, err := sc.docker.ServiceList(&model.ServiceListArgs{
 		Labels: []string{
 			"swarm.cronjob.enable",
@@ -48,18 +48,16 @@ func (sc *SwarmCronjob) Run() error {
 	}
 	log.Debug().Msgf("%d scheduled services found through labels", len(services))
 
-	// Add services as cronjobs
 	for _, service := range services {
 		if _, err := sc.crudJob(service.Name); err != nil {
 			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Name)
 		}
 	}
 
-	// Start cron routine
 	log.Debug().Msg("Starting the cron scheduler")
 	sc.cron.Start()
+	sc.logScheduledJobs()
 
-	// Listen Docker events
 	log.Debug().Msg("Listening docker events...")
 	filter := make(client.Filters).Add("type", "service")
 
@@ -96,10 +94,8 @@ func (sc *SwarmCronjob) Run() error {
 
 // crudJob adds, updates or removes cron job service
 func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
-	// Find existing job
 	jobID, jobFound := sc.jobs[serviceName]
 
-	// Check service exists
 	service, err := sc.docker.Service(serviceName)
 	if err != nil {
 		if jobFound {
@@ -111,7 +107,6 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		return false, nil
 	}
 
-	// Cronjob worker
 	wc := &worker.Client{
 		Docker: sc.docker,
 		Job: model.Job{
@@ -163,7 +158,6 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		}
 	}
 
-	// Disabled or non-cron service
 	if !wc.Job.Enable {
 		if jobFound {
 			log.Info().Str("service", service.Name).Msg("Disable cronjob")
@@ -174,7 +168,6 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		return false, nil
 	}
 
-	// Add/Update job
 	if jobFound {
 		sc.removeJob(serviceName, jobID)
 		log.Debug().Str("service", service.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
@@ -188,6 +181,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	}
 
 	sc.jobs[serviceName] = jobID
+	sc.logScheduledJob(serviceName, jobID)
 	return true, err
 }
 
@@ -201,4 +195,30 @@ func (sc *SwarmCronjob) Close() {
 func (sc *SwarmCronjob) removeJob(serviceName string, id cron.EntryID) {
 	delete(sc.jobs, serviceName)
 	sc.cron.Remove(id)
+}
+
+func (sc *SwarmCronjob) logScheduledJobs() {
+	serviceNames := make([]string, 0, len(sc.jobs))
+	for serviceName := range sc.jobs {
+		serviceNames = append(serviceNames, serviceName)
+	}
+	slices.Sort(serviceNames)
+	for _, serviceName := range serviceNames {
+		sc.logScheduledJob(serviceName, sc.jobs[serviceName])
+	}
+}
+
+func (sc *SwarmCronjob) logScheduledJob(serviceName string, id cron.EntryID) {
+	entry := sc.cron.Entry(id)
+	if !entry.Valid() {
+		return
+	}
+	logger := log.Debug().Str("service", serviceName)
+	if workerClient, ok := entry.Job.(*worker.Client); ok {
+		logger = logger.Str("schedule", workerClient.Job.Schedule)
+	}
+	if entry.Next.IsZero() {
+		return
+	}
+	logger.Time("next_run", entry.Next.UTC()).Msg("Cronjob scheduled")
 }
