@@ -15,10 +15,11 @@
 
 ## About
 
-**swarm-cronjob** creates jobs on a time-based schedule on [Swarm](https://docs.docker.com/engine/swarm/) with a
-dedicated service in a distributed manner that configures itself automatically and dynamically through
-[labels](https://docs.docker.com/engine/reference/commandline/service_create/#set-metadata-on-a-service--l---label)
-and Docker API.
+**swarm-cronjob** lets you run recurring jobs on [Docker Swarm](https://docs.docker.com/engine/swarm/)
+by defining cron-style schedules with [service labels](https://docs.docker.com/engine/reference/commandline/service_create/#set-metadata-on-a-service--l---label).
+It watches your services through the Docker API, keeps its configuration in
+sync automatically, and creates scheduled job runs across the cluster without
+requiring a separate scheduler.
 
 > [!TIP] 
 > Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun)
