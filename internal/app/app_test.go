@@ -7,9 +7,10 @@ import (
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/crazy-max/swarm-cronjob/internal/worker"
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/registry"
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/events"
+	"github.com/moby/moby/api/types/registry"
+	"github.com/moby/moby/api/types/swarm"
+	"github.com/moby/moby/client"
 	cron "github.com/robfig/cron/v3"
 	"github.com/stretchr/testify/require"
 )
@@ -28,15 +29,15 @@ func (s *appDockerStub) RetrieveAuthTokenFromImage(context.Context, string) (str
 	return "", nil
 }
 
-func (s *appDockerStub) ServiceUpdate(context.Context, string, swarm.Version, swarm.ServiceSpec, swarm.ServiceUpdateOptions) (swarm.ServiceUpdateResponse, error) {
-	return swarm.ServiceUpdateResponse{}, nil
+func (s *appDockerStub) ServiceUpdate(context.Context, string, swarm.Version, swarm.ServiceSpec, client.ServiceUpdateOptions) (client.ServiceUpdateResult, error) {
+	return client.ServiceUpdateResult{}, nil
 }
 
-func (s *appDockerStub) ServiceInspectWithRaw(context.Context, string, swarm.ServiceInspectOptions) (swarm.Service, []byte, error) {
+func (s *appDockerStub) ServiceInspectWithRaw(context.Context, string, client.ServiceInspectOptions) (swarm.Service, []byte, error) {
 	return swarm.Service{}, nil, nil
 }
 
-func (s *appDockerStub) Events(context.Context, events.ListOptions) (<-chan events.Message, <-chan error) {
+func (s *appDockerStub) Events(context.Context, client.EventsListOptions) (<-chan events.Message, <-chan error) {
 	return nil, nil
 }
 
