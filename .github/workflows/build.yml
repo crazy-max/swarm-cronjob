@@ -37,6 +37,7 @@ jobs:
         uses: docker/bake-action/subaction/matrix@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
         with:
           target: validate
+          fields: platforms
         env:
           GOLANGCI_LINT_MULTIPLATFORM: 1
       -
@@ -68,6 +69,8 @@ jobs:
         with:
           source: .
           targets: ${{ matrix.target }}
+          set: |
+            *.platform=${{ matrix.platforms }}
 
   test:
     runs-on: ubuntu-latest
