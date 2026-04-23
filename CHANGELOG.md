@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.16.0 (2026/04/23)
+
+* Skip cron runs while services are reconciling by @crazy-max in #472
+* Fix missed schedule updates with periodic cronjob reconciliation by @crazy-max in #473
+* Migrate to Moby client and api modules, updating to 29.4.1 by @crazy-max in #466
+* Simplify shutdown lifecycle by @crazy-max in #471
+* Go 1.26 by @crazy-max in #459
+* MkDocs Materials 9.7.5 by @crazy-max in #469
+* Bump github.com/alecthomas/kong to 1.15.0 in #452
+* Bump github.com/go-viper/mapstructure/v2 to 2.5.0 in #421
+* Bump github.com/rs/zerolog to 1.35.1 in #443 #475
+* Bump golang.org/x/sys to 0.43.0 in #457
+
+**Full Changelog**: [`v1.15.0...v1.16.0`](https://github.com/crazy-max/swarm-cronjob/compare/v1.15.0...v1.16.0)
+
 ## 1.15.0 (2025/12/31)
 
 * Go 1.25 by @crazy-max in #406
