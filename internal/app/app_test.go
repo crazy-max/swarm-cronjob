@@ -214,6 +214,139 @@ func TestCrudJobSkipsScaledownServicesWithoutReplacingCurrentEntry(t *testing.T)
 	require.Equal(t, existingEntry.ID, sc.cron.Entry(existingID).ID)
 }
 
+func TestCrudJobTreatsUnchangedExistingEntryAsProcessed(t *testing.T) {
+	dockerStub := &appDockerStub{
+		service: &model.ServiceInfo{
+			Name: "backup",
+			Labels: map[string]string{
+				"swarm.cronjob.enable":   "true",
+				"swarm.cronjob.schedule": "0 * * * *",
+			},
+		},
+	}
+
+	sc := newTestSwarmCronjob(dockerStub)
+
+	processed, err := sc.crudJob("backup")
+	require.NoError(t, err)
+	require.True(t, processed)
+
+	existingID := sc.jobs["backup"]
+
+	processed, err = sc.crudJob("backup")
+	require.NoError(t, err)
+	require.True(t, processed)
+	require.Equal(t, existingID, sc.jobs["backup"])
+	require.True(t, sc.cron.Entry(existingID).Valid())
+}
+
+func TestReconcileJobsUpdatesExistingEntryWhenScheduleChanges(t *testing.T) {
+	dockerStub := &appDockerStub{
+		serviceList: []*model.ServiceInfo{
+			{
+				Name: "backup",
+				Labels: map[string]string{
+					"swarm.cronjob.enable":   "true",
+					"swarm.cronjob.schedule": "0 * * * *",
+				},
+			},
+		},
+	}
+
+	sc := newTestSwarmCronjob(dockerStub)
+
+	require.NoError(t, sc.reconcileJobs())
+
+	existingID := sc.jobs["backup"]
+	require.True(t, sc.cron.Entry(existingID).Valid())
+
+	dockerStub.serviceList = []*model.ServiceInfo{
+		{
+			Name: "backup",
+			Labels: map[string]string{
+				"swarm.cronjob.enable":   "true",
+				"swarm.cronjob.schedule": "*/5 * * * *",
+			},
+		},
+	}
+
+	require.NoError(t, sc.reconcileJobs())
+
+	updatedID := sc.jobs["backup"]
+	require.NotEqual(t, existingID, updatedID)
+	require.False(t, sc.cron.Entry(existingID).Valid())
+
+	entry := sc.cron.Entry(updatedID)
+	require.True(t, entry.Valid())
+
+	workerClient, ok := entry.Job.(*worker.Client)
+	require.True(t, ok)
+	require.Equal(t, "*/5 * * * *", workerClient.Job.Schedule)
+}
+
+func TestReconcileJobsKeepsExistingEntryWhenJobIsUnchanged(t *testing.T) {
+	dockerStub := &appDockerStub{
+		serviceList: []*model.ServiceInfo{
+			{
+				Name: "backup",
+				Labels: map[string]string{
+					"swarm.cronjob.enable":         "true",
+					"swarm.cronjob.schedule":       "0 * * * *",
+					"swarm.cronjob.skip-running":   "true",
+					"swarm.cronjob.replicas":       "3",
+					"swarm.cronjob.registry-auth":  "true",
+					"swarm.cronjob.query-registry": "false",
+				},
+			},
+		},
+	}
+
+	sc := newTestSwarmCronjob(dockerStub)
+
+	require.NoError(t, sc.reconcileJobs())
+
+	existingID := sc.jobs["backup"]
+	entry := sc.cron.Entry(existingID)
+	require.True(t, entry.Valid())
+
+	require.NoError(t, sc.reconcileJobs())
+
+	require.Equal(t, existingID, sc.jobs["backup"])
+	require.Equal(t, entry.ID, sc.cron.Entry(existingID).ID)
+}
+
+func TestReconcileJobsRemovesExistingEntryWhenServiceLosesCronLabels(t *testing.T) {
+	dockerStub := &appDockerStub{
+		service: &model.ServiceInfo{
+			Name:   "backup",
+			Labels: map[string]string{},
+		},
+		serviceList: []*model.ServiceInfo{
+			{
+				Name: "backup",
+				Labels: map[string]string{
+					"swarm.cronjob.enable":   "true",
+					"swarm.cronjob.schedule": "0 * * * *",
+				},
+			},
+		},
+	}
+
+	sc := newTestSwarmCronjob(dockerStub)
+
+	require.NoError(t, sc.reconcileJobs())
+
+	existingID := sc.jobs["backup"]
+	require.True(t, sc.cron.Entry(existingID).Valid())
+
+	dockerStub.serviceList = nil
+
+	require.NoError(t, sc.reconcileJobs())
+
+	require.Empty(t, sc.jobs)
+	require.False(t, sc.cron.Entry(existingID).Valid())
+}
+
 func TestRunReturnsWhenContextCanceled(t *testing.T) {
 	ctx, cancel := context.WithCancelCause(context.Background())
 	defer cancel(nil)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"slices"
 	"strconv"
+	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
@@ -14,6 +15,10 @@ import (
 	cron "github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
+
+// Periodic reconciliation keeps the in-memory schedule aligned with Swarm
+// even if a service update event is missed or lacks enough attributes.
+const reconcileInterval = time.Minute
 
 // SwarmCronjob represents an active swarm-cronjob object
 type SwarmCronjob struct {
@@ -36,23 +41,9 @@ func New() (*SwarmCronjob, error) {
 	}, err
 }
 
-// Run starts swarm-cronjob process
 func (sc *SwarmCronjob) Run(ctx context.Context) error {
-	services, servErr := sc.docker.ServiceList(&model.ServiceListArgs{
-		Labels: []string{
-			"swarm.cronjob.enable",
-			"swarm.cronjob.schedule",
-		},
-	})
-	if servErr != nil {
-		return servErr
-	}
-	log.Debug().Msgf("%d scheduled services found through labels", len(services))
-
-	for _, service := range services {
-		if _, err := sc.crudJob(service.Name); err != nil {
-			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Name)
-		}
+	if err := sc.reconcileJobs(); err != nil {
+		return err
 	}
 
 	log.Debug().Msg("Starting the cron scheduler")
@@ -64,16 +55,21 @@ func (sc *SwarmCronjob) Run(ctx context.Context) error {
 
 	log.Debug().Msg("Listening docker events...")
 	filter := make(client.Filters).Add("type", "service")
+	reconcileTicker := time.NewTicker(reconcileInterval)
+	defer reconcileTicker.Stop()
 
 	msgs, errs := sc.docker.Events(ctx, client.EventsListOptions{
 		Filters: filter,
 	})
 
-	var event model.ServiceEvent
 	for msgs != nil || errs != nil {
 		select {
 		case <-ctx.Done():
 			return nil
+		case <-reconcileTicker.C:
+			if err := sc.reconcileJobs(); err != nil {
+				log.Error().Err(err).Msg("Cannot reconcile cronjobs")
+			}
 		case err, ok := <-errs:
 			if !ok {
 				errs = nil
@@ -91,9 +87,17 @@ func (sc *SwarmCronjob) Run(ctx context.Context) error {
 				msgs = nil
 				continue
 			}
+			event := model.ServiceEvent{}
 			err := mapstructure.Decode(msg.Actor.Attributes, &event)
 			if err != nil {
 				log.Warn().Msgf("Cannot decode event, %v", err)
+				continue
+			}
+			if event.Service == "" {
+				log.Debug().Msg("Service event missing name, reconciling all cronjobs")
+				if err := sc.reconcileJobs(); err != nil {
+					log.Error().Err(err).Msg("Cannot reconcile cronjobs")
+				}
 				continue
 			}
 			log.Debug().
@@ -115,7 +119,42 @@ func (sc *SwarmCronjob) Run(ctx context.Context) error {
 	return nil
 }
 
-// crudJob adds, updates or removes cron job service
+func (sc *SwarmCronjob) reconcileJobs() error {
+	services, err := sc.docker.ServiceList(&model.ServiceListArgs{
+		Labels: []string{
+			"swarm.cronjob.enable",
+			"swarm.cronjob.schedule",
+		},
+	})
+	if err != nil {
+		return err
+	}
+	log.Debug().Msgf("%d scheduled services found through labels", len(services))
+
+	desired := make(map[string]struct{}, len(services))
+	for _, service := range services {
+		desired[service.Name] = struct{}{}
+		if _, err := sc.crudJobWithService(service, false); err != nil {
+			log.Error().Err(err).Msgf("Cannot manage job for service %s", service.Name)
+		}
+	}
+
+	existing := make([]string, 0, len(sc.jobs))
+	for serviceName := range sc.jobs {
+		if _, ok := desired[serviceName]; !ok {
+			existing = append(existing, serviceName)
+		}
+	}
+	slices.Sort(existing)
+	for _, serviceName := range existing {
+		if _, err := sc.crudJob(serviceName); err != nil {
+			log.Error().Err(err).Msgf("Cannot manage job for service %s", serviceName)
+		}
+	}
+
+	return nil
+}
+
 func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	jobID, jobFound := sc.jobs[serviceName]
 
@@ -130,6 +169,13 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		return false, nil
 	}
 
+	return sc.crudJobWithService(service, true)
+}
+
+func (sc *SwarmCronjob) crudJobWithService(service *model.ServiceInfo, noopCountsAsProcessed bool) (bool, error) {
+	jobID, jobFound := sc.jobs[service.Name]
+	var err error
+
 	wc := &worker.Client{
 		Docker: sc.docker,
 		Job: model.Job{
@@ -140,7 +186,6 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		},
 	}
 
-	// Seek swarm.cronjob labels
 	for labelKey, labelValue := range service.Labels {
 		switch labelKey {
 		case "swarm.cronjob.enable":
@@ -184,7 +229,7 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	if !wc.Job.Enable {
 		if jobFound {
 			log.Info().Str("service", service.Name).Msg("Disable cronjob")
-			sc.removeJob(serviceName, jobID)
+			sc.removeJob(service.Name, jobID)
 			return true, nil
 		}
 		log.Debug().Str("service", service.Name).Msg("Cronjob disabled")
@@ -192,7 +237,13 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 	}
 
 	if jobFound {
-		sc.removeJob(serviceName, jobID)
+		entry := sc.cron.Entry(jobID)
+		if entry.Valid() {
+			if workerClient, ok := entry.Job.(*worker.Client); ok && jobEqual(workerClient.Job, wc.Job) {
+				return noopCountsAsProcessed, nil
+			}
+		}
+		sc.removeJob(service.Name, jobID)
 		log.Debug().Str("service", service.Name).Msgf("Update cronjob with schedule %s", wc.Job.Schedule)
 	} else {
 		log.Info().Str("service", service.Name).Msgf("Add cronjob with schedule %s", wc.Job.Schedule)
@@ -203,8 +254,8 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 		return false, err
 	}
 
-	sc.jobs[serviceName] = jobID
-	sc.logScheduledJob(serviceName, jobID)
+	sc.jobs[service.Name] = jobID
+	sc.logScheduledJob(service.Name, jobID)
 	return true, err
 }
 
@@ -237,4 +288,19 @@ func (sc *SwarmCronjob) logScheduledJob(serviceName string, id cron.EntryID) {
 		return
 	}
 	logger.Time("next_run", entry.Next.UTC()).Msg("Cronjob scheduled")
+}
+
+func jobEqual(a, b model.Job) bool {
+	if a.Name != b.Name ||
+		a.Enable != b.Enable ||
+		a.Schedule != b.Schedule ||
+		a.SkipRunning != b.SkipRunning ||
+		a.RegistryAuth != b.RegistryAuth ||
+		a.Replicas != b.Replicas {
+		return false
+	}
+	if a.QueryRegistry == nil || b.QueryRegistry == nil {
+		return a.QueryRegistry == nil && b.QueryRegistry == nil
+	}
+	return *a.QueryRegistry == *b.QueryRegistry
 }
