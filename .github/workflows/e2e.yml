@@ -63,7 +63,7 @@ jobs:
             ${{ env.BUILD_TAG }}
       -
         name: Check service logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@c0330b414db4cc26a27bbd6f896af62395634183 # main
+        uses: crazy-max/.github/.github/actions/container-logs-check@0f441a64f0c6a8c48433266bf951eedcee8049cd # main
         with:
           name: ${{ env.SERVICE_NAME }}
           type: service
