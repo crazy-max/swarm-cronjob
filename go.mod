@@ -6,8 +6,8 @@ require (
 	github.com/alecthomas/kong v1.15.0
 	github.com/docker/cli v29.4.2+incompatible
 	github.com/go-viper/mapstructure/v2 v2.5.0
-	github.com/moby/moby/api v1.54.2
-	github.com/moby/moby/client v0.4.1
+	github.com/moby/moby/api v1.55.0
+	github.com/moby/moby/client v0.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.35.1
