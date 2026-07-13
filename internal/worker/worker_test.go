@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/model"
 	"github.com/moby/moby/api/types/events"
@@ -177,6 +178,65 @@ func TestRunScalesDownReplicatedServiceBeforeUpdating(t *testing.T) {
 	require.NotContains(t, finalUpdate.labels, "swarm.cronjob.scaledown")
 	require.EqualValues(t, 8, finalUpdate.force)
 	require.Equal(t, swarm.RegistryAuthFromSpec, finalUpdate.options.RegistryAuthFrom)
+}
+
+func TestRunScalesBackToZeroWhenServiceStartedFromZero(t *testing.T) {
+	oldPoll := waitForCompletionPollInterval
+	oldTimeout := waitForCompletionTimeout
+	waitForCompletionPollInterval = time.Millisecond
+	waitForCompletionTimeout = 100 * time.Millisecond
+	defer func() {
+		waitForCompletionPollInterval = oldPoll
+		waitForCompletionTimeout = oldTimeout
+	}()
+
+	stub := &workerDockerStub{
+		serviceResponses: []*model.ServiceInfo{
+			{
+				Name: "backup",
+				Mode: model.ServiceModeReplicated,
+				Raw:  replicatedService("svc-1", "backup", 7, 0, "busybox:latest"),
+			},
+			{
+				Name:    "backup",
+				Mode:    model.ServiceModeReplicated,
+				Actives: 1,
+				Busy:    1,
+				Raw:     replicatedService("svc-1", "backup", 8, 1, "busybox:latest"),
+			},
+			{
+				Name: "backup",
+				Mode: model.ServiceModeReplicated,
+				Raw:  replicatedService("svc-1", "backup", 8, 1, "busybox:latest"),
+			},
+			{
+				Name: "backup",
+				Mode: model.ServiceModeReplicated,
+				Raw:  replicatedService("svc-1", "backup", 9, 0, "busybox:latest"),
+			},
+		},
+	}
+
+	client := Client{
+		Docker: stub,
+		Job: model.Job{
+			Name:     "backup",
+			Replicas: 1,
+		},
+	}
+
+	client.Run()
+
+	require.Len(t, stub.updateCalls, 2)
+
+	startUpdate := stub.updateCalls[0]
+	require.NotNil(t, startUpdate.replicas)
+	require.EqualValues(t, 1, *startUpdate.replicas)
+
+	restoreUpdate := stub.updateCalls[1]
+	require.NotNil(t, restoreUpdate.replicas)
+	require.Zero(t, *restoreUpdate.replicas)
+	require.Equal(t, "true", restoreUpdate.labels["swarm.cronjob.scaledown"])
 }
 
 func TestRunUsesRegistryAuthAndQueryRegistryFlags(t *testing.T) {

@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
 	"github.com/crazy-max/swarm-cronjob/internal/model"
@@ -100,6 +101,38 @@ func (c *Client) Run() {
 	}
 	for _, warn := range response.Warnings {
 		log.Warn().Str("service", c.Job.Name).Msg(warn)
+	}
+}
+
+func (c *Client) waitForRunCompletionAndScaleDown() error {
+	ctx, cancel := context.WithTimeout(context.Background(), waitForCompletionTimeout)
+	defer cancel()
+
+	ticker := time.NewTicker(waitForCompletionPollInterval)
+	defer ticker.Stop()
+
+	seenRunning := false
+
+	for {
+		service, err := c.Docker.Service(c.Job.Name)
+		if err != nil {
+			return err
+		}
+
+		if service.Actives > 0 || service.Busy > 0 {
+			seenRunning = true
+		}
+
+		if seenRunning && service.Actives == 0 && service.Busy == 0 {
+			_, err := c.scaleDown(service.Raw)
+			return err
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
 	}
 }
 
