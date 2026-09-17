@@ -83,7 +83,7 @@ github.com/felixge/httpsnoop
 # github.com/fvbommel/sortorder v1.1.0
 ## explicit; go 1.13
 github.com/fvbommel/sortorder
-# github.com/go-logr/logr v1.4.3
+# github.com/go-logr/logr v1.4.4
 ## explicit; go 1.18
 github.com/go-logr/logr
 github.com/go-logr/logr/funcr
@@ -207,7 +207,7 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/request
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconv
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconvutil
-# go.opentelemetry.io/otel v1.43.0
+# go.opentelemetry.io/otel v1.45.0
 ## explicit; go 1.25.0
 go.opentelemetry.io/otel
 go.opentelemetry.io/otel/attribute
@@ -219,10 +219,12 @@ go.opentelemetry.io/otel/internal/baggage
 go.opentelemetry.io/otel/internal/errorhandler
 go.opentelemetry.io/otel/internal/global
 go.opentelemetry.io/otel/propagation
+go.opentelemetry.io/otel/semconv/internal/metricpool
 go.opentelemetry.io/otel/semconv/v1.20.0
 go.opentelemetry.io/otel/semconv/v1.26.0
 go.opentelemetry.io/otel/semconv/v1.37.0
-go.opentelemetry.io/otel/semconv/v1.40.0
+go.opentelemetry.io/otel/semconv/v1.43.0
+go.opentelemetry.io/otel/semconv/v1.43.0/otelconv
 # go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.33.0
 ## explicit; go 1.22.7
 go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc
@@ -242,28 +244,33 @@ go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/envconfig
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/otlpconfig
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/retry
-# go.opentelemetry.io/otel/metric v1.43.0
+# go.opentelemetry.io/otel/metric v1.45.0
 ## explicit; go 1.25.0
 go.opentelemetry.io/otel/metric
 go.opentelemetry.io/otel/metric/embedded
 go.opentelemetry.io/otel/metric/noop
-# go.opentelemetry.io/otel/sdk v1.35.0
-## explicit; go 1.22.0
+# go.opentelemetry.io/otel/sdk v1.45.0
+## explicit; go 1.25.0
 go.opentelemetry.io/otel/sdk
 go.opentelemetry.io/otel/sdk/instrumentation
-go.opentelemetry.io/otel/sdk/internal/env
+go.opentelemetry.io/otel/sdk/internal/attrnorm
 go.opentelemetry.io/otel/sdk/internal/x
 go.opentelemetry.io/otel/sdk/resource
 go.opentelemetry.io/otel/sdk/trace
-# go.opentelemetry.io/otel/sdk/metric v1.35.0
-## explicit; go 1.22.0
+go.opentelemetry.io/otel/sdk/trace/internal/env
+go.opentelemetry.io/otel/sdk/trace/internal/observ
+# go.opentelemetry.io/otel/sdk/metric v1.45.0
+## explicit; go 1.25.0
 go.opentelemetry.io/otel/sdk/metric
 go.opentelemetry.io/otel/sdk/metric/exemplar
 go.opentelemetry.io/otel/sdk/metric/internal
 go.opentelemetry.io/otel/sdk/metric/internal/aggregate
+go.opentelemetry.io/otel/sdk/metric/internal/attrnorm
+go.opentelemetry.io/otel/sdk/metric/internal/observ
+go.opentelemetry.io/otel/sdk/metric/internal/reservoir
 go.opentelemetry.io/otel/sdk/metric/internal/x
 go.opentelemetry.io/otel/sdk/metric/metricdata
-# go.opentelemetry.io/otel/trace v1.43.0
+# go.opentelemetry.io/otel/trace v1.45.0
 ## explicit; go 1.25.0
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
@@ -286,7 +293,7 @@ golang.org/x/net/idna
 golang.org/x/net/internal/httpcommon
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/sys v0.43.0
+# golang.org/x/sys v0.47.0
 ## explicit; go 1.25.0
 golang.org/x/sys/unix
 golang.org/x/sys/windows
