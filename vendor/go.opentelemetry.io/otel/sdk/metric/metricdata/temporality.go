@@ -3,14 +3,14 @@
 
 //go:generate stringer -type=Temporality
 
-package metricdata // import "go.opentelemetry.io/otel/sdk/metric/metricdata"
+package metricdata
 
 // Temporality defines the window that an aggregation was calculated over.
 type Temporality uint8
 
 const (
 	// undefinedTemporality represents an unset Temporality.
-	//nolint:deadcode,unused,varcheck
+	//nolint:unused
 	undefinedTemporality Temporality = iota
 
 	// CumulativeTemporality defines a measurement interval that continues to
