@@ -4,6 +4,7 @@ import (
 	"context"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/crazy-max/swarm-cronjob/internal/docker"
@@ -22,13 +23,14 @@ const reconcileInterval = time.Minute
 
 // SwarmCronjob represents an active swarm-cronjob object
 type SwarmCronjob struct {
-	docker docker.Client
-	cron   *cron.Cron
-	jobs   map[string]cron.EntryID
+	docker        docker.Client
+	cron          *cron.Cron
+	jobs          map[string]cron.EntryID
+	serviceLabels []string
 }
 
 // New creates new swarm-cronjob instance
-func New() (*SwarmCronjob, error) {
+func New(serviceLabels ...string) (*SwarmCronjob, error) {
 	log.Debug().Msg("Creating Docker API client")
 	d, err := docker.NewEnvClient()
 
@@ -37,7 +39,8 @@ func New() (*SwarmCronjob, error) {
 		cron: cron.New(cron.WithParser(cron.NewParser(
 			cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor),
 		)),
-		jobs: make(map[string]cron.EntryID),
+		jobs:          make(map[string]cron.EntryID),
+		serviceLabels: slices.Clone(serviceLabels),
 	}, err
 }
 
@@ -120,11 +123,12 @@ func (sc *SwarmCronjob) Run(ctx context.Context) error {
 }
 
 func (sc *SwarmCronjob) reconcileJobs() error {
+	labels := append([]string{
+		"swarm.cronjob.enable",
+		"swarm.cronjob.schedule",
+	}, sc.serviceLabels...)
 	services, err := sc.docker.ServiceList(&model.ServiceListArgs{
-		Labels: []string{
-			"swarm.cronjob.enable",
-			"swarm.cronjob.schedule",
-		},
+		Labels: labels,
 	})
 	if err != nil {
 		return err
@@ -174,6 +178,14 @@ func (sc *SwarmCronjob) crudJob(serviceName string) (bool, error) {
 
 func (sc *SwarmCronjob) crudJobWithService(service *model.ServiceInfo, noopCountsAsProcessed bool) (bool, error) {
 	jobID, jobFound := sc.jobs[service.Name]
+	if !sc.matchesServiceLabels(service.Labels) {
+		if jobFound {
+			log.Info().Str("service", service.Name).Msg("Remove cronjob outside label filters")
+			sc.removeJob(service.Name, jobID)
+			return true, nil
+		}
+		return false, nil
+	}
 	var err error
 
 	wc := &worker.Client{
@@ -257,6 +269,17 @@ func (sc *SwarmCronjob) crudJobWithService(service *model.ServiceInfo, noopCount
 	sc.jobs[service.Name] = jobID
 	sc.logScheduledJob(service.Name, jobID)
 	return true, err
+}
+
+func (sc *SwarmCronjob) matchesServiceLabels(labels map[string]string) bool {
+	for _, filter := range sc.serviceLabels {
+		key, value, hasValue := strings.Cut(filter, "=")
+		actual, exists := labels[key]
+		if !exists || (hasValue && actual != value) {
+			return false
+		}
+	}
+	return true
 }
 
 func (sc *SwarmCronjob) removeJob(serviceName string, id cron.EntryID) {
