@@ -43,7 +43,7 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	sc, err := app.New()
+	sc, err := app.New(cli.ServiceLabel...)
 	if err != nil {
 		return errors.Wrap(err, "cannot initialize swarm-cronjob")
 	}
